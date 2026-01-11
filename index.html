@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tera Selection Journey</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <!-- GLOBAL LOGO (ทุกหน้า) -->
+  <div class="global-logo">
+    <!-- เปลี่ยนเป็น path โลโก้ของคุณได้ -->
+    <img src="./Logo%20Veichi.png" alt="TERA" />
+  </div>
+
+  <!-- PAGE: Landing -->
+  <section id="landing" class="page page-bg is-active">
+    <div class="bg-overlay"></div>
+    <div class="page-inner center">
+      <div class="hero">
+        <h1>บริษัท เทอรา กรุ้ป จำกัด</h1>
+        <p>ตอบคำถามที่เป็นตัวคุณมากที่สุด</p>
+        <p>ไม่มีถูกผิด</p>
+        <button class="btn btn-red" id="btnStart">เริ่ม</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: Profile -->
+  <section id="profile" class="page page-bg">
+    <div class="bg-overlay"></div>
+
+    <div class="page-inner">
+      <div class="profile-head">
+        <h2>ก่อนจะเดินต่อไป</h2>
+        <p>ขอทราบข้อมูลพื้นฐานเล็กน้อย เพื่อให้การประเมินต่อเนื่องสำหรับคุณ</p>
+      </div>
+
+      <div class="glass-card">
+        <form id="profileForm" novalidate>
+          <div class="grid2">
+            <label class="label">ชื่อ-นามสกุล</label>
+            <div>
+              <input id="userName" class="input" placeholder="ชื่อของคุณ" required />
+              <div class="err" id="errName">กรุณากรอกชื่อ-นามสกุล</div>
+            </div>
+
+            <label class="label">ตำแหน่งงานที่สมัคร</label>
+            <div>
+              <input id="userPosition" class="input" placeholder="ตำแหน่งงานที่สมัคร" required />
+              <div class="err" id="errPosition">กรุณากรอกตำแหน่งงานที่สมัคร</div>
+            </div>
+
+            <label class="label">ทราบจากช่องทาง</label>
+            <div>
+              <select id="userChannel" class="input" required>
+                <option value="" selected disabled>-- เลือกช่องทาง --</option>
+                <option>JOBDB</option>
+                <option>Facebook</option>
+                <option>TikTok</option>
+                <option>Website</option>
+                <option>เพื่อนแนะนำ</option>
+                <option>อื่น ๆ</option>
+              </select>
+              <div class="err" id="errChannel">กรุณาเลือกช่องทางที่ทราบข่าว</div>
+            </div>
+          </div>
+
+          <button class="btn btn-red btn-full" type="submit">ไปต่อ</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: Assessment -->
+  <section id="assessment" class="page page-bg">
+    <div class="bg-overlay dark"></div>
+
+    <div class="page-inner">
+      <div class="assess-top">
+        <div class="pill" id="progressPill">1/6</div>
+      </div>
+
+      <div class="assess-card">
+        <h2 id="questionText"></h2>
+        <div id="optionsContainer" class="options"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: Results -->
+  <section id="results" class="page page-bg">
+    <div class="bg-overlay"></div>
+
+    <div class="page-inner center">
+      <div class="result-card">
+        <h2>ขอบคุณสำหรับคำตอบ!</h2>
+        <p id="resultText"></p>
+      </div>
+    </div>
+  </section>
+
+  <script src="./app.js"></script>
+</body>
+</html>
