@@ -171,7 +171,7 @@ function pickAnswer(idx) {
 }
 
 function finishAssessment() {
-  const total = appData.answers.reduce((s,a) => s + Number(a.score || 0), 0);
+  const total = appData.answers.reduce((s, a) => s + Number(a.score || 0), 0);
 
   let result = "";
   if (total >= 24) result = "ผ่านการทดสอบยอดเยี่ยม: ผู้สมัครนี้มีทัศนคติที่ดีในทุกด้าน ทั้งความดี, ความซื่อสัตย์, ความมุ่งมั่น, ความพยายาม, ความเก่ง และความขยัน พวกเขามีการตัดสินใจที่ดีและสามารถรับมือกับสถานการณ์ที่ท้าทายได้ดีเยี่ยม";
@@ -179,11 +179,10 @@ function finishAssessment() {
   else if (total >= 12) result = "ผ่านการทดสอบแต่ต้องพัฒนาค่อนข้างเยอะ: ผู้สมัครนี้มีการตัดสินใจที่ดีในบางสถานการณ์ แต่บางครั้งยังลังเลหรือตัดสินใจช้าเกินไปในสถานการณ์ที่ต้องการความรวดเร็ว";
   else result = "ไม่ผ่านการทดสอบต้องพัฒนา: ผู้สมัครนี้ต้องพัฒนาในบางด้าน เช่น ความมุ่งมั่น ความพยายาม หรือความขยัน โดยเฉพาะเมื่อเผชิญกับสถานการณ์ที่ต้องการการตัดสินใจที่รวดเร็วและแน่วแน่";
 
-  // ✅ เก็บผลจริงไว้ส่งชีตเหมือนเดิม
   appData.resultText = result;
 
-  // ✅ ส่งเข้า Google Sheet (หลังบ้าน)
-  submitToSheet(total).catch(console.error);
+  // ✅ ส่งเข้า Google Sheet แบบเงียบๆ (ไม่เอา radarUrl มาแสดง)
+  submitToSheet(total).catch(err => console.error("submitToSheet failed:", err));
 
   // ✅ หน้าเว็บโชว์แค่ข้อความนี้
   $("resultText").textContent = "ขอให้คุณโชคดีในการสัมภาษณ์";
@@ -212,18 +211,13 @@ async function submitToSheet(totalScore) {
 
   const body = new URLSearchParams(payload);
 
-  // สำคัญ: ไม่ตั้ง header เอง → เป็น simple request → ไม่ preflight
-  const res = await fetch(SCRIPT_URL, {
+  // ✅ ไม่ตั้ง header เอง → simple request → ไม่ preflight
+  // ✅ ไม่อ่าน response → คนทำแบบทดสอบดูอะไรไม่ได้จากหน้าเว็บ
+  await fetch(SCRIPT_URL, {
     method: "POST",
-    body
+    body,
+    cache: "no-store"
   });
-
-  // ถ้าเปิดจาก local บางทีอ่าน response อาจไม่จำเป็น
-  // แต่โดยทั่วไปจะอ่านได้เมื่อ GAS อนุญาต Anyone
-  try {
-    const txt = await res.text();
-    console.log("Sheet response:", txt);
-  } catch (_) {}
 }
 
 /* ---------- Reset ---------- */
@@ -251,3 +245,23 @@ function genUUID_() {
 
 /* Start */
 showPage("landing");
+
+function showRadarUI(radarUrl) {
+  // 1) ถ้ามีลิงก์ให้คลิก
+  const a = $("radarLink");
+  if (a) {
+    a.href = radarUrl;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.style.display = "inline-flex";
+  }
+
+  // 2) ถ้ามี img ให้โชว์ภาพ (Google Drive view URL อาจฝังไม่ได้เสมอ)
+  // ถ้าฝังไม่ได้ ให้แสดงแค่ลิงก์ก็พอ
+  const img = $("radarImg");
+  if (img) {
+    img.src = radarUrl;
+    img.alt = "Radar Chart";
+    img.style.display = "block";
+  }
+}
