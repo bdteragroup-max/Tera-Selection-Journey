@@ -1,18 +1,9 @@
 'use strict';
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
+var appData = { currentQuestion: 0, answers: [], profile: {}, results: null };
 
-const appData = {
-  uuid: "",
-  currentQuestion: 0,
-  answers: [],
-  profile: { name: "", position: "", channel: "" },
-  resultText: "",
-  totalScore: 0,
-  radarUrl: ""
-};
-
-const questions = [
+var questions = [
   {
     chapter: '1.ความดี',
     question: 'เมื่อถูกล็อตเตอรี่รางวัลที่ 1 สิ่งแรกที่คุณจะทำคือ?',
@@ -83,47 +74,49 @@ function showPage(pageId) {
   $(pageId)?.classList.remove('hidden');
 }
 
-function genUUID_() {
-  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-  return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-}
-
-/* ----------------- Navigation ----------------- */
 function goToProfile() {
   showPage('profile');
 }
 
-/* ----------------- Start Assessment ----------------- */
-function startAssessment() {
-  const name = ($('userName')?.value || '').trim();
-  const position = ($('userPosition')?.value || '').trim();
-  const channel = ($('userChannel')?.value || '').trim();
+function validateProfileForm() {
+  const userName = document.getElementById("userName").value;
+  const userPosition = document.getElementById("userPosition").value;
+  const userChannel = document.getElementById("userChannel").value;
 
-  if (!name || !position || !channel) {
+  if (!userName || !userPosition || !userChannel) {
+    alert("กรุณากรอกข้อมูลทั้งหมด");
+    return false; // ไม่ส่งฟอร์ม
+  }
+
+  // ถ้าผ่านการตรวจสอบข้อมูลทั้งหมด
+  return true;
+}
+
+function startAssessment() {
+  const userName = document.getElementById("userName").value.trim();
+  const userPosition = document.getElementById("userPosition").value.trim();
+  const userChannel = document.getElementById("userChannel").value.trim();
+
+  if (!userName || !userPosition || !userChannel) {
     alert("กรุณากรอกข้อมูลทั้งหมด");
     return;
   }
 
-  appData.uuid = genUUID_(); // ✅ สร้างครั้งเดียว
-  appData.profile = { name, position, channel };
-  appData.currentQuestion = 0;
-  appData.answers = [];
-  appData.resultText = "";
-  appData.totalScore = 0;
-  appData.radarUrl = "";
-
+  // ถ้าผ่านการตรวจสอบข้อมูลทั้งหมด
+  appData.profile = { name: userName, position: userPosition, channel: userChannel };
   showPage('assessment');
   renderQuestion();
 }
 
-/* ----------------- Render Question ----------------- */
 function renderQuestion() {
   const q = questions[appData.currentQuestion];
   if (!q) return;
 
+  // progress
   const pill = $('progressPill');
   if (pill) pill.textContent = (appData.currentQuestion + 1) + '/' + questions.length;
 
+  // text
   if ($('questionText')) $('questionText').textContent = q.question || '';
 
   const box = $('optionsContainer');
@@ -157,15 +150,16 @@ function handleAnswerClick(ev) {
     if (buttons[i].disabled) return;
   }
 
+  // ✅ บันทึกคำตอบ
   const picked = q.options[idx];
-
-  // ✅ เก็บแบบเดียวกับ GAS ต้องการ: {text, score}
-  appData.answers.push({ text: picked.text, score: picked.score });
+  appData.answers.push(picked);
 
   // UI selected
   btn.classList.add('is-selected');
+
   const oldCheck = btn.querySelector('.option-check');
   if (oldCheck) oldCheck.remove();
+
   const check = document.createElement('span');
   check.className = 'option-check';
   check.textContent = '✓';
@@ -179,47 +173,60 @@ function handleAnswerClick(ev) {
       appData.currentQuestion++;
       renderQuestion();
     } else {
-      finishAssessment();
+      calculateResults();
     }
-  }, 260);
+  }, 300);
 }
 
-/* ----------------- Finish & Submit ----------------- */
-function finishAssessment() {
-  const totalScore = appData.answers.reduce((sum, ans) => sum + Number(ans.score || 0), 0);
-  appData.totalScore = totalScore;
+function calculateResults() {
+  const totalScore = appData.answers.reduce((sum, ans) => sum + ans.score, 0);
 
   let result = '';
-  if (totalScore >= 24) {
+  if (totalScore >= 24 && totalScore <= 26) {
     result = 'ผ่านการทดสอบยอดเยี่ยม: ผู้สมัครนี้มีทัศนคติที่ดีในทุกด้าน';
-  } else if (totalScore >= 18) {
+  } else if (totalScore >= 18 && totalScore <= 23) {
     result = 'ผ่านการทดสอบและพัฒนาบางทักษะ: ผู้สมัครนี้มีความสามารถในการตัดสินใจที่ดีในหลายๆ ด้าน';
-  } else if (totalScore >= 12) {
+  } else if (totalScore >= 12 && totalScore <= 17) {
     result = 'ผ่านการทดสอบแต่ต้องพัฒนาค่อนข้างเยอะ: ผู้สมัครนี้มีการตัดสินใจที่ดีในบางสถานการณ์';
-  } else {
+  } else if (totalScore >= 6 && totalScore <= 11) {
     result = 'ไม่ผ่านการทดสอบต้องพัฒนา: ผู้สมัครนี้ต้องพัฒนาในบางด้าน';
   }
 
-  appData.resultText = result;
+  appData.results = result;
 
-  // แสดงหน้าผลลัพธ์ก่อน (ไม่บล็อค)
-  showResults();
+  // ส่งข้อมูลขึ้นชีต (ไม่บล็อก UI)
+  submitToGoogleSheet().catch(err => console.error("❌ submit error", err));
 
-  // ส่งข้อมูล + รอ radarUrl แล้วอัปเดตรูป
-  submitToGoogleSheet()
-    .then(() => updateRadarUI_())
-    .catch(err => console.error("❌ submit error", err));
+  showResults(result);
 }
 
-/* ----------------- Results UI ----------------- */
-function showResults() {
-  // ✅ หน้า Results ให้ขึ้นข้อความนี้ตามที่คุณต้องการ
-  if ($('resultText')) $('resultText').textContent = "ขอให้คุณโชคดีในการสัมภาษณ์";
+function showResults(result) {
+  if ($('resultText')) $('resultText').textContent = result;
 
-  // (ถ้าคุณอยากโชว์ resultText จริงด้วย เอา comment ออก)
-  // if ($('resultText')) $('resultText').textContent = appData.resultText;
+  // ซ่อนปุ่มแชร์และทำใหม่
+  const resultsActions = document.querySelector('.results-actions');
+  if (resultsActions) {
+    // ลบปุ่มแชร์ผลลัพธ์ออก
+    const shareButton = resultsActions.querySelector('.btn-tera.primary');
+    if (shareButton) {
+      shareButton.style.display = 'none';
+    }
 
-  // ซ่อนการ์ดอื่น ๆ ตามเดิม
+    // เปลี่ยนปุ่ม "ทำใหม่" ให้ทำการรีเซ็ตเมื่อคลิก
+    const resetButton = resultsActions.querySelector('.btn-tera.ghost');
+    if (resetButton) {
+      resetButton.textContent = "ทำใหม่";
+      resetButton.onclick = function () {
+        resetAssessment();
+      };
+    }
+  }
+
+  // ปิดการแก้ไขข้อมูลในฟอร์ม
+  const profileInputs = document.querySelectorAll('.form-input');
+  profileInputs.forEach(input => input.disabled = true);
+
+  // ซ่อนคำอธิบายของการประเมิน
   const primaryCard = $('primaryCard');
   const secondaryCard = $('secondaryCard');
   const insightCards = document.querySelectorAll('.insight-card');
@@ -228,124 +235,81 @@ function showResults() {
   if (secondaryCard) secondaryCard.style.display = 'none';
   insightCards.forEach(card => card.style.display = 'none');
 
-  // ปุ่มทำใหม่
-  const resultsActions = document.querySelector('.results-actions');
-  if (resultsActions) {
-    const shareButton = resultsActions.querySelector('.btn-tera.primary');
-    if (shareButton) shareButton.style.display = 'none';
-
-    const resetButton = resultsActions.querySelector('.btn-tera.ghost');
-    if (resetButton) {
-      resetButton.textContent = "ทำใหม่";
-      resetButton.onclick = resetAssessment;
-    }
-  }
-
+  // แสดงผลหน้า "ขอบคุณ" และคำแนะนำ
   showPage('results');
 }
 
-/**
- * ✅ สร้างพื้นที่โชว์เรดาร์ในหน้า results
- * ต้องมี <div id="radarWrap"></div> ในหน้า results (ถ้ายังไม่มี เดี๋ยวผมบอก HTML ให้)
- */
-function updateRadarUI_() {
-  const wrap = $('radarWrap');
-  if (!wrap) return;
-
-  wrap.innerHTML = '';
-
-  if (!appData.radarUrl) {
-    wrap.innerHTML = `<div style="color:#fff;opacity:.85;margin-top:12px;">กำลังสร้างเรดาร์ หรือไม่มีลิงก์เรดาร์</div>`;
+async function submitToGoogleSheet() {
+  if (!SCRIPT_URL) {
+    console.error("SCRIPT_URL ว่าง");
     return;
   }
 
-  // แสดงภาพเรดาร์
-  const img = document.createElement('img');
-  img.src = appData.radarUrl;
-  img.alt = 'Radar Chart';
-  img.style.maxWidth = '760px';
-  img.style.width = '100%';
-  img.style.borderRadius = '16px';
-  img.style.boxShadow = '0 18px 50px rgba(0,0,0,.35)';
-  img.style.marginTop = '14px';
-
-  // ปุ่มเปิดในแท็บใหม่
-  const a = document.createElement('a');
-  a.href = appData.radarUrl;
-  a.target = '_blank';
-  a.rel = 'noopener';
-  a.textContent = 'เปิดเรดาร์ในแท็บใหม่';
-  a.style.display = 'inline-block';
-  a.style.marginTop = '10px';
-  a.style.color = '#fff';
-  a.style.fontWeight = '800';
-  a.style.textDecoration = 'underline';
-
-  wrap.appendChild(img);
-  wrap.appendChild(a);
-}
-
-/* ----------------- Submit to GAS (สำคัญ) ----------------- */
-async function submitToGoogleSheet() {
-  if (!SCRIPT_URL) throw new Error("SCRIPT_URL ว่าง");
-
-  // ✅ field ต้องตรงกับ doPost ใน GAS
+  const uuid = genUUID_();
   const payload = {
-    uuid: appData.uuid,
-    name: appData.profile.name,
-    position: appData.profile.position,
-    channel: appData.profile.channel,
-    totalScore: String(appData.totalScore),
-    resultText: appData.resultText,
-    answersCount: String(appData.answers.length),
-    answers: JSON.stringify(appData.answers),
-    userAgent: navigator.userAgent,
-    pageUrl: location.href
+    uuid: uuid,
+    ts: new Date().toISOString(),
+    name: appData.profile?.name || '',
+    position: appData.profile?.position || '',
+    results: appData.results,
+    answersCount: (appData.answers || []).length
   };
 
-  // ✅ ใช้ URLSearchParams และไม่ตั้ง headers → ลดปัญหา CORS / preflight
-  const body = new URLSearchParams(payload);
-
-  const res = await fetch(SCRIPT_URL, {
-    method: "POST",
-    body
-  });
-
-  const txt = await res.text();
-  console.log("Sheet response:", txt);
-
-  // ✅ GAS ส่งกลับ { ok:true, status:"ok", radarUrl:"..." }
   try {
-    const json = JSON.parse(txt);
-    if (json && json.ok) {
-      if (json.radarUrl) appData.radarUrl = json.radarUrl;
-      return json;
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "cors",  // ใช้ "cors" แทน "no-cors"
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error("Error sending data to Google Sheets: " + response.statusText);
     }
-    throw new Error(json?.message || "GAS returned not ok");
-  } catch (e) {
-    // ถ้า parse ไม่ได้ แสดงว่าไม่ได้คืน JSON จริง
-    throw new Error("Invalid response from GAS: " + txt);
+
+    console.log("✅ Sent to Google Sheets successfully!");
+  } catch (err) {
+    console.error("❌ Error sending data:", err);
   }
 }
 
-/* ----------------- Reset ----------------- */
-function resetAssessment() {
-  appData.uuid = "";
+// Function to generate a unique identifier
+function genUUID_() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+}
+
+// Initialization to start the quiz
+function startAssessment() {
+  const name = ($('userName')?.value || '').trim();
+  const position = ($('userPosition')?.value || '').trim();
+
+  appData.profile = { name, position };
   appData.currentQuestion = 0;
   appData.answers = [];
-  appData.profile = { name: "", position: "", channel: "" };
-  appData.resultText = "";
-  appData.totalScore = 0;
-  appData.radarUrl = "";
+  appData.results = null;
 
+  showPage('assessment');
+  renderQuestion();
+}
+
+function resetAssessment() {
+  // รีเซ็ตคำตอบทั้งหมด
+  appData.currentQuestion = 0;
+  appData.answers = [];
+  appData.profile = {};
+  appData.results = null;
+
+  // รีเซ็ตข้อมูลในฟอร์ม
   if ($('userName')) $('userName').value = '';
   if ($('userPosition')) $('userPosition').value = '';
   if ($('userChannel')) $('userChannel').value = '';
 
+  // แสดงหน้า Landing
   showPage('landing');
 }
 
-/* expose */
+// ต้องมีการประกาศฟังก์ชัน goToProfile เพื่อให้เรียกใช้งานได้
 window.goToProfile = goToProfile;
 window.startAssessment = startAssessment;
 window.resetAssessment = resetAssessment;
