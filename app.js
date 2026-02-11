@@ -25,7 +25,7 @@ const questions = [
   {
     chapter: "2.ความซื่อสัตย์",
     question: "คุณกำลังจะออกจากบ้านไปขึ้นเงินล็อตเตอรี่ แต่ดันเจอเงินแสนตกอยู่หน้าบ้าน คุณจะ?",
-    options: [ 
+    options: [
       { text: "ตามหาเจ้าของเงิน", score: 4 },
       { text: "เอาเงินไปส่งให้ตำรวจ", score: 3 },
       { text: "เก็บไว้เองก่อน", score: 2 },
@@ -219,7 +219,7 @@ function finishAssessment() {
     targetURL = pos.match(/manager|ผู้จัดการ|หัวหน้า|mgr/) ? "exam-accounting-manager.html" : "exam-accounting.html";
   }
   // กลุ่มสาขา
-  else if (pos.match(/สาขา|branch/)) {
+  else if (pos.match(/สาขา|branch|แอดมิน|admin/)) {
     targetURL = pos.match(/manager|ผู้จัดการ|หัวหน้า|mgr/) ? "exam-branch-manager.html" : "exam-branch-admin.html";
   }
   // กลุ่ม IT/BD
@@ -335,7 +335,4 @@ window.goHome = function () {
   window.location.href = "index.html";
 };
 
-
 showPage("landing");
-
-
