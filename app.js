@@ -201,7 +201,7 @@ function finishAssessment() {
   // 2. เกณฑ์ HR
   let hrStatus = total >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : total >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน";
 
-  appData.resultText = attitudeResult;
+  appData.resultText = result;
   appData.hrRecommendation = hrStatus;
 
   // ส่งข้อมูลลง Sheet
