@@ -96,7 +96,7 @@
         const urlParams = new URLSearchParams(window.location.search);
 
         const userName = urlParams.get('name') || 'ผู้สมัคร';
-        const userPos = urlParams.get('position') || 'HR';
+        const userPos = urlParams.get('position') || 'Branch_Admin';
         const uuid = urlParams.get('uuid') || "no-uuid";
         const questions = [
             { q: "1. หน้าที่หลักของพนักงานธุรการสาขาคือข้อใด?", options: ["ก. การกำหนดกลยุทธ์ระดับมหาภาค", "ข. การซ่อมแซมโครงสร้างพื้นฐานด้วยตนเอง", "ค. การบริหารจัดการงานเอกสาร ข้อมูล และประสานงานสนับสนุน", "ง. การปฏิบัติหน้าที่ขายเพื่อปิดยอดเพียงอย่างเดียว"], ans: 2 },
@@ -266,4 +266,5 @@
 
 
 </html>
+
 
