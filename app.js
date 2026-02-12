@@ -215,12 +215,12 @@ function finishAssessment() {
   let targetURL = "";
 
   // กลุ่มบัญชี
-  if (pos.match(/บัญชี|บช|acc|fin|audit|เงิน/)) {
-    targetURL = pos.match(/accounting manager|ผู้จัดการบัญชี|หัวหน้าบัญชี/) ? "exam-accounting-manager.html" : "exam-accounting.html";
+  if (pos.match(/บัญชี|บช|acc|fin|audit|เงิน|ap|ar/)) {
+    targetURL = pos.match(/accounting manager|ผู้จัดการบัญชี|หัวหน้าบัญชี|ผู้จัดการการเงิน|ผู้จัดการบัญชี/การเงิน/) ? "exam-accounting-manager.html" : "exam-accounting.html";
   }
   // กลุ่มสาขา
-  else if (pos.match(/branch|แอดมิน|admin|ธุการ|ธุรการประสานงาน|ประสานงาน|/)) {
-    targetURL = pos.match(/manager|ผู้จัดการสาขา|หัวหน้า/) ? "exam-branch-manager.html" : "exam-branch-admin.html";
+  else if (pos.match(/แอดมิน|admin|ธุการ|ธุรการประสานงาน|ประสานงาน|/)) {
+    targetURL = pos.match(/manager|ผู้จัดการสาขา|หัวหน้าสาขา/) ? "exam-branch-manager.html" : "exam-branch-admin.html";
   }
   // กลุ่ม IT/BD
   else if (pos.match(/developer|dev|bd/)) {
@@ -245,7 +245,7 @@ function finishAssessment() {
     targetURL = "exam-engineer.html";
   }
   // กลุ่มบริการ
-  else if (pos.match(/บริการ|service/)) {
+  else if (pos.match(/บริการ|service|เซอร์วิส/)) {
     targetURL = "exam-service.html";
   }
   // กลุ่มคลังสินค้า
@@ -336,6 +336,7 @@ window.goHome = function () {
 };
 
 showPage("landing");
+
 
 
 
