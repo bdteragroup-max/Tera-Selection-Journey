@@ -219,7 +219,7 @@ function finishAssessment() {
     targetURL = pos.match(/accounting manager|ผู้จัดการบัญชี|หัวหน้าบัญชี/) ? "exam-accounting-manager.html" : "exam-accounting.html";
   }
   // กลุ่มสาขา
-  else if (pos.match(/สาขา|branch|แอดมิน|admin|ธุการ|ธุรการประสานงาน/)) {
+  else if (pos.match(/branch|แอดมิน|admin|ธุการ|ธุรการประสานงาน/)) {
     targetURL = pos.match(/manager|ผู้จัดการสาขา|หัวหน้า/) ? "exam-branch-manager.html" : "exam-branch-admin.html";
   }
   // กลุ่ม IT/BD
@@ -336,6 +336,7 @@ window.goHome = function () {
 };
 
 showPage("landing");
+
 
 
 
