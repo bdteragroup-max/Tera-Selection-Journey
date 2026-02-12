@@ -238,7 +238,7 @@ function finishAssessment() {
     targetURL = "exam-purchasing.html";
   }
   // กลุ่มช่าง/วิศวกร
-  else if (pos.match(/ช่าง|ไฟ|electric/)) {
+  else if (pos.match(/ช่าง|ไฟ|electric|ช่างไฟฟ้า/)) {
     targetURL = "exam-electrician.html";
   }
   else if (pos.match(/วิศวกร|engineer/)) {
@@ -336,6 +336,7 @@ window.goHome = function () {
 };
 
 showPage("landing");
+
 
 
 
