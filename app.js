@@ -216,7 +216,7 @@ function finishAssessment() {
 
   // กลุ่มบัญชี
   if (pos.match(/บัญชี|บช|acc|fin|audit|เงิน|ap|ar/)) {
-    targetURL = pos.match(/accounting manager|ผู้จัดการบัญชี|หัวหน้าบัญชี|ผู้จัดการการเงิน|ผู้จัดการบัญชี/การเงิน/) ? "exam-accounting-manager.html" : "exam-accounting.html";
+    targetURL = pos.match(/accounting manager|ผู้จัดการบัญชี|หัวหน้าบัญชี|ผู้จัดการการเงิน|/) ? "exam-accounting-manager.html" : "exam-accounting.html";
   }
   // กลุ่มสาขา
   else if (pos.match(/แอดมิน|admin|ธุการ|ธุรการประสานงาน|ประสานงาน|/)) {
@@ -336,6 +336,7 @@ window.goHome = function () {
 };
 
 showPage("landing");
+
 
 
 
