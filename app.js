@@ -216,11 +216,11 @@ function finishAssessment() {
 
   // กลุ่มบัญชี
   if (pos.match(/บัญชี|บช|acc|fin|audit|เงิน/)) {
-    targetURL = pos.match(/manager|ผู้จัดการบัญชี|หัวหน้าบัญชี/) ? "exam-accounting-manager.html" : "exam-accounting.html";
+    targetURL = pos.match(/accounting manager|ผู้จัดการบัญชี|หัวหน้าบัญชี/) ? "exam-accounting-manager.html" : "exam-accounting.html";
   }
   // กลุ่มสาขา
   else if (pos.match(/สาขา|branch|แอดมิน|admin/)) {
-    targetURL = pos.match(/manager|ผู้จัดการสาขา|หัวหน้า/) ? "exam-branch-manager.html" : "exam-branch-admin.html";
+    targetURL = pos.match(/manager|ผู้จัดการสาขา|หัวหน้า|ธุการ/) ? "exam-branch-manager.html" : "exam-branch-admin.html";
   }
   // กลุ่ม IT/BD
   else if (pos.match(/developer|dev|bd/)) {
@@ -336,4 +336,5 @@ window.goHome = function () {
 };
 
 showPage("landing");
+
 
