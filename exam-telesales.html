@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>TeleSales Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,108 +51,342 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        .cat-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: rgba(241, 196, 15, 0.7);
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.03em;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบทักษะและความเชี่ยวชาญ Telesales</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง TeleSales</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <form id="telesalesForm">
-            <div id="questionsContainer"></div>
-            <button type="submit" class="btn-submit">ส่งคำตอบและบันทึกคะแนน</button>
-        </form>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง TeleSales",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: TeleSales",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            // Section 1
+            {
+                q: "1. เมื่อลูกค้าบอกว่า 'ไม่ว่างคุย' ในช่วงต้นของการสนทนา คุณควรทำอย่างไร?",
+                qEn: "1. When a customer says 'I'm busy' at the start of a call, what should you do?",
+                options: ["ก. พยายามพูดเร็วๆ เพื่อให้จบสคริปต์ก่อนลูกค้าวางสาย", "ข. ขออนุญาตให้ข้อมูลสั้นๆ เพียง 30 วินาที เพื่อประเมินความสนใจ", "ค. ขอบคุณและวางสายทันที", "ง. ถามว่า 'ยุ่งเรื่องอะไรอยู่ครับ/คะ?'"],
+                optionsEn: ["A. Try to speak quickly to finish the script before the customer hangs up.", "B. Ask for just 30 seconds to share a brief point and gauge their interest.", "C. Thank the customer and hang up immediately.", "D. Ask 'What are you busy with right now?'"],
+                cat: "หมวดที่ 1: ทักษะและความเชี่ยวชาญในการขาย",
+                catEn: "Section 1: Sales Skills & Expertise",
+                ans: 2
+            },
+            {
+                q: "2. การทำ 'Active Listening' (การฟังเชิงรุก) สำคัญอย่างไรกับ Telesales?",
+                qEn: "2. Why is 'Active Listening' important in Telesales?",
+                options: ["ก. ช่วยให้พูดได้น้อยลง แต่ขายได้มากขึ้น", "ข. ช่วยควบคุมบทสนทนาอย่างนุ่มนวล โดยการทวนความ, สรุป, และขอความยืนยัน", "ค. ช่วยจับสัญญาณซื้อและเปลี่ยนกลยุทธ์ทันที", "ง. ช่วยวินิจฉัยปัญหา-วางโจทย์ แบบที่ปรึกษา"],
+                optionsEn: ["A. It allows you to speak less but sell more.", "B. It helps guide the conversation smoothly through reflection, summarising, and confirming.", "C. It helps detect buying signals and pivot strategy instantly.", "D. It helps diagnose problems and frame challenges like a consultant."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            {
+                q: "3. ขั้นตอนใดสำคัญที่สุดก่อนเริ่มโทรหาลูกค้า (Cold Calling)?",
+                qEn: "3. Which step is most important before starting a Cold Call?",
+                options: ["ก. ทำ Pre-call Research ขั้นต่ำให้รู้บริบทลูกค้า", "ข. เตรียม Value Proposition แบบ 1 ประโยคที่ผูกกับ Pain", "ค. ตั้งเป้าหมายของสายให้ชัดเจน (Objective-first)", "ง. เตรียมแผนรับมือการปฏิเสธ (Objection Map)"],
+                optionsEn: ["A. Conduct minimum pre-call research to understand the customer's context.", "B. Prepare a one-sentence Value Proposition tied to a specific pain point.", "C. Define a clear call objective before dialling (Objective-first).", "D. Prepare an objection-handling plan (Objection Map)."],
+                cat: null, catEn: null,
+                ans: 2
+            },
+            {
+                q: "4. หากลูกค้าถามคำถามเชิงเทคนิคที่คุณไม่รู้คำตอบ คุณควรทำอย่างไร?",
+                qEn: "4. If a customer asks a technical question you cannot answer, what should you do?",
+                options: ["ก. ขออนุญาตสะท้อนโจทย์และคัดกรองให้ชัดก่อน", "ข. ยอมรับอย่างมืออาชีพ + ยืนยันความถูกต้องก่อนตอบ", "ค. เบี่ยงประเด็นกลับไปที่โปรโมชัน/ราคาทันที", "ง. ตอบแบบคาดเดาคร่าวๆ ไปก่อน"],
+                optionsEn: ["A. Ask permission to reflect the question back and clarify it first.", "B. Acknowledge professionally and confirm the correct answer before responding.", "C. Immediately redirect the topic to promotions or pricing.", "D. Give a rough guess for the time being."],
+                cat: null, catEn: null,
+                ans: 2
+            },
+            {
+                q: "5. 'Up-selling' หมายถึงข้อใด?",
+                qEn: "5. Which best describes 'Up-selling'?",
+                options: ["ก. การเสนอ รุ่น/แพ็กเกจที่มูลค่าสูงกว่า จากตัวเลือกที่ลูกค้าสนใจ", "ข. การลดราคาเพื่อเร่งการตัดสินใจ", "ค. การโน้มน้าวให้ลูกค้าซื้อจำนวนมากขึ้นในรุ่นเดิม", "ง. การเสนอสินค้าที่เกี่ยวข้องเพิ่มเติม (Cross-sell)"],
+                optionsEn: ["A. Offering a higher-value model or package than the one the customer is considering.", "B. Reducing the price to accelerate the customer's decision.", "C. Persuading the customer to buy a larger quantity of the same product.", "D. Offering additional related products (Cross-sell)."],
+                cat: null, catEn: null,
+                ans: 0
+            },
+            {
+                q: "6. ข้อใดคือลักษณะของ 'น้ำเสียง' ที่สร้างความน่าเชื่อถือที่สุด?",
+                qEn: "6. Which vocal style builds the most credibility?",
+                options: ["ก. น้ำเสียงตื่นเต้น พูดเร็ว มีพลังสูง", "ข. น้ำเสียงนิ่ง มั่นคง จังหวะพอดี มีโทนให้คำปรึกษา", "ค. น้ำเสียงเป็นกันเองมาก พูดเล่น/แซว", "ง. น้ำเสียงสุภาพมาก พูดเบาๆ นุ่มนวลตลอด"],
+                optionsEn: ["A. Excited, fast-paced, and high-energy.", "B. Calm, steady, well-paced, and consultative in tone.", "C. Very casual, playful, and joking.", "D. Extremely polite, soft, and gentle throughout."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            {
+                q: "7. เมื่อลูกค้าถามเรื่อง 'เปรียบเทียบกับคู่แข่ง' คุณควรทำอย่างไร?",
+                qEn: "7. When a customer asks you to compare your product with a competitor's, what should you do?",
+                options: ["ก. พูดให้ชนะด้วยการตำหนิคู่แข่งตรงๆ", "ข. ปฏิเสธการเปรียบเทียบทั้งหมดเพราะเป็นเรื่องอ่อนไหว", "ค. ใช้กรอบคำถามคัดกรองก่อนเปรียบเทียบ", "ง. ตอบแบบยึดเกณฑ์วัดผลที่ตรวจสอบได้และผูกกับหน้างานลูกค้า"],
+                optionsEn: ["A. Win by directly criticising the competitor.", "B. Refuse any comparison as it is a sensitive topic.", "C. Use a qualifying question framework before making any comparison.", "D. Answer based on verifiable criteria tied to the customer's specific use case."],
+                cat: null, catEn: null,
+                ans: 2
+            },
+            // Section 2
+            {
+                q: "8. ในการบันทึกข้อมูลลูกค้าหลังการโทร สิ่งใดสำคัญที่สุด?",
+                qEn: "8. When logging customer information after a call, what is most important?",
+                options: ["ก. บันทึกให้ละเอียดที่สุดเท่าที่ทำได้ทุกประโยค", "ข. บันทึกข้อมูลที่ทำให้ทีมทำงานต่อได้ทันที (Actionable CRM Note)", "ค. บันทึกความรู้สึกและท่าทีของลูกค้าเป็นหลัก", "ง. บันทึกเฉพาะข้อมูลติดต่อพื้นฐาน"],
+                optionsEn: ["A. Record every sentence in as much detail as possible.", "B. Record information that allows the team to take immediate next steps (Actionable CRM Note).", "C. Focus primarily on recording the customer's emotions and attitudes.", "D. Record only basic contact details."],
+                cat: "หมวดที่ 2: ความถูกต้องและละเอียดรอบคอบ",
+                catEn: "Section 2: Accuracy & Attention to Detail",
+                ans: 1
+            },
+            {
+                q: "9. หากคุณพบว่าข้อมูลที่แจ้งลูกค้าไปเมื่อครู่ 'ผิดพลาด' คุณควรทำอย่างไร?",
+                qEn: "9. If you realise you gave a customer incorrect information moments ago, what should you do?",
+                options: ["ก. แก้ไขทันทีแบบโปร่งใส ขอโทษและให้ข้อมูลที่ถูกต้อง", "ข. รอให้ลูกค้าทักกลับหรือถามซ้ำก่อนค่อยแก้", "ค. ควบคุมความเสี่ยงก่อน โดยทวนสิ่งที่แจ้งว่าอาจไม่ชัดเจนและขอเช็คข้อมูล", "ง. รีบโทรกลับแก้ทันทีแต่พูดแบบคลุมเครือไม่ยอมรับว่าผิด"],
+                optionsEn: ["A. Correct it immediately, transparently apologise, and provide the accurate information.", "B. Wait for the customer to follow up or ask again before correcting it.", "C. Manage the risk first by revisiting what was said as potentially unclear and requesting to verify.", "D. Call back quickly to correct it but speak vaguely without admitting the mistake."],
+                cat: null, catEn: null,
+                ans: 2
+            },
+            {
+                q: "10. การแจ้ง 'เงื่อนไขและข้อตกลง' (Terms & Conditions) ควรทำอย่างไร?",
+                qEn: "10. How should 'Terms & Conditions' be communicated to a customer?",
+                options: ["ก. แจ้งเฉพาะส่วนที่เป็นข้อดีเพื่อให้ปิดการขายง่าย", "ข. แจ้งแบบโปร่งใส-เป็นขั้นตอน-ยืนยันความเข้าใจ", "ค. แจ้งรวดเดียวทั้งหมดแบบละเอียดมาก", "ง. แจ้งเมื่อใกล้โอนหรือใกล้ปิดดีลเท่านั้น"],
+                optionsEn: ["A. Disclose only the benefits to make closing easier.", "B. Communicate transparently, step by step, confirming understanding at each stage.", "C. Deliver everything at once in a single, highly detailed block.", "D. Only disclose them just before payment or deal closure."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            {
+                q: "11. สิ่งใดคือความผิดพลาดร้ายแรงที่สุดในการยืนยันคำสั่งซื้อ?",
+                qEn: "11. What is the most critical mistake when confirming a purchase order?",
+                options: ["ก. ลืมพูดขอบคุณลูกค้า", "ข. ยืนยันโดยไม่ให้ลูกค้ายืนยันรายละเอียดสำคัญแบบทวนกลับ", "ค. ใช้คำพูดเชิงบังคับเร่งให้โอน", "ง. ยืนยันกับผู้ประสานงานโดยไม่เช็คอำนาจตัดสินใจ"],
+                optionsEn: ["A. Forgetting to thank the customer.", "B. Confirming without having the customer verify key details by reading them back.", "C. Using pressuring language to rush the payment.", "D. Confirming with a coordinator without verifying their decision-making authority."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            {
+                q: "12. เมื่อต้องอ่านสคริปต์ที่กฎหมายบังคับ (เช่น PDPA) คุณควรทำอย่างไร?",
+                qEn: "12. When you must read a legally required script (e.g. PDPA consent), what is the best approach?",
+                options: ["ก. อ่านรวดเดียวให้จบเร็วที่สุด", "ข. จัดเป็นขั้นตอนกำกับความยินยอมแบบมืออาชีพและชัดเจน", "ค. สรุปใจความเองโดยไม่ต้องตามข้อความมาตรฐาน", "ง. อ่านให้ครบแต่กระชับและเป็นธรรมชาติ"],
+                optionsEn: ["A. Read through it as quickly as possible in one go.", "B. Structure it as a step-by-step consent process in a professional and clear manner.", "C. Summarise it in your own words without following the standard text.", "D. Read it in full but keep it concise and natural-sounding."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            // Section 3
+            {
+                q: "13. ลูกค้ากำลังโมโหและต่อว่าสินค้าของบริษัทด้วยถ้อยคำรุนแรง คุณควรทำอย่างไร?",
+                qEn: "13. A customer is angry and criticising your company's product using harsh language. What should you do?",
+                options: ["ก. โต้กลับด้วยเหตุผลชี้แจงว่าลูกค้าใช้ผิดวิธี", "ข. วางขอบเขตการสื่อสารอย่างสุภาพและขอพักสาย", "ค. ตั้งสติและลดอุณหภูมิอารมณ์ รับฟังและเสนอขั้นตอนแก้ไข", "ง. รีบเสนอส่วนลดทันทีเพื่อให้หยุดโมโห"],
+                optionsEn: ["A. Counter with reasoning and point out that the customer is using the product incorrectly.", "B. Politely set a communication boundary and request a brief pause.", "C. Stay composed, de-escalate the emotion, listen, and offer a clear resolution path.", "D. Immediately offer a discount to stop the anger."],
+                cat: "หมวดที่ 3: การแก้ปัญหาเฉพาะหน้า",
+                catEn: "Section 3: On-the-Spot Problem Solving",
+                ans: 2
+            },
+            {
+                q: "14. ถ้าลูกค้าบอกว่า 'ราคาแพงเกินไป' วิธีแก้ปัญหาที่ดีที่สุดคือ?",
+                qEn: "14. If a customer says 'It's too expensive', what is the best response?",
+                options: ["ก. ตัดบทเรื่องราคาแล้วดึงกลับไปคุยของแถม", "ข. รีบเสนอส่วนลดทันทีเพื่อปิดดีล", "ค. ลดแรงต้านก่อน แล้ววินิจฉัยคำว่าแพงให้ชัด", "ง. อธิบายคุณภาพสเปกแบบยาวๆ"],
+                optionsEn: ["A. Cut off the price discussion and redirect to value-adds or freebies.", "B. Immediately offer a discount to close the deal.", "C. Reduce resistance first, then diagnose exactly what 'expensive' means to the customer.", "D. Launch into a lengthy explanation of the product's quality and specifications."],
+                cat: null, catEn: null,
+                ans: 2
+            },
+            {
+                q: "15. หากระบบคอมพิวเตอร์ล่มขณะคุณกำลังคุยกับลูกค้าเพื่อปิดการขาย คุณจะทำอย่างไร?",
+                qEn: "15. If your computer system crashes while you are in the middle of closing a sale, what do you do?",
+                options: ["ก. ขอให้ลูกค้ารอคาสายจนกว่าระบบจะกลับมา", "ข. แจ้งลูกค้าอย่างโปร่งใสและคุมจังหวะปิดดีลด้วยแผนสำรอง", "ค. วางสายทันทีเพื่อรีบแก้ระบบ", "ง. พยายามปิดการขายต่อโดยไม่บอกลูกค้าว่าระบบล่ม"],
+                optionsEn: ["A. Ask the customer to hold on the line until the system recovers.", "B. Transparently inform the customer and manage the closing pace using a backup plan.", "C. Hang up immediately to fix the system.", "D. Continue attempting to close the sale without telling the customer about the outage."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            {
+                q: "16. ลูกค้ามีท่าทีลังเลและบอกว่า 'ขอปรึกษาแฟนก่อน' คุณควรใช้ไหวพริบอย่างไร?",
+                qEn: "16. A customer hesitates and says 'I need to consult my partner first.' How should you handle this?",
+                options: ["ก. ตอบรับอย่างเข้าใจ แล้วทำให้การปรึกษามีกรอบ", "ข. ขอส่งใบเสนอราคาให้ทั้งคู่ดูตรงกัน", "ค. เปลี่ยนจากการตัดสินใจ เป็นการยืนยันเงื่อนไขจองสิทธิ์", "ง. เร่งปิดด้วยแรงกดดันว่าโปรจะหมดวันนี้"],
+                optionsEn: ["A. Acknowledge empathetically and then give the consultation a clear framework.", "B. Offer to send a quotation for both of them to review together.", "C. Shift the conversation from a final decision to confirming a reservation or holding terms.", "D. Apply pressure by saying the promotion expires today."],
+                cat: null, catEn: null,
+                ans: 2
+            },
+            {
+                q: "17. หากคุณโทรไปผิดจังหวะ เช่น ลูกค้ากำลังขับรถหรือติดประชุม คุณควรทำอย่างไร?",
+                qEn: "17. If you call at a bad time (e.g. the customer is driving or in a meeting), what should you do?",
+                options: ["ก. พยายามคุยต่อแบบย่นย่อที่สุด", "ข. เคารพความปลอดภัยและเวลา โดยขอโทรกลับในเวลาที่นัดหมาย", "ค. ขอให้ลูกค้าหยุดขับรถสักครู่เพื่อคุยเรื่องสำคัญ", "ง. เปลี่ยนช่องทางไปส่งข้อความสรุปแทนทันที"],
+                optionsEn: ["A. Try to condense the conversation as much as possible and continue.", "B. Respect their safety and time by requesting to call back at a mutually agreed time.", "C. Ask the customer to pull over briefly to discuss something important.", "D. Immediately switch channels and send a summary message instead."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            {
+                q: "18. ลูกค้าเปรียบเทียบว่า 'เจ้าอื่นแถมเยอะกว่า' คุณควรตอบอย่างไร?",
+                qEn: "18. A customer says 'Another company offers more freebies.' How should you respond?",
+                options: ["ก. โจมตีคู่แข่งว่าของแถมคุณภาพไม่ดี", "ข. เสนอแพ็กเกจเทียบเคียงอย่างมีเงื่อนไขให้เลือก", "ค. ยอมรับและคัดกรองให้ชัดว่าลูกค้าให้ค่าน้ำหนักเรื่องไหน", "ง. รีเฟรมจากของแถม เป็นมูลค่ารวมและความเสี่ยง"],
+                optionsEn: ["A. Attack the competitor by saying their freebies are low quality.", "B. Offer a comparable package with conditional options for the customer to choose from.", "C. Acknowledge it and clarify what the customer values most.", "D. Reframe the conversation from freebies to total value and risk."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            {
+                q: "19. เมื่อเจอคำถามที่ลูกค้าพยายาม 'ลองภูมิ' หรือถามจิกกัด คุณควรทำอย่างไร?",
+                qEn: "19. When a customer tries to test you or asks a provocative question, what should you do?",
+                options: ["ก. สู้กลับให้ชนะเพื่อให้รู้ว่าเราไม่ยอม", "ข. รักษาความนิ่ง ตอบด้วยข้อเท็จจริง และใช้คำถามคุมทิศทาง", "ค. ใช้เทคนิค Agree-Clarify-Answer", "ง. ยอมรับอย่างมืออาชีพและวางกรอบการสนทนา"],
+                optionsEn: ["A. Fight back to win and show you won't be pushed around.", "B. Stay calm, respond with facts, and use questions to steer the direction.", "C. Use the Agree-Clarify-Answer technique.", "D. Acknowledge professionally and set the conversational frame."],
+                cat: null, catEn: null,
+                ans: 1
+            },
+            {
+                q: "20. เป้าหมายสูงสุดของการแก้ปัญหาเฉพาะหน้าในงาน Telesales คืออะไร?",
+                qEn: "20. What is the ultimate goal of on-the-spot problem solving in Telesales?",
+                options: ["ก. ปิดการขายให้ได้ในสายเดียว", "ข. ทำให้ลูกค้าอารมณ์ดีขึ้นเป็นหลัก", "ค. รักษาความไว้วางใจและพาไปสู่ขั้นตอนถัดไป (Next Step)", "ง. เอาชนะข้อโต้แย้งลูกค้าให้ได้"],
+                optionsEn: ["A. Close the sale within a single call.", "B. Primarily make the customer feel good.", "C. Preserve trust and guide the customer to the next step.", "D. Win every objection the customer raises."],
+                cat: null, catEn: null,
+                ans: 2
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'TeleSales';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            // หมวดที่ 1
-            { q: "1. เมื่อลูกค้าบอกว่า 'ไม่ว่างคุย' ในช่วงต้นของการสนทนา คุณควรทำอย่างไร?", options: ["ก. พยายามพูดเร็วๆ เพื่อให้จบสคริปต์ก่อนลูกค้าวางสาย", "ข. ขออนุญาตให้ข้อมูลสั้นๆ เพียง 30 วินาที เพื่อประเมินความสนใจ", "ค. ขอบคุณและวางสายทันที", "ง. ถามว่า 'ยุ่งเรื่องอะไรอยู่ครับ/คะ?'"], ans: 2, cat: "หมวดที่ 1: ทักษะและความเชี่ยวชาญในการขาย" },
-            { q: "2. การทำ 'Active Listening' (การฟังเชิงรุก) สำคัญอย่างไรกับ Telesales?", options: ["ก. ช่วยให้พูดได้น้อยลง แต่ขายได้มากขึ้น", "ข. ช่วยควบคุมบทสนทนาอย่างนุ่มนวล โดยการทวนความ, สรุป, และขอความยืนยัน", "ค. ช่วยจับสัญญาณซื้อและเปลี่ยนกลยุทธ์ทันที", "ง. ช่วยวินิจฉัยปัญหา-วางโจทย์ แบบที่ปรึกษา"], ans: 1 },
-            { q: "3. ขั้นตอนใดสำคัญที่สุดก่อนเริ่มโทรหาลูกค้า (Cold Calling)?", options: ["ก. ทำ Pre-call Research ขั้นต่ำให้รู้บริบทลูกค้า", "ข. เตรียม Value Proposition แบบ 1 ประโยคที่ผูกกับ Pain", "ค. ตั้งเป้าหมายของสายให้ชัดเจน (Objective-first)", "ง. เตรียมแผนรับมือการปฏิเสธ (Objection Map)"], ans: 2 },
-            { q: "4. หากลูกค้าถามคำถามเชิงเทคนิคที่คุณไม่รู้คำตอบ คุณควรทำอย่างไร?", options: ["ก. ขออนุญาตสะท้อนโจทย์และคัดกรองให้ชัดก่อน", "ข. ยอมรับอย่างมืออาชีพ + ยืนยันความถูกต้องก่อนตอบ", "ค. เบี่ยงประเด็นกลับไปที่โปรโมชัน/ราคาทันที", "ง. ตอบแบบคาดเดาคร่าวๆ ไปก่อน"], ans: 2 },
-            { q: "5. 'Up-selling' หมายถึงข้อใด?", options: ["ก. การเสนอ รุ่น/แพ็กเกจที่มูลค่าสูงกว่า จากตัวเลือกที่ลูกค้าสนใจ", "ข. การลดราคาเพื่อเร่งการตัดสินใจ", "ค. การโน้มน้าวให้ลูกค้าซื้อจำนวนมากขึ้นในรุ่นเดิม", "ง. การเสนอสินค้าที่เกี่ยวข้องเพิ่มเติม (Cross-sell)"], ans: 0 },
-            { q: "6. ข้อใดคือลักษณะของ 'น้ำเสียง' ที่สร้างความน่าเชื่อถือที่สุด?", options: ["ก. น้ำเสียงตื่นเต้น พูดเร็ว มีพลังสูง", "ข. น้ำเสียงนิ่ง มั่นคง จังหวะพอดี มีโทนให้คำปรึกษา", "ค. น้ำเสียงเป็นกันเองมาก พูดเล่น/แซว", "ง. น้ำเสียงสุภาพมาก พูดเบาๆ นุ่มนวลตลอด"], ans: 1 },
-            { q: "7. เมื่อลูกค้าถามเรื่อง 'เปรียบเทียบกับคู่แข่ง' คุณควรทำอย่างไร?", options: ["ก. พูดให้ชนะด้วยการตำหนิคู่แข่งตรงๆ", "ข. ปฏิเสธการเปรียบเทียบทั้งหมดเพราะเป็นเรื่องอ่อนไหว", "ค. ใช้กรอบคำถามคัดกรองก่อนเปรียบเทียบ", "ง. ตอบแบบยึดเกณฑ์วัดผลที่ตรวจสอบได้และผูกกับหน้างานลูกค้า"], ans: 2 },
-            // หมวดที่ 2
-            { q: "8. ในการบันทึกข้อมูลลูกค้าหลังการโทร สิ่งใดสำคัญที่สุด?", options: ["ก. บันทึกให้ละเอียดที่สุดเท่าที่ทำได้ทุกประโยค", "ข. บันทึกข้อมูลที่ทำให้ทีมทำงานต่อได้ทันที (Actionable CRM Note)", "ค. บันทึกความรู้สึกและท่าทีของลูกค้าเป็นหลัก", "ง. บันทึกเฉพาะข้อมูลติดต่อพื้นฐาน"], ans: 1, cat: "หมวดที่ 2: ความถูกต้องและละเอียดรอบคอบ" },
-            { q: "9. หากคุณพบว่าข้อมูลที่แจ้งลูกค้าไปเมื่อครู่ 'ผิดพลาด' คุณควรทำอย่างไร?", options: ["ก. แก้ไขทันทีแบบโปร่งใส ขอโทษและให้ข้อมูลที่ถูกต้อง", "ข. รอให้ลูกค้าทักกลับหรือถามซ้ำก่อนค่อยแก้", "ค. ควบคุมความเสี่ยงก่อน โดยทวนสิ่งที่แจ้งว่าอาจไม่ชัดเจนและขอเช็คข้อมูล", "ง. รีบโทรกลับแก้ทันทีแต่พูดแบบคลุมเครือไม่ยอมรับว่าผิด"], ans: 2 },
-            { q: "10. การแจ้ง 'เงื่อนไขและข้อตกลง' (Terms & Conditions) ควรทำอย่างไร?", options: ["ก. แจ้งเฉพาะส่วนที่เป็นข้อดีเพื่อให้ปิดการขายง่าย", "ข. แจ้งแบบโปร่งใส-เป็นขั้นตอน-ยืนยันความเข้าใจ", "ค. แจ้งรวดเดียวทั้งหมดแบบละเอียดมาก", "ง. แจ้งเมื่อใกล้โอนหรือใกล้ปิดดีลเท่านั้น"], ans: 2 },
-            { q: "11. สิ่งใดคือความผิดพลาดร้ายแรงที่สุดในการยืนยันคำสั่งซื้อ?", options: ["ก. ลืมพูดขอบคุณลูกค้า", "ข. ยืนยันโดยไม่ให้ลูกค้ายืนยันรายละเอียดสำคัญแบบทวนกลับ", "ค. ใช้คำพูดเชิงบังคับเร่งให้โอน", "ง. ยืนยันกับผู้ประสานงานโดยไม่เช็คอำนาจตัดสินใจ"], ans: 1 },
-            { q: "12. เมื่อต้องอ่านสคริปต์ที่กฎหมายบังคับ (เช่น PDPA) คุณควรทำอย่างไร?", options: ["ก. อ่านรวดเดียวให้จบเร็วที่สุด", "ข. จัดเป็นขั้นตอนกำกับความยินยอมแบบมืออาชีพและชัดเจน", "ค. สรุปใจความเองโดยไม่ต้องตามข้อความมาตรฐาน", "ง. อ่านให้ครบแต่กระชับและเป็นธรรมชาติ"], ans: 1 },
-            // หมวดที่ 3
-            { q: "13. ลูกค้ากำลังโมโหและต่อว่าสินค้าของบริษัทด้วยถ้อยคำรุนแรง คุณควรทำอย่างไร?", options: ["ก. โต้กลับด้วยเหตุผลชี้แจงว่าลูกค้าใช้ผิดวิธี", "ข. วางขอบเขตการสื่อสารอย่างสุภาพและขอพักสาย", "ค. ตั้งสติและลดอุณหภูมิอารมณ์ รับฟังและเสนอขั้นตอนแก้ไข", "ง. รีบเสนอส่วนลดทันทีเพื่อให้หยุดโมโห"], ans: 2, cat: "หมวดที่ 3: การแก้ปัญหาเฉพาะหน้า" },
-            { q: "14. ถ้าลูกค้าบอกว่า 'ราคาแพงเกินไป' วิธีแก้ปัญหาที่ดีที่สุดคือ?", options: ["ก. ตัดบทเรื่องราคาแล้วดึงกลับไปคุยของแถม", "ข. รีบเสนอส่วนลดทันทีเพื่อปิดดีล", "ค. ลดแรงต้านก่อน แล้ววินิจฉัยคำว่าแพงให้ชัด", "ง. อธิบายคุณภาพสเปกแบบยาวๆ"], ans: 2 },
-            { q: "15. หากระบบคอมพิวเตอร์ล่มขณะคุณกำลังคุยกับลูกค้าเพื่อปิดการขาย คุณจะทำอย่างไร?", options: ["ก. ขอให้ลูกค้ารอคาสายจนกว่าระบบจะกลับมา", "ข. แจ้งลูกค้าอย่างโปร่งใสและคุมจังหวะปิดดีลด้วยแผนสำรอง", "ค. วางสายทันทีเพื่อรีบแก้ระบบ", "ง. พยายามปิดการขายต่อโดยไม่บอกลูกค้าว่าระบบล่ม"], ans: 1 },
-            { q: "16. ลูกค้ามีท่าทีลังเลและบอกว่า 'ขอปรึกษาแฟนก่อน' คุณควรใช้ไหวพริบอย่างไร?", options: ["ก. ตอบรับอย่างเข้าใจ แล้วทำให้การปรึกษามีกรอบ", "ข. ขอส่งใบเสนอราคาให้ทั้งคู่ดูตรงกัน", "ค. เปลี่ยนจากการตัดสินใจ เป็นการยืนยันเงื่อนไขจองสิทธิ์", "ง. เร่งปิดด้วยแรงกดดันว่าโปรจะหมดวันนี้"], ans: 2 },
-            { q: "17. หากคุณโทรไปผิดจังหวะ เช่น ลูกค้ากำลังขับรถหรือติดประชุม คุณควรทำอย่างไร?", options: ["ก. พยายามคุยต่อแบบย่นย่อที่สุด", "ข. เคารพความปลอดภัยและเวลา โดยขอโทรกลับในเวลาที่นัดหมาย", "ค. ขอให้ลูกค้าหยุดขับรถสักครู่เพื่อคุยเรื่องสำคัญ", "ง. เปลี่ยนช่องทางไปส่งข้อความสรุปแทนทันที"], ans: 1 },
-            { q: "18. ลูกค้าเปรียบเทียบว่า 'เจ้าอื่นแถมเยอะกว่า' คุณควรตอบอย่างไร?", options: ["ก. โจมตีคู่แข่งว่าของแถมคุณภาพไม่ดี", "ข. เสนอแพ็กเกจเทียบเคียงอย่างมีเงื่อนไขให้เลือก", "ค. ยอมรับและคัดกรองให้ชัดว่าลูกค้าให้ค่าน้ำหนักเรื่องไหน", "ง. รีเฟรมจากของแถม เป็นมูลค่ารวมและความเสี่ยง"], ans: 1 },
-            { q: "19. เมื่อเจอคำถามที่ลูกค้าพยายาม 'ลองภูมิ' หรือถามจิกกัด คุณควรทำอย่างไร?", options: ["ก. สู้กลับให้ชนะเพื่อให้รู้ว่าเราไม่ยอม", "ข. รักษาความนิ่ง ตอบด้วยข้อเท็จจริง และใช้คำถามคุมทิศทาง", "ค. ใช้เทคนิค Agree-Clarify-Answer", "ง. ยอมรับอย่างมืออาชีพและวางกรอบการสนทนา"], ans: 1 },
-            { q: "20. เป้าหมายสูงสุดของการแก้ปัญหาเฉพาะหน้าในงาน Telesales คืออะไร?", options: ["ก. ปิดการขายให้ได้ในสายเดียว", "ข. ทำให้ลูกค้าอารมณ์ดีขึ้นเป็นหลัก", "ค. รักษาความไว้วางใจและพาไปสู่ขั้นตอนถัดไป (Next Step)", "ง. เอาชนะข้อโต้แย้งลูกค้าให้ได้"], ans: 2 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+            const catLabel = currentLang === 'en' ? item.catEn : item.cat;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                ${catLabel ? `<div class="cat-label">📂 ${catLabel}</div>` : ''}
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
@@ -169,15 +403,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -191,27 +425,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -221,54 +454,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
