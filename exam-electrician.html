@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Technician Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,107 +51,310 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบตำแหน่ง ช่างไฟฟ้า / วิศวกรไฟฟ้า</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Technician</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Technician",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Technician",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. อุปกรณ์ชนิดใดมีหน้าที่ป้องกันกระแสไฟฟ้ารั่วและตัดวงจรเพื่อความปลอดภัยของชีวิต?",
+                qEn: "1. Which device is designed to detect leakage current and trip the circuit to protect human life?",
+                options: ["ก. MCCB ที่มีฟังก์ชัน Magnetic Trip", "ข. RCBO ที่ตรวจจับกระแสไม่สมดุลระหว่าง Line และ Neutral", "ค. Overload Relay ที่ติดตั้งหลัง Contactor", "ง. Surge Protector แบบ Type 2"],
+                optionsEn: ["A. An MCCB with a Magnetic Trip function.", "B. An RCBO that detects current imbalance between the Line and Neutral conductors.", "C. An Overload Relay installed downstream of a Contactor.", "D. A Type 2 Surge Protector."],
+                ans: 1
+            },
+            {
+                q: "2. ตามมาตรฐาน วสท. สายเส้นไฟ (Phase), สายนิวทรัล (Neutral) และสายดิน (Ground) ในระบบไฟ 1 เฟส ควรใช้สีอะไรตามลำดับ?",
+                qEn: "2. According to the EIT standard, what are the correct colours for the Phase, Neutral, and Ground conductors in a single-phase system?",
+                options: ["ก. ดำ, ขาว, เขียว", "ข. น้ำตาล, ฟ้า, เขียวแถบเหลือง", "ค. แดง, ดำ, เทา", "ง. น้ำเงิน, เทา, เขียว"],
+                optionsEn: ["A. Black, White, Green.", "B. Brown, Blue, Green-Yellow stripe.", "C. Red, Black, Grey.", "D. Blue, Grey, Green."],
+                ans: 1
+            },
+            {
+                q: "3. หากคุณพบว่าเบรกเกอร์ทริป (Trip) ทันทีที่สับสวิตช์เปิดเครื่องจักร สิ่งแรกที่ควรตรวจสอบคืออะไร?",
+                qEn: "3. If you find that a breaker trips immediately upon switching on a machine, what should you check first?",
+                options: ["ก. ขนาดเบรกเกอร์ต่ำกว่ากำลังมอเตอร์", "ข. การลัดวงจรในโหลดหรือสายไฟ", "ค. ค่า Inrush Current ของมอเตอร์", "ง. แรงดันไฟตกจากหม้อแปลง"],
+                optionsEn: ["A. The breaker rating is lower than the motor's power rating.", "B. A short circuit in the load or wiring.", "C. The inrush current value of the motor.", "D. Voltage drop from the transformer."],
+                ans: 1
+            },
+            {
+                q: "4. เครื่องมือชนิดใดใช้สำหรับวัดความต้านทานฉนวนของสายไฟหรือมอเตอร์?",
+                qEn: "4. Which instrument is used to measure the insulation resistance of wiring or a motor?",
+                options: ["ก. True RMS Multimeter", "ข. Clamp Meter", "ค. Insulation Resistance Tester (Megger)", "ง. Earth Tester"],
+                optionsEn: ["A. True RMS Multimeter.", "B. Clamp Meter.", "C. Insulation Resistance Tester (Megger).", "D. Earth Tester."],
+                ans: 2
+            },
+            {
+                q: "5. การต่อสายดิน (Grounding) มีจุดประสงค์หลักเพื่ออะไร?",
+                qEn: "5. What is the primary purpose of grounding?",
+                options: ["ก. ทำให้แรงดันระบบเสถียร", "ข. สร้างทางเดินกระแสผิดปกติลงดินเพื่อให้ Protective Device ทำงาน", "ค. ลดสัญญาณรบกวนในระบบ", "ง. ป้องกันไฟกระชาก"],
+                optionsEn: ["A. To stabilise the system voltage.", "B. To provide a low-impedance path for fault current to flow to earth, enabling the protective device to operate.", "C. To reduce signal interference in the system.", "D. To prevent power surges."],
+                ans: 1
+            },
+            {
+                q: "6. ในการทำงานกับตู้ควบคุมไฟฟ้า ข้อใดคือขั้นตอนความปลอดภัยที่สำคัญที่สุดก่อนเริ่มงาน?",
+                qEn: "6. When working on an electrical control panel, which safety step is most critical before starting?",
+                options: ["ก. ใส่ถุงมือยาง", "ข. ทำ LOTO และตรวจสอบว่าไม่มีไฟด้วยเครื่องมือวัด", "ค. ปิดเมนเบรกเกอร์", "ง. ติดป้ายเตือน"],
+                optionsEn: ["A. Put on rubber gloves.", "B. Perform LOTO and verify the absence of voltage with a measuring instrument.", "C. Switch off the main breaker.", "D. Post a warning sign."],
+                ans: 1
+            },
+            {
+                q: "7. หากต้องการวัดกระแสไฟฟ้า (Ampere) ในสายไฟเส้นเดียวขณะเครื่องจักรทำงาน ควรใช้เครื่องมือใดสะดวกที่สุด?",
+                qEn: "7. If you need to measure the current (Amperes) in a single cable while the machine is running, which instrument is most convenient?",
+                options: ["ก. Digital Multimeter ต่ออนุกรม", "ข. Clamp Meter", "ค. Current Transformer", "ง. Power Analyzer"],
+                optionsEn: ["A. A digital multimeter connected in series.", "B. A Clamp Meter.", "C. A Current Transformer.", "D. A Power Analyzer."],
+                ans: 1
+            },
+            {
+                q: "8. Overload Relay มีหน้าที่อะไรในวงจรควบคุมมอเตอร์?",
+                qEn: "8. What is the function of an Overload Relay in a motor control circuit?",
+                options: ["ก. ป้องกันไฟลัดวงจร", "ข. ป้องกันมอเตอร์ร้อนเกินจาก Overcurrent ต่อเนื่อง", "ค. ป้องกันไฟตก", "ง. หน่วงเวลาการสตาร์ท"],
+                optionsEn: ["A. To protect against short circuits.", "B. To protect the motor from overheating due to sustained overcurrent.", "C. To protect against voltage drops.", "D. To provide a start-up time delay."],
+                ans: 1
+            },
+            {
+                q: "9. ขนาดของเซอร์กิตเบรกเกอร์ (Circuit Breaker) ควรสัมพันธ์กับสิ่งใดมากที่สุด?",
+                qEn: "9. The size of a circuit breaker should primarily correspond to which factor(s)?",
+                options: ["ก. กำลังโหลด", "ข. ขนาดสายไฟ", "ค. กระแส Short Circuit ของระบบ", "ง. ทั้งข้อ ก และ ข"],
+                optionsEn: ["A. The load capacity.", "B. The cable size.", "C. The system's available short-circuit current.", "D. Both A and B."],
+                ans: 3
+            },
+            {
+                q: "10. การติดตั้งเต้ารับ (Plug) ในห้องน้ำหรือพื้นที่เปียกชื้น ต้องใช้ร่วมกับอุปกรณ์ใดเสมอ?",
+                qEn: "10. Installing a socket outlet in a bathroom or wet area must always be used together with which device?",
+                options: ["ก. Isolator", "ข. RCBO / RCD", "ค. SPD", "ง. Fuse"],
+                optionsEn: ["A. Isolator.", "B. RCBO / RCD.", "C. SPD.", "D. Fuse."],
+                ans: 1
+            },
+            {
+                q: "11. สัญลักษณ์ 'L' และ 'N' บนขั้วต่อไฟฟ้าหมายถึงอะไร?",
+                qEn: "11. What do the symbols 'L' and 'N' on electrical terminals stand for?",
+                options: ["ก. Line และ Neutral", "ข. Live และ Node", "ค. Load และ Neutral", "ง. Line และ Node"],
+                optionsEn: ["A. Line and Neutral.", "B. Live and Node.", "C. Load and Neutral.", "D. Line and Node."],
+                ans: 0
+            },
+            {
+                q: "12. หากมอเตอร์ 3 เฟส ทำงานแล้วมีเสียงครางและไม่หมุน (Single Phasing) สาเหตุส่วนใหญ่มักเกิดจากอะไร?",
+                qEn: "12. If a 3-phase motor hums and fails to rotate (single phasing), what is the most likely cause?",
+                options: ["ก. แรงดันเกิน", "ข. ไฟขาด 1 เฟส", "ค. แบริ่งฝืด", "ง. โหลดเกิน"],
+                optionsEn: ["A. Overvoltage.", "B. Loss of one phase.", "C. Stiff bearings.", "D. Overload."],
+                ans: 1
+            },
+            {
+                q: "13. การอ่านแบบไฟฟ้า สัญลักษณ์วงกลมที่มีเส้นขีดกากบาทข้างใน (X) มักหมายถึงอะไร?",
+                qEn: "13. In an electrical drawing, what does a circle with an 'X' inside it typically represent?",
+                options: ["ก. เต้ารับ", "ข. โคมไฟ", "ค. สวิตช์", "ง. Motor Outlet"],
+                optionsEn: ["A. A socket outlet.", "B. A light fixture.", "C. A switch.", "D. A motor outlet."],
+                ans: 1
+            },
+            {
+                q: "14. ในการเดินสายไฟในท่อร้อยสาย (Conduit) ห้ามกระทำการใดเด็ดขาด?",
+                qEn: "14. When pulling wires through conduit, what is absolutely prohibited?",
+                options: ["ก. ใช้ท่อ PVC ในโรงงาน", "ข. ร้อยสายเกินพิกัดท่อ", "ค. ใช้สาย THW", "ง. เดินสายร่วมกราวด์"],
+                optionsEn: ["A. Using PVC conduit in a factory.", "B. Overfilling the conduit beyond its rated capacity.", "C. Using THW cable.", "D. Running the ground wire alongside other conductors in the same conduit."],
+                ans: 1
+            },
+            {
+                q: "15. หน่วยวัดความสามารถในการต้านทานไฟฟ้าคืออะไร?",
+                qEn: "15. What is the unit used to measure electrical resistance?",
+                options: ["ก. Volt", "ข. Ampere", "ค. Ohm", "ง. Watt"],
+                optionsEn: ["A. Volt.", "B. Ampere.", "C. Ohm.", "D. Watt."],
+                ans: 2
+            },
+            {
+                q: "16. หากพบว่าสายไฟมีรอยไหม้หรือความร้อนสูงผิดปกติ (Overheating) สาเหตุที่พบบ่อยที่สุดคืออะไร?",
+                qEn: "16. If wiring shows signs of burning or abnormal heat (overheating), what is the most common cause?",
+                options: ["ก. ใช้งานเกินเวลา", "ข. จุดต่อหลวม หรือสายเล็กเกินพิกัด", "ค. ระบบกราวด์ไม่ดี", "ง. แรงดันเกิน"],
+                optionsEn: ["A. Extended hours of use.", "B. A loose connection or a cable that is undersized for the load.", "C. A poor grounding system.", "D. Overvoltage."],
+                ans: 1
+            },
+            {
+                q: "17. อุปกรณ์ 'Magnetic Contactor' ทำหน้าที่อะไร?",
+                qEn: "17. What is the function of a Magnetic Contactor?",
+                options: ["ก. ตัดวงจรอัตโนมัติเมื่อไฟรั่ว", "ข. ตัดต่อวงจรไฟฟ้ากำลังด้วยแม่เหล็กไฟฟ้า", "ค. ป้องกัน Overload", "ง. ปรับแรงดัน"],
+                optionsEn: ["A. To automatically trip when a ground fault is detected.", "B. To switch a power circuit on and off using an electromagnetic coil.", "C. To protect against overload.", "D. To regulate voltage."],
+                ans: 1
+            },
+            {
+                q: "18. เมื่อเกิดเพลิงไหม้จากอุปกรณ์ไฟฟ้า ห้ามใช้สิ่งใดดับไฟเด็ดขาด?",
+                qEn: "18. When a fire occurs involving electrical equipment, what must absolutely never be used to extinguish it?",
+                options: ["ก. ถังดับเพลิงชนิด CO2", "ข. ถังดับเพลิงชนิดผงเคมีแห้ง", "ค. น้ำเปล่า", "ง. ทรายแห้ง"],
+                optionsEn: ["A. A CO2 fire extinguisher.", "B. A dry chemical powder fire extinguisher.", "C. Plain water.", "D. Dry sand."],
+                ans: 2
+            },
+            {
+                q: "19. IP Rating (เช่น IP54, IP67) บนอุปกรณ์ไฟฟ้าบอกถึงอะไร?",
+                qEn: "19. What does the IP Rating (e.g. IP54, IP67) on an electrical device indicate?",
+                options: ["ก. ระดับทนแรงดัน", "ข. ระดับป้องกันฝุ่นและน้ำ", "ค. มาตรฐานอุตสาหกรรม", "ง. ระดับฉนวน"],
+                optionsEn: ["A. The voltage withstand level.", "B. The degree of protection against dust and water ingress.", "C. The industrial standard classification.", "D. The insulation class."],
+                ans: 1
+            },
+            {
+                q: "20. การสตาร์ทมอเตอร์แบบ Star-Delta มีวัตถุประสงค์หลักเพื่ออะไร?",
+                qEn: "20. What is the primary purpose of Star-Delta motor starting?",
+                options: ["ก. เพิ่มแรงบิด", "ข. ลดกระแสตอนสตาร์ท", "ค. กลับทิศทางหมุน", "ง. ควบคุมความเร็ว"],
+                optionsEn: ["A. To increase torque.", "B. To reduce the starting current.", "C. To reverse the direction of rotation.", "D. To control the motor speed."],
+                ans: 1
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Technician';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            { q: "1. อุปกรณ์ชนิดใดมีหน้าที่ป้องกันกระแสไฟฟ้ารั่วและตัดวงจรเพื่อความปลอดภัยของชีวิต?", options: ["ก. MCCB ที่มีฟังก์ชัน Magnetic Trip", "ข. RCBO ที่ตรวจจับกระแสไม่สมดุลระหว่าง Line และ Neutral", "ค. Overload Relay ที่ติดตั้งหลัง Contactor", "ง. Surge Protector แบบ Type 2"], ans: 1 },
-            { q: "2. ตามมาตรฐาน วสท. สายเส้นไฟ (Phase), สายนิวทรัล (Neutral) และสายดิน (Ground) ในระบบไฟ 1 เฟส ควรใช้สีอะไรตามลำดับ?", options: ["ก. ดำ, ขาว, เขียว", "ข. น้ำตาล, ฟ้า, เขียวแถบเหลือง", "ค. แดง, ดำ, เทา", "ง. น้ำเงิน, เทา, เขียว"], ans: 1 },
-            { q: "3. หากคุณพบว่าเบรกเกอร์ทริป (Trip) ทันทีที่สับสวิตช์เปิดเครื่องจักร สิ่งแรกที่ควรตรวจสอบคืออะไร?", options: ["ก. ขนาดเบรกเกอร์ต่ำกว่ากำลังมอเตอร์", "ข. การลัดวงจรในโหลดหรือสายไฟ", "ค. ค่า Inrush Current ของมอเตอร์", "ง. แรงดันไฟตกจากหม้อแปลง"], ans: 1 },
-            { q: "4. เครื่องมือชนิดใดใช้สำหรับวัดความต้านทานฉนวนของสายไฟหรือมอเตอร์?", options: ["ก. True RMS Multimeter", "ข. Clamp Meter", "ค. Insulation Resistance Tester (Megger)", "ง. Earth Tester"], ans: 2 },
-            { q: "5. การต่อสายดิน (Grounding) มีจุดประสงค์หลักเพื่ออะไร?", options: ["ก. ทำให้แรงดันระบบเสถียร", "ข. สร้างทางเดินกระแสผิดปกติลงดินเพื่อให้ Protective Device ทำงาน", "ค. ลดสัญญาณรบกวนในระบบ", "ง. ป้องกันไฟกระชาก"], ans: 1 },
-            { q: "6. ในการทำงานกับตู้ควบคุมไฟฟ้า ข้อใดคือขั้นตอนความปลอดภัยที่สำคัญที่สุดก่อนเริ่มงาน?", options: ["ก. ใส่ถุงมือยาง", "ข. ทำ LOTO และตรวจสอบว่าไม่มีไฟด้วยเครื่องมือวัด", "ค. ปิดเมนเบรกเกอร์", "ง. ติดป้ายเตือน"], ans: 1 },
-            { q: "7. หากต้องการวัดกระแสไฟฟ้า (Ampere) ในสายไฟเส้นเดียวขณะเครื่องจักรทำงาน ควรใช้เครื่องมือใดสะดวกที่สุด?", options: ["ก. Digital Multimeter ต่ออนุกรม", "ข. Clamp Meter", "ค. Current Transformer", "ง. Power Analyzer"], ans: 1 },
-            { q: "8. Overload Relay มีหน้าที่อะไรในวงจรควบคุมมอเตอร์?", options: ["ก. ป้องกันไฟลัดวงจร", "ข. ป้องกันมอเตอร์ร้อนเกินจาก Overcurrent ต่อเนื่อง", "ค. ป้องกันไฟตก", "ง. หน่วงเวลาการสตาร์ท"], ans: 1 },
-            { q: "9. ขนาดของเซอร์กิตเบรกเกอร์ (Circuit Breaker) ควรสัมพันธ์กับสิ่งใดมากที่สุด?", options: ["ก. กำลังโหลด", "ข. ขนาดสายไฟ", "ค. กระแส Short Circuit ของระบบ", "ง. ทั้งข้อ ก และ ข"], ans: 3 },
-            { q: "10. การติดตั้งเต้ารับ (Plug) ในห้องน้ำหรือพื้นที่เปียกชื้น ต้องใช้ร่วมกับอุปกรณ์ใดเสมอ?", options: ["ก. Isolator", "ข. RCBO / RCD", "ค. SPD", "ง. Fuse"], ans: 1 },
-            { q: "11. สัญลักษณ์ 'L' และ 'N' บนขั้วต่อไฟฟ้าหมายถึงอะไร?", options: ["ก. Line และ Neutral", "ข. Live และ Node", "ค. Load และ Neutral", "ง. Line และ Node"], ans: 0 },
-            { q: "12. หากมอเตอร์ 3 เฟส ทำงานแล้วมีเสียงครางและไม่หมุน (Single Phasing) สาเหตุส่วนใหญ่มักเกิดจากอะไร?", options: ["ก. แรงดันเกิน", "ข. ไฟขาด 1 เฟส", "ค. แบริ่งฝืด", "ง. โหลดเกิน"], ans: 1 },
-            { q: "13. การอ่านแบบไฟฟ้า สัญลักษณ์วงกลมที่มีเส้นขีดกากบาทข้างใน (X) มักหมายถึงอะไร?", options: ["ก. เต้ารับ", "ข. โคมไฟ", "ค. สวิตช์", "ง. Motor Outlet"], ans: 1 },
-            { q: "14. ในการเดินสายไฟในท่อร้อยสาย (Conduit) ห้ามกระทำการใดเด็ดขาด?", options: ["ก. ใช้ท่อ PVC ในโรงงาน", "ข. ร้อยสายเกินพิกัดท่อ", "ค. ใช้สาย THW", "ง. เดินสายร่วมกราวด์"], ans: 1 },
-            { q: "15. หน่วยวัดความสามารถในการต้านทานไฟฟ้าคืออะไร?", options: ["ก. Volt", "ข. Ampere", "ค. Ohm", "ง. Watt"], ans: 2 },
-            { q: "16. หากพบว่าสายไฟมีรอยไหม้หรือความร้อนสูงผิดปกติ (Overheating) สาเหตุที่พบบ่อยที่สุดคืออะไร?", options: ["ก. ใช้งานเกินเวลา", "ข. จุดต่อหลวม หรือสายเล็กเกินพิกัด", "ค. ระบบกราวด์ไม่ดี", "ง. แรงดันเกิน"], ans: 1 },
-            { q: "17. อุปกรณ์ 'Magnetic Contactor' ทำหน้าที่อะไร?", options: ["ก. ตัดวงจรอัตโนมัติเมื่อไฟรั่ว", "ข. ตัดต่อวงจรไฟฟ้ากำลังด้วยแม่เหล็กไฟฟ้า", "ค. ป้องกัน Overload", "ง. ปรับแรงดัน"], ans: 1 },
-            { q: "18. เมื่อเกิดเพลิงไหม้จากอุปกรณ์ไฟฟ้า ห้ามใช้สิ่งใดดับไฟเด็ดขาด?", options: ["ก. ถังดับเพลิงชนิด CO2", "ข. ถังดับเพลิงชนิดผงเคมีแห้ง", "ค. น้ำเปล่า", "ง. ทรายแห้ง"], ans: 2 },
-            { q: "19. IP Rating (เช่น IP54, IP67) บนอุปกรณ์ไฟฟ้าบอกถึงอะไร?", options: ["ก. ระดับทนแรงดัน", "ข. ระดับป้องกันฝุ่นและน้ำ", "ค. มาตรฐานอุตสาหกรรม", "ง. ระดับฉนวน"], ans: 1 },
-            { q: "20. การสตาร์ทมอเตอร์แบบ Star-Delta มีวัตถุประสงค์หลักเพื่ออะไร?", options: ["ก. เพิ่มแรงบิด", "ข. ลดกระแสตอนสตาร์ท", "ค. กลับทิศทางหมุน", "ง. ควบคุมความเร็ว"], ans: 1 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
-                text: item.options[choiceIndex],
+                text: item.options[choiceIndex],   // always store Thai for Sheet
                 isCorrect: choiceIndex === item.ans
             });
 
@@ -164,15 +367,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -186,27 +389,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -216,54 +418,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
