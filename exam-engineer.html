@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Engineering Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,107 +51,310 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบตำแหน่ง Project Engineer</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Project Engineer</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Project Engineer",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Project Engineer",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. หากคุณพบว่าแบบงาน (Drawing) ขัดแย้งกับสภาพหน้างานจริงในส่วนที่เป็นโครงสร้างหลัก คุณควรทำอย่างไรเป็นอันดับแรก?",
+                qEn: "1. If you find that a drawing conflicts with actual site conditions in a structurally critical section, what should you do first?",
+                options: ["ก. สั่งหยุดงานเฉพาะจุดทันที และทำเอกสาร RFI", "ข. ปรับแก้แบบหน้างานตามประสบการณ์", "ค. เดินงานตามแบบเดิมก่อนแล้วค่อยแก้", "ง. ปรึกษาโฟร์แมนและตัดสินใจร่วมกันทันที"],
+                optionsEn: ["A. Immediately stop work in that specific area and submit an RFI.", "B. Modify the drawing on-site based on your own experience.", "C. Continue working according to the original drawing and address it later.", "D. Consult the foreman and make a joint decision on the spot."],
+                ans: 0
+            },
+            {
+                q: "2. Critical Path ในแผนงานโครงการ มีความสำคัญอย่างไรมากที่สุด?",
+                qEn: "2. What is the most important significance of the Critical Path in a project schedule?",
+                options: ["ก. เป็นชุดกิจกรรมที่มีต้นทุนรวมสูงสุด", "ข. เป็นกิจกรรมที่หากล่าช้าจะกระทบวันแล้วเสร็จของโครงการโดยตรง", "ค. เป็นกิจกรรมที่ต้องใช้แรงงานมากที่สุด", "ง. เป็นรายการงานที่มีวัสดุ Lead Time นานที่สุด"],
+                optionsEn: ["A. It is the sequence of activities with the highest combined cost.", "B. It is the sequence of activities where any delay will directly impact the project completion date.", "C. It is the sequence of activities requiring the most manpower.", "D. It is the list of items with the longest material lead times."],
+                ans: 1
+            },
+            {
+                q: "3. เมื่อเกิดอุบัติเหตุในเขตก่อสร้างเนื่องจากความประมาทของคนงาน สิ่งแรกที่ต้องทำคือ?",
+                qEn: "3. If an accident occurs on a construction site due to worker negligence, what is the first thing to do?",
+                options: ["ก. รีบรายงานเจ้าของโครงการก่อน", "ข. ตรวจสอบ CCTV เพื่อระบุผู้ผิด", "ค. เข้าควบคุมสถานการณ์ ปฐมพยาบาล และกั้นพื้นที่อันตราย", "ง. สั่งปิดไซต์งานทั้งหมดทันที"],
+                optionsEn: ["A. Report to the project owner first.", "B. Review CCTV footage to identify who is at fault.", "C. Manage the situation, administer first aid, and cordon off the hazardous area.", "D. Immediately shut down the entire construction site."],
+                ans: 2
+            },
+            {
+                q: "4. ในการตรวจสอบคุณภาพงานเทคอนกรีต หากค่า Slump Test ไม่เป็นไปตามข้อกำหนด ควรทำอย่างไร?",
+                qEn: "4. During a concrete quality inspection, if the Slump Test result does not meet the specification, what should you do?",
+                options: ["ก. เติมน้ำเพิ่มหน้างาน", "ข. ยอมให้ใช้งานได้ถ้าไม่ใช่โครงสร้างหลัก", "ค. เพิ่มจำนวนลูกปูนทดสอบเป็น 2 เท่า", "ง. ปฏิเสธคอนกรีตรถนั้น (Reject) ห้ามเทใช้งาน"],
+                optionsEn: ["A. Add water on-site to adjust the consistency.", "B. Allow it to be used if it is not for a structural element.", "C. Double the number of concrete cube samples for testing.", "D. Reject that concrete truck and prohibit it from being poured."],
+                ans: 3
+            },
+            {
+                q: "5. หาก Supplier แจ้งว่าวัสดุหลักจะส่งล่าช้าไป 2 สัปดาห์ คุณจะแก้ปัญหาอย่างไร?",
+                qEn: "5. If a supplier informs you that a key material will be delayed by 2 weeks, how will you resolve the issue?",
+                options: ["ก. ปรับแผนงานใหม่ (Reschedule) ดึงงานอื่นขึ้นมาทำก่อน", "ข. รอวัสดุแล้วค่อยทำ OT ชดเชย", "ค. ยกเลิกสัญญาและหาผู้ขายรายใหม่", "ง. แจ้ง Owner ว่าโครงการต้องเลื่อนแน่นอน โดยไม่มีทางเลือกอื่น"],
+                optionsEn: ["A. Reschedule the plan by pulling forward other available work.", "B. Wait for the material and compensate with overtime afterwards.", "C. Cancel the contract and find a new supplier.", "D. Inform the owner that the project will definitely be delayed with no alternative."],
+                ans: 0
+            },
+            {
+                q: "6. เอกสารใดใช้สำหรับยืนยันการเปลี่ยนแปลงงานและวงเงินในสัญญา?",
+                qEn: "6. Which document is used to formally confirm changes to the scope of work and contract value?",
+                options: ["ก. Shop Drawing", "ข. Daily Report", "ค. Change Order (CO)", "ง. Purchase Order (PO)"],
+                optionsEn: ["A. Shop Drawing.", "B. Daily Report.", "C. Change Order (CO).", "D. Purchase Order (PO)."],
+                ans: 2
+            },
+            {
+                q: "7. หากฝ่ายจัดซื้อและฝ่ายก่อสร้างขัดแย้งเรื่องสเปกวัสดุ ควรใช้เกณฑ์ใดตัดสิน?",
+                qEn: "7. If the procurement team and construction team disagree on material specifications, what criterion should be used to resolve the dispute?",
+                options: ["ก. เลือกวัสดุที่ราคาถูกที่สุด", "ข. ให้ฝ่ายที่มีตำแหน่งสูงกว่าตัดสิน", "ค. ใช้วิธีโหวตในที่ประชุม", "ง. อ้างอิง Specification/Approved Material"],
+                optionsEn: ["A. Select the cheapest available material.", "B. Let the person with the higher position decide.", "C. Put it to a vote in a meeting.", "D. Refer to the Project Specification and Approved Material List."],
+                ans: 3
+            },
+            {
+                q: "8. Value Engineering (VE) หมายถึงอะไร?",
+                qEn: "8. What does 'Value Engineering' (VE) mean?",
+                options: ["ก. การลดเกรดวัสดุเพื่อกำไร", "ข. การปรับแนวทาง/วัสดุให้ลดต้นทุนโดยยังรักษาฟังก์ชันและคุณภาพ", "ค. การเพิ่มวัสดุราคาแพงให้หรูหรา", "ง. การจ้างวิศวกรค่าตัวแพง"],
+                optionsEn: ["A. Downgrading materials to increase profit.", "B. Adjusting methods or materials to reduce cost while maintaining function and quality.", "C. Adding expensive materials for a more premium appearance.", "D. Hiring high-fee engineers."],
+                ans: 1
+            },
+            {
+                q: "9. หากตรวจสอบพบว่างานจริง (Actual) ช้ากว่าแผน (Planned) อยู่ 15% ควรทำอย่างไร?",
+                qEn: "9. If a review shows that actual progress is 15% behind the planned schedule, what should you do?",
+                options: ["ก. วิเคราะห์สาเหตุเชิงระบบและทำ Catch-up Plan", "ข. ปรับตัวเลขรายงานให้ตรงแผน", "ค. สั่งคนงานทำ OT ทันที", "ง. ยกเลิกสัญญาผู้รับเหมาช่วง"],
+                optionsEn: ["A. Analyze the root causes systematically and develop a catch-up plan.", "B. Adjust the figures in the report to match the plan.", "C. Immediately order all workers to work overtime.", "D. Terminate the subcontractor's contract."],
+                ans: 0
+            },
+            {
+                q: "10. ความแม่นยำในการทำ Survey และ Setting out สำคัญอย่างไร?",
+                qEn: "10. Why is precision in Survey and Setting Out critical?",
+                options: ["ก. เพื่อให้คนงานทำงานสะดวก", "ข. เพื่อประหยัดการใช้กล้องระดับ", "ค. ป้องกันความผิดพลาดของแนว/ระดับ/ตำแหน่งโครงสร้าง", "ง. เพื่อให้ดูเป็นมืออาชีพ"],
+                optionsEn: ["A. To make work more convenient for labourers.", "B. To minimise the use of surveying equipment.", "C. To prevent errors in the alignment, elevation, and position of structural elements.", "D. To appear more professional."],
+                ans: 2
+            },
+            {
+                q: "11. การทำ Punch List ควรทำในช่วงใด?",
+                qEn: "11. When should a Punch List be created?",
+                options: ["ก. ก่อนเริ่มเซ็นสัญญา", "ข. ทำเฉพาะตอนลูกค้าร้องเรียน", "ค. หลังหมดระยะเวลารับประกัน", "ง. ก่อนการส่งมอบงานในแต่ละงวด/ส่งมอบงานสมบูรณ์"],
+                optionsEn: ["A. Before signing the contract.", "B. Only when a customer complaint is raised.", "C. After the warranty period has expired.", "D. Before the handover at each milestone or the final completion handover."],
+                ans: 3
+            },
+            {
+                q: "12. ในกรณีเทคอนกรีตขนาดใหญ่ ปัญหาความร้อนมักส่งผลให้เกิดอะไร?",
+                qEn: "12. In large-volume concrete pours, heat of hydration typically results in what problem?",
+                options: ["ก. คอนกรีตเปลี่ยนเป็นสีขาวซีด", "ข. Thermal Cracking (รอยร้าวจากความต่างอุณหภูมิ)", "ค. เหล็กเสริมขยายตัวจนหลุด", "ง. คอนกรีตแข็งตัวช้า"],
+                optionsEn: ["A. The concrete turns a pale white colour.", "B. Thermal cracking caused by temperature differentials.", "C. Reinforcement bars expanding and becoming dislodged.", "D. The concrete setting more slowly."],
+                ans: 1
+            },
+            {
+                q: "13. As-Built Drawing คือเอกสารที่มีความสำคัญอย่างไร?",
+                qEn: "13. Why is an As-Built Drawing an important document?",
+                options: ["ก. แบบร่างแรกเริ่ม", "ข. ใบเสร็จรับเงินค่าวัสดุ", "ค. แบบที่จัดทำตามสภาพก่อสร้างจริงเพื่อใช้อ้างอิงซ่อมบำรุง", "ง. คู่มือเครื่องจักร"],
+                optionsEn: ["A. It is the initial draft drawing.", "B. It is a receipt for materials purchased.", "C. It is a drawing produced to reflect the actual constructed condition, used as a reference for future maintenance.", "D. It is an equipment manual."],
+                ans: 2
+            },
+            {
+                q: "14. หากพบผู้รับเหมาช่วงใช้ PPE ไม่ครบถ้วน ควรทำอย่างไร?",
+                qEn: "14. If you find that a subcontractor's workers are not wearing complete PPE, what should you do?",
+                options: ["ก. สั่งหยุดงานส่วนนั้นทันทีและให้แก้ไขก่อนทำงานต่อ", "ข. ตักเตือนด้วยวาจาและอนุโลมให้เสร็จงานวันนั้น", "ค. รอเจ้าหน้าที่ จป. มาสั่งการ", "ง. เก็บค่าปรับโดยไม่ต้องหยุดงาน"],
+                optionsEn: ["A. Immediately stop work in that area and require corrective action before work can resume.", "B. Issue a verbal warning and allow them to finish that day's work.", "C. Wait for the Safety Officer (JSO) to give instructions.", "D. Impose a fine without stopping the work."],
+                ans: 0
+            },
+            {
+                q: "15. เทคนิค 'Fast-Tracking' หมายถึงอะไร?",
+                qEn: "15. What does the technique of 'Fast-Tracking' mean?",
+                options: ["ก. เพิ่มคนงานเป็น 2 เท่า", "ข. ส่งวัสดุทางอากาศ", "ค. จ้างผู้รับเหมาที่เร็วที่สุด", "ง. ทำกิจกรรมแบบขนาน (Overlap) เพื่อลดเวลา"],
+                optionsEn: ["A. Doubling the number of workers.", "B. Shipping materials by air freight.", "C. Hiring the fastest available contractor.", "D. Running activities in parallel (overlapping) to reduce overall duration."],
+                ans: 3
+            },
+            {
+                q: "16. วิธีตรวจสอบ 'ภายใน' เนื้อรอยเชื่อมเหล็กที่แม่นยำที่สุดคือ?",
+                qEn: "16. Which method provides the most accurate inspection of the internal quality of steel welds?",
+                options: ["ก. Visual Inspection", "ข. Ultrasonic Testing (UT) / Radiographic Testing (RT)", "ค. ใช้ไม้บรรทัดวัด", "ง. เคาะฟังเสียง"],
+                optionsEn: ["A. Visual Inspection.", "B. Ultrasonic Testing (UT) or Radiographic Testing (RT).", "C. Measuring with a ruler.", "D. Tapping and listening to the sound."],
+                ans: 1
+            },
+            {
+                q: "17. หาก Drawing และ BOQ ขัดแย้งกัน ปกติยึดสิ่งใดเป็นหลัก?",
+                qEn: "17. If a Drawing and a Bill of Quantities (BOQ) are in conflict, which document typically takes precedence?",
+                options: ["ก. ยึดราคาถูกสุดใน BOQ", "ข. ยึดคำบอกเล่าฝ่ายจัดซื้อ", "ค. ยึด Drawing และ Specification เป็นหลัก", "ง. ยกเลิกงานส่วนนั้น"],
+                optionsEn: ["A. The lowest price item in the BOQ.", "B. The verbal instruction from the procurement team.", "C. The Drawing and Project Specification.", "D. Cancel that scope of work."],
+                ans: 2
+            },
+            {
+                q: "18. การจัดการแบบ 'Just-in-Time' (JIT) มีข้อดีอย่างไร?",
+                qEn: "18. What are the advantages of Just-in-Time (JIT) material management on a construction site?",
+                options: ["ก. ลดสต๊อก ลดพื้นที่จัดเก็บ และช่วยให้ไซต์คล่องตัว", "ข. ทำให้มีวัสดุเหลือใช้จำนวนมาก", "ค. ไม่ต้องวางแผนการซื้อ", "ง. เหมาะสำหรับของหายากซื้อเก็บยาว"],
+                optionsEn: ["A. It reduces stock, minimises storage space, and keeps site operations more agile.", "B. It results in a large surplus of materials on-site.", "C. It eliminates the need for procurement planning.", "D. It is best suited for rare materials that need to be stockpiled long in advance."],
+                ans: 0
+            },
+            {
+                q: "19. เมื่อเผชิญงานเร่ง แต่งบจำกัด สิ่งที่ห้ามทำเด็ดขาดคือ?",
+                qEn: "19. When facing an urgent project with a limited budget, which action is absolutely prohibited?",
+                options: ["ก. เจรจาลดค่าเช่าเครื่องจักร", "ข. ลดสเปกวัสดุหรือข้ามขั้นตอนวิศวกรรมที่กระทบความปลอดภัย", "ค. เพิ่มประสิทธิภาพการทำงานของทีม", "ง. ประชุมร่วม Owner หาทางออก"],
+                optionsEn: ["A. Negotiating a lower equipment rental rate.", "B. Downgrading material specifications or skipping engineering steps that affect safety.", "C. Improving team work efficiency.", "D. Holding a joint meeting with the owner to explore solutions."],
+                ans: 1
+            },
+            {
+                q: "20. Soft Skill ใดสำคัญที่สุดสำหรับ Project Engineer?",
+                qEn: "20. Which soft skill is most important for a Project Engineer?",
+                options: ["ก. พิมพ์ดีดรวดเร็ว", "ข. วาดภาพเหมือนเก่ง", "ค. ท่องจำสูตรแม่น", "ง. การสื่อสารและการเจรจาต่อรอง"],
+                optionsEn: ["A. Fast typing speed.", "B. Exceptional drawing skills.", "C. Memorising formulas accurately.", "D. Communication and negotiation skills."],
+                ans: 3
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Engineering';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            { q: "1. หากคุณพบว่าแบบงาน (Drawing) ขัดแย้งกับสภาพหน้างานจริงในส่วนที่เป็นโครงสร้างหลัก คุณควรทำอย่างไรเป็นอันดับแรก?", options: ["ก. สั่งหยุดงานเฉพาะจุดทันที และทำเอกสาร RFI", "ข. ปรับแก้แบบหน้างานตามประสบการณ์", "ค. เดินงานตามแบบเดิมก่อนแล้วค่อยแก้", "ง. ปรึกษาโฟร์แมนและตัดสินใจร่วมกันทันที"], ans: 0 },
-            { q: "2. Critical Path ในแผนงานโครงการ มีความสำคัญอย่างไรมากที่สุด?", options: ["ก. เป็นชุดกิจกรรมที่มีต้นทุนรวมสูงสุด", "ข. เป็นกิจกรรมที่หากล่าช้าจะกระทบวันแล้วเสร็จของโครงการโดยตรง", "ค. เป็นกิจกรรมที่ต้องใช้แรงงานมากที่สุด", "ง. เป็นรายการงานที่มีวัสดุ Lead Time นานที่สุด"], ans: 1 },
-            { q: "3. เมื่อเกิดอุบัติเหตุในเขตก่อสร้างเนื่องจากความประมาทของคนงาน สิ่งแรกที่ต้องทำคือ?", options: ["ก. รีบรายงานเจ้าของโครงการก่อน", "ข. ตรวจสอบ CCTV เพื่อระบุผู้ผิด", "ค. เข้าควบคุมสถานการณ์ ปฐมพยาบาล และกั้นพื้นที่อันตราย", "ง. สั่งปิดไซต์งานทั้งหมดทันที"], ans: 2 },
-            { q: "4. ในการตรวจสอบคุณภาพงานเทคอนกรีต หากค่า Slump Test ไม่เป็นไปตามข้อกำหนด ควรทำอย่างไร?", options: ["ก. เติมน้ำเพิ่มหน้างาน", "ข. ยอมให้ใช้งานได้ถ้าไม่ใช่โครงสร้างหลัก", "ค. เพิ่มจำนวนลูกปูนทดสอบเป็น 2 เท่า", "ง. ปฏิเสธคอนกรีตรถนั้น (Reject) ห้ามเทใช้งาน"], ans: 3 },
-            { q: "5. หาก Supplier แจ้งว่าวัสดุหลักจะส่งล่าช้าไป 2 สัปดาห์ คุณจะแก้ปัญหาอย่างไร?", options: ["ก. ปรับแผนงานใหม่ (Reschedule) ดึงงานอื่นขึ้นมาทำก่อน", "ข. รอวัสดุแล้วค่อยทำ OT ชดเชย", "ค. ยกเลิกสัญญาและหาผู้ขายรายใหม่", "ง. แจ้ง Owner ว่าโครงการต้องเลื่อนแน่นอน โดยไม่มีทางเลือกอื่น"], ans: 0 },
-            { q: "6. เอกสารใดใช้สำหรับยืนยันการเปลี่ยนแปลงงานและวงเงินในสัญญา?", options: ["ก. Shop Drawing", "ข. Daily Report", "ค. Change Order (CO)", "ง. Purchase Order (PO)"], ans: 2 },
-            { q: "7. หากฝ่ายจัดซื้อและฝ่ายก่อสร้างขัดแย้งเรื่องสเปกวัสดุ ควรใช้เกณฑ์ใดตัดสิน?", options: ["ก. เลือกวัสดุที่ราคาถูกที่สุด", "ข. ให้ฝ่ายที่มีตำแหน่งสูงกว่าตัดสิน", "ค. ใช้วิธีโหวตในที่ประชุม", "ง. อ้างอิง Specification/Approved Material"], ans: 3 },
-            { q: "8. Value Engineering (VE) หมายถึงอะไร?", options: ["ก. การลดเกรดวัสดุเพื่อกำไร", "ข. การปรับแนวทาง/วัสดุให้ลดต้นทุนโดยยังรักษาฟังก์ชันและคุณภาพ", "ค. การเพิ่มวัสดุราคาแพงให้หรูหรา", "ง. การจ้างวิศวกรค่าตัวแพง"], ans: 1 },
-            { q: "9. หากตรวจสอบพบว่างานจริง (Actual) ช้ากว่าแผน (Planned) อยู่ 15% ควรทำอย่างไร?", options: ["ก. วิเคราะห์สาเหตุเชิงระบบและทำ Catch-up Plan", "ข. ปรับตัวเลขรายงานให้ตรงแผน", "ค. สั่งคนงานทำ OT ทันที", "ง. ยกเลิกสัญญาผู้รับเหมาช่วง"], ans: 0 },
-            { q: "10. ความแม่นยำในการทำ Survey และ Setting out สำคัญอย่างไร?", options: ["ก. เพื่อให้คนงานทำงานสะดวก", "ข. เพื่อประหยัดการใช้กล้องระดับ", "ค. ป้องกันความผิดพลาดของแนว/ระดับ/ตำแหน่งโครงสร้าง", "ง. เพื่อให้ดูเป็นมืออาชีพ"], ans: 2 },
-            { q: "11. การทำ Punch List ควรทำในช่วงใด?", options: ["ก. ก่อนเริ่มเซ็นสัญญา", "ข. ทำเฉพาะตอนลูกค้าร้องเรียน", "ค. หลังหมดระยะเวลารับประกัน", "ง. ก่อนการส่งมอบงานในแต่ละงวด/ส่งมอบงานสมบูรณ์"], ans: 3 },
-            { q: "12. ในกรณีเทคอนกรีตขนาดใหญ่ ปัญหาความร้อนมักส่งผลให้เกิดอะไร?", options: ["ก. คอนกรีตเปลี่ยนเป็นสีขาวซีด", "ข. Thermal Cracking (รอยร้าวจากความต่างอุณหภูมิ)", "ค. เหล็กเสริมขยายตัวจนหลุด", "ง. คอนกรีตแข็งตัวช้า"], ans: 1 },
-            { q: "13. As-Built Drawing คือเอกสารที่มีความสำคัญอย่างไร?", options: ["ก. แบบร่างแรกเริ่ม", "ข. ใบเสร็จรับเงินค่าวัสดุ", "ค. แบบที่จัดทำตามสภาพก่อสร้างจริงเพื่อใช้อ้างอิงซ่อมบำรุง", "ง. คู่มือเครื่องจักร"], ans: 2 },
-            { q: "14. หากพบผู้รับเหมาช่วงใช้ PPE ไม่ครบถ้วน ควรทำอย่างไร?", options: ["ก. สั่งหยุดงานส่วนนั้นทันทีและให้แก้ไขก่อนทำงานต่อ", "ข. ตักเตือนด้วยวาจาและอนุโลมให้เสร็จงานวันนั้น", "ค. รอเจ้าหน้าที่ จป. มาสั่งการ", "ง. เก็บค่าปรับโดยไม่ต้องหยุดงาน"], ans: 0 },
-            { q: "15. เทคนิค 'Fast-Tracking' หมายถึงอะไร?", options: ["ก. เพิ่มคนงานเป็น 2 เท่า", "ข. ส่งวัสดุทางอากาศ", "ค. จ้างผู้รับเหมาที่เร็วที่สุด", "ง. ทำกิจกรรมแบบขนาน (Overlap) เพื่อลดเวลา"], ans: 3 },
-            { q: "16. วิธีตรวจสอบ 'ภายใน' เนื้อรอยเชื่อมเหล็กที่แม่นยำที่สุดคือ?", options: ["ก. Visual Inspection", "ข. Ultrasonic Testing (UT) / Radiographic Testing (RT)", "ค. ใช้ไม้บรรทัดวัด", "ง. เคาะฟังเสียง"], ans: 1 },
-            { q: "17. หาก Drawing และ BOQ ขัดแย้งกัน ปกติยึดสิ่งใดเป็นหลัก?", options: ["ก. ยึดราคาถูกสุดใน BOQ", "ข. ยึดคำบอกเล่าฝ่ายจัดซื้อ", "ค. ยึด Drawing และ Specification เป็นหลัก", "ง. ยกเลิกงานส่วนนั้น"], ans: 2 },
-            { q: "18. การจัดการแบบ 'Just-in-Time' (JIT) มีข้อดีอย่างไร?", options: ["ก. ลดสต๊อก ลดพื้นที่จัดเก็บ และช่วยให้ไซต์คล่องตัว", "ข. ทำให้มีวัสดุเหลือใช้จำนวนมาก", "ค. ไม่ต้องวางแผนการซื้อ", "ง. เหมาะสำหรับของหายากซื้อเก็บยาว"], ans: 0 },
-            { q: "19. เมื่อเผชิญงานเร่ง แต่งบจำกัด สิ่งที่ห้ามทำเด็ดขาดคือ?", options: ["ก. เจรจาลดค่าเช่าเครื่องจักร", "ข. ลดสเปกวัสดุหรือข้ามขั้นตอนวิศวกรรมที่กระทบความปลอดภัย", "ค. เพิ่มประสิทธิภาพการทำงานของทีม", "ง. ประชุมร่วม Owner หาทางออก"], ans: 1 },
-            { q: "20. Soft Skill ใดสำคัญที่สุดสำหรับ Project Engineer?", options: ["ก. พิมพ์ดีดรวดเร็ว", "ข. วาดภาพเหมือนเก่ง", "ค. ท่องจำสูตรแม่น", "ง. การสื่อสารและการเจรจาต่อรอง"], ans: 3 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
-                text: item.options[choiceIndex],
+                text: item.options[choiceIndex],   // always store Thai for Sheet
                 isCorrect: choiceIndex === item.ans
             });
 
@@ -164,15 +367,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -186,27 +389,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -216,54 +418,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
