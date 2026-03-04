@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Purchasing Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,103 +51,306 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบตำแหน่ง เจ้าหน้าที่จัดซื้อ</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Purchasing</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Purchasing",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Purchasing",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. วัตถุประสงค์หลักของงานจัดซื้อคือข้อใด?",
+                qEn: "1. What is the primary objective of the purchasing function?",
+                options: ['ก. เน้นซื้อให้ "ถูกที่สุด" เป็นอันดับแรก', 'ข. จัดหาให้ "ถูกต้องครบ 5R" พร้อมคุมความเสี่ยงและความโปร่งใส', "ค. สร้างความสนิทกับ Supplier เป็นหลักเพื่อให้ขอของด่วนได้ง่าย", "ง. ทำสต็อกให้เต็มคลังเสมอเพื่อกันของขาด"],
+                optionsEn: ["A. To prioritise buying at the lowest possible price above all else.", "B. To procure correctly across the 5 Rights while managing risk and maintaining transparency.", "C. To build close personal relationships with suppliers so urgent requests can be fulfilled easily.", "D. To always keep the warehouse fully stocked to prevent shortages."],
+                ans: 1
+            },
+            {
+                q: "2. ขั้นตอนแรกของกระบวนการจัดซื้อ (Purchasing Cycle) คือข้อใด?",
+                qEn: "2. What is the first step in the Purchasing Cycle?",
+                options: ["ก. ตรวจรับสินค้าเข้าคลังทันที", "ข. รับใบขอซื้อ (PR) พร้อมตรวจสเปก ปริมาณ และงบประมาณ", "ค. ออกใบสั่งซื้อ (PO) ก่อนเพื่อกันของ", "ง. จ่ายเงินให้ Supplier ก่อนเพื่อเร่งการผลิต"],
+                optionsEn: ["A. Immediately receive goods into the warehouse.", "B. Receive the Purchase Request (PR) and verify the specifications, quantity, and budget.", "C. Issue a Purchase Order (PO) first to reserve the stock.", "D. Pay the supplier in advance to expedite production."],
+                ans: 1
+            },
+            {
+                q: "3. ในการคัดเลือก Supplier รายใหม่ ปัจจัยใดสำคัญน้อยที่สุด?",
+                qEn: "3. When evaluating a new supplier, which factor is the least important?",
+                options: ["ก. จำนวนพนักงานของผู้ขายเพียงอย่างเดียว", "ข. คุณภาพสินค้าและความสม่ำเสมอ", "ค. ความมั่นคงและชื่อเสียงผู้ขาย", "ง. เงื่อนไขชำระเงิน (Credit Term)"],
+                optionsEn: ["A. The supplier's headcount alone.", "B. Product quality and consistency.", "C. The supplier's financial stability and reputation.", "D. Payment terms (Credit Term)."],
+                ans: 0
+            },
+            {
+                q: "4. 'PR' และ 'PO' มีความแตกต่างกันอย่างไร?",
+                qEn: "4. What is the difference between a 'PR' and a 'PO'?",
+                options: ["ก. PR เป็นใบส่งของ PO เป็นใบเสร็จ", "ข. PR ใช้ระดับล่าง PO ใช้ระดับบริหาร", "ค. PR คือใบขอซื้อภายในส่วน PO คือคำสั่งซื้ออย่างเป็นทางการถึงผู้ขาย", "ง. PR และ PO ใช้แทนกันได้ทั้งหมด"],
+                optionsEn: ["A. A PR is a delivery note; a PO is a receipt.", "B. A PR is used by lower-level staff; a PO is used by management.", "C. A PR is an internal purchase request; a PO is a formal order issued to the supplier.", "D. A PR and a PO are completely interchangeable."],
+                ans: 2
+            },
+            {
+                q: "5. หาก Supplier รายประจำขอปรับขึ้นราคาสินค้า 10% คุณควรทำอย่างไรเป็นอันดับแรก?",
+                qEn: "5. If a regular supplier requests a 10% price increase, what should you do first?",
+                options: ["ก. ยอมรับราคาทันทีเพื่อกันของขาด", "ข. ขอโครงสร้างต้นทุนและทำ Price Benchmark เปรียบเทียบตลาด", "ค. เลิกสั่งซื้อทันทีเพื่อกดดัน", "ง. ปรับราคาขายของบริษัทขึ้นทันที"],
+                optionsEn: ["A. Accept the new price immediately to prevent a stock shortage.", "B. Request a cost breakdown and conduct a market price benchmark.", "C. Immediately stop all orders to apply pressure.", "D. Immediately increase the company's own selling prices."],
+                ans: 1
+            },
+            {
+                q: "6. 'Lead Time' ในงานจัดซื้อหมายถึงอะไร?",
+                qEn: "6. What does 'Lead Time' mean in the context of purchasing?",
+                options: ["ก. เวลาที่ใช้ผลิตสินค้าเพียงอย่างเดียว", "ข. เวลาที่ใช้ประชุมต่อรองราคา", "ค. ระยะเวลารับประกันสินค้า", "ง. ระยะเวลาตั้งแต่ยืนยันคำสั่งซื้อจนได้รับสินค้าใช้งานจริง"],
+                optionsEn: ["A. The time required to manufacture the product only.", "B. The time spent in price negotiation meetings.", "C. The product warranty period.", "D. The total time from order confirmation to receiving the goods for use."],
+                ans: 3
+            },
+            {
+                q: "7. หากพบว่าสินค้าที่ส่งมา 'คุณภาพไม่ตรงตามสเปก' คุณควรทำอย่างไร?",
+                qEn: "7. If delivered goods are found to be 'not conforming to specification', what should you do?",
+                options: ["ก. รับไว้ก่อนแล้วซ่อมเอง", "ข. หักเงินเดือนพนักงานตรวจรับ", "ค. ทำบันทึก NCR แจ้งผู้ขายเพื่อเคลมหรือเปลี่ยน", "ง. นำไปขายต่อให้บริษัทอื่น"],
+                optionsEn: ["A. Accept the goods and repair them in-house.", "B. Deduct the salary of the receiving staff.", "C. Raise a Non-Conformance Report (NCR) and notify the supplier to claim or replace the goods.", "D. Resell the goods to another company."],
+                ans: 2
+            },
+            {
+                q: "8. 'Credit Term' ที่นานขึ้น (เช่น จาก 30 วัน เป็น 60 วัน) มีประโยชน์อย่างไร?",
+                qEn: "8. What is the benefit of a longer Credit Term (e.g. extending from 30 days to 60 days)?",
+                options: ["ก. ได้สินค้าเร็วขึ้น", "ข. สินค้าคุณภาพดีขึ้น", "ค. ช่วยลด VAT", "ง. เพิ่มสภาพคล่องและบริหาร Cash Flow ได้ดีขึ้น"],
+                optionsEn: ["A. Goods are received more quickly.", "B. Product quality improves.", "C. It reduces VAT liability.", "D. It improves liquidity and enables better cash flow management."],
+                ans: 3
+            },
+            {
+                q: "9. เอกสาร 'Quotation' คือเอกสารชนิดใด?",
+                qEn: "9. What type of document is a 'Quotation'?",
+                options: ["ก. ใบแจ้งหนี้เรียกเก็บเงิน", "ข. ใบรับรองมาตรฐานอุตสาหกรรม", "ค. ใบประเมินผลงานพนักงาน", "ง. ใบเสนอราคาที่ผู้ขายแจ้งราคา สเปก และเงื่อนไข"],
+                optionsEn: ["A. An invoice requesting payment.", "B. An industrial standard certificate.", "C. An employee performance evaluation form.", "D. A document issued by the supplier stating price, specifications, and terms."],
+                ans: 3
+            },
+            {
+                q: "10. การเปรียบเทียบราคา (Price Comparison) ควรเทียบอย่างน้อยกี่ราย?",
+                qEn: "10. How many suppliers should be included in a Price Comparison at minimum?",
+                options: ["ก. 1 รายที่ไว้ใจ", "ข. 2 รายเพื่อให้มีตัวเทียบ", "ค. 3 รายขึ้นไป เพื่อเห็นช่วงราคาและลดอคติ", "ง. ไม่ต้องเทียบถ้าสนิทกัน"],
+                optionsEn: ["A. 1 trusted supplier.", "B. 2 suppliers to have a reference point.", "C. At least 3 suppliers to understand the price range and reduce bias.", "D. No comparison is needed if you have a good relationship with the supplier."],
+                ans: 2
+            },
+            {
+                q: "11. หาก Supplier เสนอ 'ค่าคอมมิชชั่นส่วนตัว' ให้ คุณควรทำอย่างไร?",
+                qEn: "11. If a supplier offers you a personal commission, what should you do?",
+                options: ["ก. รับไว้เป็นรางวัลส่วนตัว", "ข. รับแล้วแบ่งเพื่อนร่วมงาน", "ค. ต่อรองขอเพิ่มเป็น 2 เท่า", "ง. ปฏิเสธและรายงานตามนโยบายต่อต้านทุจริต"],
+                optionsEn: ["A. Accept it as a personal reward.", "B. Accept it and share it with colleagues.", "C. Negotiate to double the amount.", "D. Decline and report it in accordance with the company's anti-corruption policy."],
+                ans: 3
+            },
+            {
+                q: "12. 'Incoterms' (เช่น EXW, FOB, CIF) มีความสำคัญอย่างไร?",
+                qEn: "12. Why are 'Incoterms' (e.g. EXW, FOB, CIF) important?",
+                options: ["ก. เป็นรหัสพิกัดศุลกากร", "ข. เป็นรหัสส่วนลดสินค้า", "ค. เป็นชื่อท่าเรือปลายทาง", "ง. กำหนดขอบเขตความรับผิดชอบ ค่าใช้จ่าย และจุดโอนความเสี่ยง"],
+                optionsEn: ["A. They are customs tariff codes.", "B. They are product discount codes.", "C. They are the names of destination ports.", "D. They define the responsibilities, costs, and the point at which risk transfers between parties."],
+                ans: 3
+            },
+            {
+                q: "13. การประเมินผู้ขาย (Vendor Evaluation) ประจำปีมีวัตถุประสงค์เพื่ออะไร?",
+                qEn: "13. What is the purpose of an annual Vendor Evaluation?",
+                options: ["ก. หาข้ออ้างในการลดราคา", "ข. จัดงานเลี้ยงขอบคุณ", "ค. ขอของขวัญสนับสนุนทีม", "ง. วัดผลคุณภาพ การส่งมอบ และบริการเพื่อตัดสินใจในอนาคต"],
+                optionsEn: ["A. To find grounds for requesting price reductions.", "B. To organise an appreciation event.", "C. To request gifts for team sponsorship.", "D. To measure quality, delivery, and service performance as a basis for future decisions."],
+                ans: 3
+            },
+            {
+                q: "14. คำว่า 'Back Order' หมายความว่าอย่างไร?",
+                qEn: "14. What does the term 'Back Order' mean?",
+                options: ["ก. การสั่งซื้อย้อนหลัง", "ข. การส่งสินค้าคืนผู้ขาย", "ค. การยกเลิกใบสั่งซื้อ", "ง. รายการที่สั่งแล้วแต่ผู้ขายยังไม่มีของจึงต้องรอเติมสต็อก"],
+                optionsEn: ["A. A retroactive purchase order.", "B. Returning goods to the supplier.", "C. Cancelling a purchase order.", "D. An ordered item that the supplier does not currently have in stock and must fulfil once available."],
+                ans: 3
+            },
+            {
+                q: "15. ในการเจรจาต่อรอง (Negotiation) เป้าหมายที่ควรจะเป็นคือข้อใด?",
+                qEn: "15. What should the goal of a purchasing negotiation be?",
+                options: ["ก. ได้ประโยชน์สูงสุดฝ่ายเดียว", "ข. ทำให้ Supplier กลัว", "ค. ยอมตามใจ Supplier ทุกอย่าง", "ง. หาข้อตกลงแบบ Win-Win เพื่อความร่วมมือระยะยาว"],
+                optionsEn: ["A. To maximise your own advantage at the other party's expense.", "B. To intimidate the supplier.", "C. To concede to all of the supplier's demands.", "D. To reach a Win-Win agreement that supports a long-term collaborative relationship."],
+                ans: 3
+            },
+            {
+                q: "16. หากคลังแจ้งว่าของใกล้หมดแต่ยังไม่มี PR คุณควรทำอย่างไร?",
+                qEn: "16. If the warehouse reports that stock is nearly depleted but no PR has been issued yet, what should you do?",
+                options: ["ก. รีบสั่งด้วยเงินส่วนตัวก่อน", "ข. นิ่งเฉยจนกว่าจะมี PR", "ค. ด่าคลังที่แจ้งช้า", "ง. ประสานผู้ใช้ให้ออก PR พร้อมตรวจสอบจุดสั่งซื้อ"],
+                optionsEn: ["A. Quickly place an order using your own money.", "B. Wait and do nothing until a PR is received.", "C. Reprimand the warehouse team for notifying late.", "D. Coordinate with the requester to raise a PR and review the reorder point."],
+                ans: 3
+            },
+            {
+                q: "17. 'Centralized Purchasing' (การจัดซื้อรวมศูนย์) มีข้อดีอย่างไร?",
+                qEn: "17. What is the advantage of Centralised Purchasing?",
+                options: ["ก. เพิ่มอำนาจต่อรองและคุมมาตรฐานราคา/สเปก", "ข. ทำให้งานล่าช้าเสมอ", "ค. ให้สาขาซื้อของได้ตามใจ", "ง. ลด Supplier เหลือเพียงรายเดียว"],
+                optionsEn: ["A. It increases bargaining power and standardises pricing and specifications.", "B. It always causes delays in procurement.", "C. It allows branches to purchase whatever they want.", "D. It reduces the supplier base to a single vendor."],
+                ans: 0
+            },
+            {
+                q: "18. เอกสาร 'Debit Note' (ใบเพิ่มหนี้) ใช้ในกรณีใด?",
+                qEn: "18. In which situation is a 'Debit Note' used?",
+                options: ["ก. ขอลดหนี้จากผู้ขาย", "ข. เพิ่มยอดหนี้เพราะยอดเดิมต่ำกว่าความจริงตามตกลง", "ค. ยืนยันว่ารับของเกิน", "ง. ขอใบกำกับภาษีใหม่"],
+                optionsEn: ["A. To request a reduction of debt from the supplier.", "B. To increase the amount owed because the original figure was lower than the agreed amount.", "C. To confirm that excess goods were received.", "D. To request a replacement tax invoice."],
+                ans: 1
+            },
+            {
+                q: "19. ความถูกต้องของ 'Unit of Measure' (หน่วยนับ) สำคัญอย่างไร?",
+                qEn: "19. Why is the accuracy of the 'Unit of Measure' important?",
+                options: ["ก. ช่วยให้พิมพ์เอกสารสวย", "ข. ไม่มีผลถ้าราคาเท่าเดิม", "ค. ลดความคลาดเคลื่อนในการสั่ง-ตรวจรับ-สต็อก", "ง. ช่วยให้ส่งของเร็วขึ้น"],
+                optionsEn: ["A. It makes documents look more presentable.", "B. It has no impact as long as the price remains the same.", "C. It reduces discrepancies across ordering, receiving, and stock management.", "D. It helps goods be delivered more quickly."],
+                ans: 2
+            },
+            {
+                q: "20. จรรยาบรรณวิชาชีพจัดซื้อข้อใดสำคัญที่สุด?",
+                qEn: "20. Which principle of purchasing professional ethics is most important?",
+                options: ["ก. ความรวดเร็วเป็นหลักแม้เอกสารไม่ครบ", "ข. เลือกซื้อจากญาติเพื่อความเชื่อใจ", "ค. สร้างความสัมพันธ์โดยไม่มีเกณฑ์ตัดสินใจ", "ง. ความซื่อสัตย์ โปร่งใส และไม่มีผลประโยชน์ทับซ้อน"],
+                optionsEn: ["A. Speed is the priority, even if documentation is incomplete.", "B. Buying from relatives for the sake of trust.", "C. Building relationships without any objective decision-making criteria.", "D. Honesty, transparency, and the absence of conflicts of interest."],
+                ans: 3
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Purchasing';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            { q: "1. วัตถุประสงค์หลักของงานจัดซื้อคือข้อใด?", options: ["ก. เน้นซื้อให้ “ถูกที่สุด” เป็นอันดับแรก", "ข. จัดหาให้ “ถูกต้องครบ 5R” พร้อมคุมความเสี่ยงและความโปร่งใส", "ค. สร้างความสนิทกับ Supplier เป็นหลักเพื่อให้ขอของด่วนได้ง่าย", "ง. ทำสต็อกให้เต็มคลังเสมอเพื่อกันของขาด"], ans: 1 },
-            { q: "2. ขั้นตอนแรกของกระบวนการจัดซื้อ (Purchasing Cycle) คือข้อใด?", options: ["ก. ตรวจรับสินค้าเข้าคลังทันที", "ข. รับใบขอซื้อ (PR) พร้อมตรวจสเปก ปริมาณ และงบประมาณ", "ค. ออกใบสั่งซื้อ (PO) ก่อนเพื่อกันของ", "ง. จ่ายเงินให้ Supplier ก่อนเพื่อเร่งการผลิต"], ans: 1 },
-            { q: "3. ในการคัดเลือก Supplier รายใหม่ ปัจจัยใดสำคัญน้อยที่สุด?", options: ["ก. จำนวนพนักงานของผู้ขายเพียงอย่างเดียว", "ข. คุณภาพสินค้าและความสม่ำเสมอ", "ค. ความมั่นคงและชื่อเสียงผู้ขาย", "ง. เงื่อนไขชำระเงิน (Credit Term)"], ans: 0 },
-            { q: "4. 'PR' และ 'PO' มีความแตกต่างกันอย่างไร?", options: ["ก. PR เป็นใบส่งของ PO เป็นใบเสร็จ", "ข. PR ใช้ระดับล่าง PO ใช้ระดับบริหาร", "ค. PR คือใบขอซื้อภายในส่วน PO คือคำสั่งซื้ออย่างเป็นทางการถึงผู้ขาย", "ง. PR และ PO ใช้แทนกันได้ทั้งหมด"], ans: 2 },
-            { q: "5. หาก Supplier รายประจำขอปรับขึ้นราคาสินค้า 10% คุณควรทำอย่างไรเป็นอันดับแรก?", options: ["ก. ยอมรับราคาทันทีเพื่อกันของขาด", "ข. ขอโครงสร้างต้นทุนและทำ Price Benchmark เปรียบเทียบตลาด", "ค. เลิกสั่งซื้อทันทีเพื่อกดดัน", "ง. ปรับราคาขายของบริษัทขึ้นทันที"], ans: 1 },
-            { q: "6. 'Lead Time' ในงานจัดซื้อหมายถึงอะไร?", options: ["ก. เวลาที่ใช้ผลิตสินค้าเพียงอย่างเดียว", "ข. เวลาที่ใช้ประชุมต่อรองราคา", "ค. ระยะเวลารับประกันสินค้า", "ง. ระยะเวลาตั้งแต่ยืนยันคำสั่งซื้อจนได้รับสินค้าใช้งานจริง"], ans: 3 },
-            { q: "7. หากพบว่าสินค้าที่ส่งมา 'คุณภาพไม่ตรงตามสเปก' คุณควรทำอย่างไร?", options: ["ก. รับไว้ก่อนแล้วซ่อมเอง", "ข. หักเงินเดือนพนักงานตรวจรับ", "ค. ทำบันทึก NCR แจ้งผู้ขายเพื่อเคลมหรือเปลี่ยน", "ง. นำไปขายต่อให้บริษัทอื่น"], ans: 2 },
-            { q: "8. 'Credit Term' ที่นานขึ้น (เช่น จาก 30 วัน เป็น 60 วัน) มีประโยชน์อย่างไร?", options: ["ก. ได้สินค้าเร็วขึ้น", "ข. สินค้าคุณภาพดีขึ้น", "ค. ช่วยลด VAT", "ง. เพิ่มสภาพคล่องและบริหาร Cash Flow ได้ดีขึ้น"], ans: 3 },
-            { q: "9. เอกสาร 'Quotation' คือเอกสารชนิดใด?", options: ["ก. ใบแจ้งหนี้เรียกเก็บเงิน", "ข. ใบรับรองมาตรฐานอุตสาหกรรม", "ค. ใบประเมินผลงานพนักงาน", "ง. ใบเสนอราคาที่ผู้ขายแจ้งราคา สเปก และเงื่อนไข"], ans: 3 },
-            { q: "10. การเปรียบเทียบราคา (Price Comparison) ควรเทียบอย่างน้อยกี่ราย?", options: ["ก. 1 รายที่ไว้ใจ", "ข. 2 รายเพื่อให้มีตัวเทียบ", "ค. 3 รายขึ้นไป เพื่อเห็นช่วงราคาและลดอคติ", "ง. ไม่ต้องเทียบถ้าสนิทกัน"], ans: 2 },
-            { q: "11. หาก Supplier เสนอ 'ค่าคอมมิชชั่นส่วนตัว' ให้ คุณควรทำอย่างไร?", options: ["ก. รับไว้เป็นรางวัลส่วนตัว", "ข. รับแล้วแบ่งเพื่อนร่วมงาน", "ค. ต่อรองขอเพิ่มเป็น 2 เท่า", "ง. ปฏิเสธและรายงานตามนโยบายต่อต้านทุจริต"], ans: 3 },
-            { q: "12. 'Incoterms' (เช่น EXW, FOB, CIF) มีความสำคัญอย่างไร?", options: ["ก. เป็นรหัสพิกัดศุลกากร", "ข. เป็นรหัสส่วนลดสินค้า", "ค. เป็นชื่อท่าเรือปลายทาง", "ง. กำหนดขอบเขตความรับผิดชอบ ค่าใช้จ่าย และจุดโอนความเสี่ยง"], ans: 3 },
-            { q: "13. การประเมินผู้ขาย (Vendor Evaluation) ประจำปีมีวัตถุประสงค์เพื่ออะไร?", options: ["ก. หาข้ออ้างในการลดราคา", "ข. จัดงานเลี้ยงขอบคุณ", "ค. ขอของขวัญสนับสนุนทีม", "ง. วัดผลคุณภาพ การส่งมอบ และบริการเพื่อตัดสินใจในอนาคต"], ans: 3 },
-            { q: "14. คำว่า 'Back Order' หมายความว่าอย่างไร?", options: ["ก. การสั่งซื้อย้อนหลัง", "ข. การส่งสินค้าคืนผู้ขาย", "ค. การยกเลิกใบสั่งซื้อ", "ง. รายการที่สั่งแล้วแต่ผู้ขายยังไม่มีของจึงต้องรอเติมสต็อก"], ans: 3 },
-            { q: "15. ในการเจรจาต่อรอง (Negotiation) เป้าหมายที่ควรจะเป็นคือข้อใด?", options: ["ก. ได้ประโยชน์สูงสุดฝ่ายเดียว", "ข. ทำให้ Supplier กลัว", "ค. ยอมตามใจ Supplier ทุกอย่าง", "ง. หาข้อตกลงแบบ Win-Win เพื่อความร่วมมือระยะยาว"], ans: 3 },
-            { q: "16. หากคลังแจ้งว่าของใกล้หมดแต่ยังไม่มี PR คุณควรทำอย่างไร?", options: ["ก. รีบสั่งด้วยเงินส่วนตัวก่อน", "ข. นิ่งเฉยจนกว่าจะมี PR", "ค. ด่าคลังที่แจ้งช้า", "ง. ประสานผู้ใช้ให้ออก PR พร้อมตรวจสอบจุดสั่งซื้อ"], ans: 3 },
-            { q: "17. 'Centralized Purchasing' (การจัดซื้อรวมศูนย์) มีข้อดีอย่างไร?", options: ["ก. เพิ่มอำนาจต่อรองและคุมมาตรฐานราคา/สเปก", "ข. ทำให้งานล่าช้าเสมอ", "ค. ให้สาขาซื้อของได้ตามใจ", "ง. ลด Supplier เหลือเพียงรายเดียว"], ans: 0 },
-            { q: "18. เอกสาร 'Debit Note' (ใบเพิ่มหนี้) ใช้ในกรณีใด?", options: ["ก. ขอลดหนี้จากผู้ขาย", "ข. เพิ่มยอดหนี้เพราะยอดเดิมต่ำกว่าความจริงตามตกลง", "ค. ยืนยันว่ารับของเกิน", "ง. ขอใบกำกับภาษีใหม่"], ans: 1 },
-            { q: "19. ความถูกต้องของ 'Unit of Measure' (หน่วยนับ) สำคัญอย่างไร?", options: ["ก. ช่วยให้พิมพ์เอกสารสวย", "ข. ไม่มีผลถ้าราคาเท่าเดิม", "ค. ลดความคลาดเคลื่อนในการสั่ง-ตรวจรับ-สต็อก", "ง. ช่วยให้ส่งของเร็วขึ้น"], ans: 2 },
-            { q: "20. จรรยาบรรณวิชาชีพจัดซื้อข้อใดสำคัญที่สุด?", options: ["ก. ความรวดเร็วเป็นหลักแม้เอกสารไม่ครบ", "ข. เลือกซื้อจากญาติเพื่อความเชื่อใจ", "ค. สร้างความสัมพันธ์โดยไม่มีเกณฑ์ตัดสินใจ", "ง. ความซื่อสัตย์ โปร่งใส และไม่มีผลประโยชน์ทับซ้อน"], ans: 3 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
@@ -164,15 +367,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -186,27 +389,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -216,54 +418,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
