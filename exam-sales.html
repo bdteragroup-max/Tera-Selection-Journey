@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Sales Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,104 +51,306 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">Sales Professional Assessment</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Sales</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
-        </form>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Sales",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Sales",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. หัวใจสำคัญของการเป็นพนักงานขายในยุคปัจจุบันคืออะไร?",
+                qEn: "1. What is the most important quality of a modern salesperson?",
+                options: ["ก. การรอคอยลูกค้าติดต่อเข้ามาเอง", "ข. การส่งอีเมลโฆษณาจำนวนมหาศาล", "ค. การโน้มน้าวใจให้ลูกค้าคล้อยตามเราทุกเรื่อง", "ง. การวิเคราะห์ปัญหาลูกค้า (Pain Points) และนำเสนอโซลูชัน"],
+                optionsEn: ["A. Waiting for customers to reach out on their own.", "B. Sending out mass advertising emails.", "C. Persuading customers to agree with everything you say.", "D. Analysing customer pain points and presenting tailored solutions."],
+                ans: 3
+            },
+            {
+                q: "2. หากลูกค้าบอกว่า 'สินค้าของคุณราคาแพงเกินไป' คุณควรตอบสนองอย่างไรเป็นอันดับแรก?",
+                qEn: "2. If a customer says 'Your product is too expensive', what should you do first?",
+                options: ["ก. วิจารณ์คู่แข่งว่าคุณภาพต่ำกว่า", "ข. ปรับลดราคาลงทันที 50%", "ค. ยุติการสนทนาทันที", "ง. ตรวจสอบสมมติฐานและนำเสนอ 'คุณค่าที่ได้รับ' (Value Proposition)"],
+                optionsEn: ["A. Criticise competitors for having lower quality.", "B. Immediately drop the price by 50%.", "C. End the conversation immediately.", "D. Probe the assumption and present your Value Proposition."],
+                ans: 3
+            },
+            {
+                q: "3. ขั้นตอน 'Prospecting' ในกระบวนการขายหมายถึงอะไร?",
+                qEn: "3. What does the 'Prospecting' stage of the sales process mean?",
+                options: ["ก. การจัดกิจกรรมสันทนาการกับลูกค้าเก่า", "ข. การระบุและคัดกรองกลุ่มเป้าหมาย (Lead Qualification)", "ค. การออกใบแจ้งหนี้ตามรอบบัญชี", "ง. การจัดเตรียมเครื่องแบบเข้าพบลูกค้า"],
+                optionsEn: ["A. Organising recreational activities with existing customers.", "B. Identifying and qualifying potential leads.", "C. Issuing invoices on a billing cycle.", "D. Preparing a uniform or dress code for client visits."],
+                ans: 1
+            },
+            {
+                q: "4. การขายแบบ 'Consultative Selling' (การขายแบบที่ปรึกษา) คืออะไร?",
+                qEn: "4. What is 'Consultative Selling'?",
+                options: ["ก. การจ้างผู้เชี่ยวชาญภายนอกมาขายแทน", "ข. การใช้เสียงหนักแน่นเพื่อให้ลูกค้าเกรงใจ", "ค. การถามคำถามเชิงลึกเพื่อวินิจฉัยความต้องการและให้คำแนะนำ", "ง. การขายให้เฉพาะกลุ่มอาชีพที่ปรึกษา"],
+                optionsEn: ["A. Hiring an external expert to sell on your behalf.", "B. Using a firm voice to make customers feel intimidated.", "C. Asking in-depth questions to diagnose needs and provide tailored advice.", "D. Selling exclusively to consultant professionals."],
+                ans: 2
+            },
+            {
+                q: "5. หากคุณต้องทำ 'Cold Calling' สิ่งที่ควรทำใน 10 วินาทีแรกคืออะไร?",
+                qEn: "5. When making a Cold Call, what should you do in the first 10 seconds?",
+                options: ["ก. เสนอโปรโมชั่นพิเศษทันที", "ข. แนะนำตนเองอย่างมืออาชีพพร้อมระบุคุณค่าที่จะมอบให้", "ค. ขอข้อมูลส่วนตัวหรือการเงิน", "ง. ชวนคุยเรื่องดินฟ้าอากาศ"],
+                optionsEn: ["A. Immediately pitch a special promotion.", "B. Introduce yourself professionally and state the value you can offer.", "C. Ask for personal or financial information.", "D. Start with small talk about the weather."],
+                ans: 1
+            },
+            {
+                q: "6. 'After-Sales Service' มีความสำคัญอย่างไรต่อพนักงานขาย?",
+                qEn: "6. Why is 'After-Sales Service' important for a salesperson?",
+                options: ["ก. เป็นหน้าที่ฝ่ายเทคนิค ไม่เกี่ยวกับงานขาย", "ข. ช่วยลดภาระทางภาษี", "ค. เป็นข้ออ้างในการโทรหาลูกค้า", "ง. เพิ่มมูลค่าตลอดช่วงชีวิตลูกค้า (CLV) และส่งเสริมการบอกต่อ"],
+                optionsEn: ["A. It is a technical team's responsibility, not related to sales.", "B. It helps reduce tax obligations.", "C. It provides an excuse to call customers.", "D. It increases Customer Lifetime Value (CLV) and encourages word-of-mouth referrals."],
+                ans: 3
+            },
+            {
+                q: "7. เมื่อลูกค้าปฏิเสธการซื้อ (Rejection) พนักงานขายที่ดีควรทำอย่างไร?",
+                qEn: "7. When a customer rejects a purchase, what should a good salesperson do?",
+                options: ["ก. แสดงความไม่พอใจและตัดการติดต่อ", "ข. ตามตื้อจนกว่าลูกค้าจะรำคาญและยอมซื้อ", "ค. เช็กข้อมูลว่าลูกค้าไปซื้อคู่แข่งรายไหนเพื่อสกัดกั้น", "ง. บริหารจัดการอารมณ์และสอบถาม Feedback เพื่อรักษาความสัมพันธ์"],
+                optionsEn: ["A. Express frustration and cut off contact.", "B. Persistently follow up until the customer is annoyed enough to buy.", "C. Investigate which competitor they went to in order to block the deal.", "D. Manage emotions professionally and ask for feedback to preserve the relationship."],
+                ans: 3
+            },
+            {
+                q: "8. 'Cross-selling' หมายถึงเทคนิคการขายแบบใด?",
+                qEn: "8. What does 'Cross-selling' mean as a sales technique?",
+                options: ["ก. ขายต่ำกว่าทุนเพื่อดึงลูกค้า", "ข. นำเสนอสินค้าที่เกี่ยวข้องหรือเสริมประสิทธิภาพให้สินค้าหลัก", "ค. ขายข้ามพื้นที่รับผิดชอบ", "ง. โน้มน้าวให้ลูกค้าซื้อสิ่งที่ไม่จำเป็นเพื่อทำยอด"],
+                optionsEn: ["A. Selling below cost to attract customers.", "B. Offering related or complementary products that enhance the main purchase.", "C. Selling outside your assigned territory.", "D. Persuading customers to buy unnecessary items just to meet quota."],
+                ans: 1
+            },
+            {
+                q: "9. KPI ที่สำคัญที่สุดสำหรับพนักงานขายคือข้อใด?",
+                qEn: "9. What are the most important KPIs for a salesperson?",
+                options: ["ก. ยอดขายสุทธิ (Sales Revenue) และอัตราการบรรลุเป้าหมาย (Quota)", "ข. ความสวยงามของสไลด์นำเสนอ", "ค. ชั่วโมงการทำงานในออฟฟิศ", "ง. จำนวนผู้ติดตามในโซเชียลส่วนตัว"],
+                optionsEn: ["A. Net Sales Revenue and Quota Attainment Rate.", "B. The visual quality of presentation slides.", "C. Hours spent working in the office.", "D. Number of followers on personal social media."],
+                ans: 0
+            },
+            {
+                q: "10. การปิดการขาย (Closing the Sale) ควรทำในช่วงเวลาใด?",
+                qEn: "10. When should you attempt to close a sale?",
+                options: ["ก. เริ่มต้นการสนทนาทันที", "ข. รอให้ลูกค้าขอซื้อเอง", "ค. เมื่อลูกค้ากำลังจะเดินออกจากห้อง", "ง. เมื่อพบสัญญาณการซื้อ (Buying Signals) และตอบข้อโต้แย้งครบแล้ว"],
+                optionsEn: ["A. Immediately at the start of the conversation.", "B. Wait for the customer to ask to buy on their own.", "C. When the customer is about to leave the room.", "D. When you detect buying signals and have addressed all objections."],
+                ans: 3
+            },
+            {
+                q: "11. 'Handling Objections' หมายถึงทักษะใด?",
+                qEn: "11. What skill does 'Handling Objections' refer to?",
+                options: ["ก. ศิลปะการจัดการข้อกังวลเพื่อเปลี่ยนอุปสรรคเป็นโอกาส", "ข. ทักษะการยกของหนักในโลจิสติกส์", "ค. ทักษะการจดรายงานการประชุม", "ง. การขับรถเข้าพบลูกค้าให้ตรงเวลา"],
+                optionsEn: ["A. The art of addressing concerns to turn obstacles into opportunities.", "B. The skill of lifting heavy loads in logistics.", "C. The skill of writing meeting minutes.", "D. Driving to client meetings on time."],
+                ans: 0
+            },
+            {
+                q: "12. หากพบว่าสินค้าคู่แข่งมีจุดที่ดียิ่งกว่าของคุณ คุณควรทำอย่างไร?",
+                qEn: "12. If a competitor's product has features that are superior to yours, what should you do?",
+                options: ["ก. สร้างข้อมูลเท็จหลอกลูกค้า", "ข. ให้ร้ายสถานะการเงินของคู่แข่ง", "ค. ลาออกไปอยู่บริษัทคู่แข่งทันที", "ง. ยอมรับข้อเท็จจริงและเน้นจุดแข็ง (USP) ที่เราเหนือกว่า"],
+                optionsEn: ["A. Fabricate false information to deceive the customer.", "B. Spread rumours about the competitor's financial instability.", "C. Immediately resign and join the competitor.", "D. Acknowledge the fact and highlight your own superior Unique Selling Points (USPs)."],
+                ans: 3
+            },
+            {
+                q: "13. ทักษะ 'Active Listening' มีประโยชน์ต่อ Sales อย่างไร?",
+                qEn: "13. How does 'Active Listening' benefit a salesperson?",
+                options: ["ก. ช่วยให้นำเรื่องบันเทิงมาคุยกับลูกค้าได้", "ข. ช่วยให้จำชื่อลูกค้าได้แม่นยำ", "ค. ช่วยให้ไม่ต้องพูดมาก เก็บแรงไว้หาลูกค้ารายอื่น", "ง. ช่วยให้เข้าใจปัญหาที่แท้จริงและแรงจูงใจเบื้องลึกของลูกค้า"],
+                optionsEn: ["A. It helps bring up entertaining topics with customers.", "B. It helps you remember customer names more accurately.", "C. It means you don't have to talk much, saving energy for other customers.", "D. It helps you understand the customer's true problems and underlying motivations."],
+                ans: 3
+            },
+            {
+                q: "14. 'Sales Pipeline' ช่วยพนักงานขายจัดการงานได้อย่างไร?",
+                qEn: "14. How does a 'Sales Pipeline' help a salesperson manage their work?",
+                options: ["ก. คำนวณค่าน้ำมันรถ", "ข. จัดการระบบระบายน้ำในออฟฟิศ", "ค. เป็นตู้นิรภัยเก็บเงินสด", "ง. มองเห็นภาพรวมและสถานะดีลเพื่อพยากรณ์ยอดขาย"],
+                optionsEn: ["A. It calculates fuel expenses.", "B. It manages the office drainage system.", "C. It acts as a safe for storing cash.", "D. It provides an overview of all deals and their status for accurate sales forecasting."],
+                ans: 3
+            },
+            {
+                q: "15. ในการนำเสนอสินค้า (Sales Presentation) ข้อใดควรทำมากที่สุด?",
+                qEn: "15. During a Sales Presentation, which approach is most effective?",
+                options: ["ก. อ่านสเปกตามเอกสารให้ฟังทุกตัว", "ข. มั่นใจเกินเหตุจนดูไม่น่าเชื่อถือ", "ค. พูดให้เร็วที่สุดเพื่อประหยัดเวลา", "ง. เชื่อมโยงคุณลักษณะ (Features) ให้เห็นเป็นประโยชน์ (Benefits)"],
+                optionsEn: ["A. Read out every specification from the document.", "B. Be excessively confident to the point of appearing untrustworthy.", "C. Speak as quickly as possible to save time.", "D. Connect product Features to customer Benefits."],
+                ans: 3
+            },
+            {
+                q: "16. หากได้รับมอบหมายพื้นที่ใหม่ที่ไม่มีฐานลูกค้าเลย ควรทำสิ่งใดก่อน?",
+                qEn: "16. If you are assigned a new territory with no existing customer base, what should you do first?",
+                options: ["ก. ทำแผน Territory Management และวิเคราะห์ตลาด", "ข. รอรายชื่อจากฝ่ายการตลาดอย่างเดียว", "ค. สุ่มแจกใบปลิวในที่คนเยอะๆ", "ง. รายงานว่าเป้าหมายเป็นไปไม่ได้"],
+                optionsEn: ["A. Create a Territory Management plan and conduct a market analysis.", "B. Wait solely for a lead list from the marketing team.", "C. Randomly distribute flyers in crowded areas.", "D. Report that the target is unachievable."],
+                ans: 0
+            },
+            {
+                q: "17. พฤติกรรมใดถือว่า 'เสียจรรยาบรรณ' ของพนักงานขาย?",
+                qEn: "17. Which behaviour is considered a violation of sales professional ethics?",
+                options: ["ก. ไปถึงก่อนเวลานัด 15 นาที", "ข. ขออนุญาตก่อนส่งอีเมลขายของ", "ค. แต่งกายสุภาพเหมาะสมกับแบรนด์", "ง. บิดเบือนข้อมูลหรือรับรองผลเกินจริงเพื่อปิดยอด"],
+                optionsEn: ["A. Arriving 15 minutes before a scheduled meeting.", "B. Asking permission before sending sales emails.", "C. Dressing appropriately and in line with the brand.", "D. Distorting information or making exaggerated guarantees to close a sale."],
+                ans: 3
+            },
+            {
+                q: "18. การรักษาลูกค้าเดิม (Retention) มีต้นทุนอย่างไรเมื่อเทียบกับลูกค้าใหม่?",
+                qEn: "18. How does the cost of customer Retention compare to acquiring new customers?",
+                options: ["ก. สูงกว่าเพราะต้องดูแลตลอด", "ข. เท่ากันทุกกรณี", "ค. ต่ำกว่าและสร้างกำไรยั่งยืนในระยะยาว", "ง. ไม่มีค่าใช้จ่ายเลย"],
+                optionsEn: ["A. Higher, because ongoing care is required.", "B. Equal in all cases.", "C. Lower, and it generates sustainable long-term profit.", "D. There is no cost at all."],
+                ans: 2
+            },
+            {
+                q: "19. คำว่า 'BANT' ใช้เพื่อวัตถุประสงค์ใด?",
+                qEn: "19. What is 'BANT' used for?",
+                options: ["ก. ขอสินเชื่อธนาคาร", "ข. รหัสส่วนลดสวัสดิการพนักงาน", "ค. ระบบจัดการคลังสินค้า", "ง. ประเมินศักยภาพผู้มุ่งหวัง (Lead Qualification)"],
+                optionsEn: ["A. Applying for a bank loan.", "B. An employee benefits discount code.", "C. A warehouse management system.", "D. Qualifying sales leads (Budget, Authority, Need, Timeline)."],
+                ans: 3
+            },
+            {
+                q: "20. พนักงานขายระดับ Top Sales มักมีลักษณะใดโดดเด่น?",
+                qEn: "20. What quality most distinguishes a Top Sales performer?",
+                options: ["ก. เลิกพยายามทันทีเมื่อถูกปฏิเสธ", "ข. พูดแทรกเก่งเพื่อแย่งนำเสนอ", "ค. ทำงานตามอารมณ์ไม่ทำตามแผน", "ง. ความเพียรพยายาม (Persistence) และมุ่งเน้นผลลัพธ์ (Results-oriented)"],
+                optionsEn: ["A. Giving up immediately after a rejection.", "B. Frequently interrupting to dominate the presentation.", "C. Working based on mood rather than a structured plan.", "D. Persistence and a strong results-oriented mindset."],
+                ans: 3
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Sales';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            { q: "1. หัวใจสำคัญของการเป็นพนักงานขายในยุคปัจจุบันคืออะไร?", options: ["ก. การรอคอยลูกค้าติดต่อเข้ามาเอง", "ข. การส่งอีเมลโฆษณาจำนวนมหาศาล", "ค. การโน้มน้าวใจให้ลูกค้าคล้อยตามเราทุกเรื่อง", "ง. การวิเคราะห์ปัญหาลูกค้า (Pain Points) และนำเสนอโซลูชัน"], ans: 3 },
-            { q: "2. หากลูกค้าบอกว่า 'สินค้าของคุณราคาแพงเกินไป' คุณควรตอบสนองอย่างไรเป็นอันดับแรก?", options: ["ก. วิจารณ์คู่แข่งว่าคุณภาพต่ำกว่า", "ข. ปรับลดราคาลงทันที 50%", "ค. ยุติการสนทนาทันที", "ง. ตรวจสอบสมมติฐานและนำเสนอ 'คุณค่าที่ได้รับ' (Value Proposition)"], ans: 3 },
-            { q: "3. ขั้นตอน 'Prospecting' ในกระบวนการขายหมายถึงอะไร?", options: ["ก. การจัดกิจกรรมสันทนาการกับลูกค้าเก่า", "ข. การระบุและคัดกรองกลุ่มเป้าหมาย (Lead Qualification)", "ค. การออกใบแจ้งหนี้ตามรอบบัญชี", "ง. การจัดเตรียมเครื่องแบบเข้าพบลูกค้า"], ans: 1 },
-            { q: "4. การขายแบบ 'Consultative Selling' (การขายแบบที่ปรึกษา) คืออะไร?", options: ["ก. การจ้างผู้เชี่ยวชาญภายนอกมาขายแทน", "ข. การใช้เสียงหนักแน่นเพื่อให้ลูกค้าเกรงใจ", "ค. การถามคำถามเชิงลึกเพื่อวินิจฉัยความต้องการและให้คำแนะนำ", "ง. การขายให้เฉพาะกลุ่มอาชีพที่ปรึกษา"], ans: 2 },
-            { q: "5. หากคุณต้องทำ 'Cold Calling' สิ่งที่ควรทำใน 10 วินาทีแรกคืออะไร?", options: ["ก. เสนอโปรโมชั่นพิเศษทันที", "ข. แนะนำตนเองอย่างมืออาชีพพร้อมระบุคุณค่าที่จะมอบให้", "ค. ขอข้อมูลส่วนตัวหรือการเงิน", "ง. ชวนคุยเรื่องดินฟ้าอากาศ"], ans: 1 },
-            { q: "6. 'After-Sales Service' มีความสำคัญอย่างไรต่อพนักงานขาย?", options: ["ก. เป็นหน้าที่ฝ่ายเทคนิค ไม่เกี่ยวกับงานขาย", "ข. ช่วยลดภาระทางภาษี", "ค. เป็นข้ออ้างในการโทรหาลูกค้า", "ง. เพิ่มมูลค่าตลอดช่วงชีวิตลูกค้า (CLV) และส่งเสริมการบอกต่อ"], ans: 3 },
-            { q: "7. เมื่อลูกค้าปฏิเสธการซื้อ (Rejection) พนักงานขายที่ดีควรทำอย่างไร?", options: ["ก. แสดงความไม่พอใจและตัดการติดต่อ", "ข. ตามตื้อจนกว่าลูกค้าจะรำคาญและยอมซื้อ", "ค. เช็กข้อมูลว่าลูกค้าไปซื้อคู่แข่งรายไหนเพื่อสกัดกั้น", "ง. บริหารจัดการอารมณ์และสอบถาม Feedback เพื่อรักษาความสัมพันธ์"], ans: 3 },
-            { q: "8. 'Cross-selling' หมายถึงเทคนิคการขายแบบใด?", options: ["ก. ขายต่ำกว่าทุนเพื่อดึงลูกค้า", "ข. นำเสนอสินค้าที่เกี่ยวข้องหรือเสริมประสิทธิภาพให้สินค้าหลัก", "ค. ขายข้ามพื้นที่รับผิดชอบ", "ง. โน้มน้าวให้ลูกค้าซื้อสิ่งที่ไม่จำเป็นเพื่อทำยอด"], ans: 1 },
-            { q: "9. KPI ที่สำคัญที่สุดสำหรับพนักงานขายคือข้อใด?", options: ["ก. ยอดขายสุทธิ (Sales Revenue) และอัตราการบรรลุเป้าหมาย (Quota)", "ข. ความสวยงามของสไลด์นำเสนอ", "ค. ชั่วโมงการทำงานในออฟฟิศ", "ง. จำนวนผู้ติดตามในโซเชียลส่วนตัว"], ans: 0 },
-            { q: "10. การปิดการขาย (Closing the Sale) ควรทำในช่วงเวลาใด?", options: ["ก. เริ่มต้นการสนทนาทันที", "ข. รอให้ลูกค้าขอซื้อเอง", "ค. เมื่อลูกค้ากำลังจะเดินออกจากห้อง", "ง. เมื่อพบสัญญาณการซื้อ (Buying Signals) และตอบข้อโต้แย้งครบแล้ว"], ans: 3 },
-            { q: "11. 'Handling Objections' หมายถึงทักษะใด?", options: ["ก. ศิลปะการจัดการข้อกังวลเพื่อเปลี่ยนอุปสรรคเป็นโอกาส", "ข. ทักษะการยกของหนักในโลจิสติกส์", "ค. ทักษะการจดรายงานการประชุม", "ง. การขับรถเข้าพบลูกค้าให้ตรงเวลา"], ans: 0 },
-            { q: "12. หากพบว่าสินค้าคู่แข่งมีจุดที่ดียิ่งกว่าของคุณ คุณควรทำอย่างไร?", options: ["ก. สร้างข้อมูลเท็จหลอกลูกค้า", "ข. ให้ร้ายสถานะการเงินของคู่แข่ง", "ค. ลาออกไปอยู่บริษัทคู่แข่งทันที", "ง. ยอมรับข้อเท็จจริงและเน้นจุดแข็ง (USP) ที่เราเหนือกว่า"], ans: 3 },
-            { q: "13. ทักษะ 'Active Listening' มีประโยชน์ต่อ Sales อย่างไร?", options: ["ก. ช่วยให้นำเรื่องบันเทิงมาคุยกับลูกค้าได้", "ข. ช่วยให้จำชื่อลูกค้าได้แม่นยำ", "ค. ช่วยให้ไม่ต้องพูดมาก เก็บแรงไว้หาลูกค้ารายอื่น", "ง. ช่วยให้เข้าใจปัญหาที่แท้จริงและแรงจูงใจเบื้องลึกของลูกค้า"], ans: 3 },
-            { q: "14. 'Sales Pipeline' ช่วยพนักงานขายจัดการงานได้อย่างไร?", options: ["ก. คำนวณค่าน้ำมันรถ", "ข. จัดการระบบระบายน้ำในออฟฟิศ", "ค. เป็นตู้นิรภัยเก็บเงินสด", "ง. มองเห็นภาพรวมและสถานะดีลเพื่อพยากรณ์ยอดขาย"], ans: 3 },
-            { q: "15. ในการนำเสนอสินค้า (Sales Presentation) ข้อใดควรทำมากที่สุด?", options: ["ก. อ่านสเปกตามเอกสารให้ฟังทุกตัว", "ข. มั่นใจเกินเหตุจนดูไม่น่าเชื่อถือ", "ค. พูดให้เร็วที่สุดเพื่อประหยัดเวลา", "ง. เชื่อมโยงคุณลักษณะ (Features) ให้เห็นเป็นประโยชน์ (Benefits)"], ans: 3 },
-            { q: "16. หากได้รับมอบหมายพื้นที่ใหม่ที่ไม่มีฐานลูกค้าเลย ควรทำสิ่งใดก่อน?", options: ["ก. ทำแผน Territory Management และวิเคราะห์ตลาด", "ข. รอรายชื่อจากฝ่ายการตลาดอย่างเดียว", "ค. สุ่มแจกใบปลิวในที่คนเยอะๆ", "ง. รายงานว่าเป้าหมายเป็นไปไม่ได้"], ans: 0 },
-            { q: "17. พฤติกรรมใดถือว่า 'เสียจรรยาบรรณ' ของพนักงานขาย?", options: ["ก. ไปถึงก่อนเวลานัด 15 นาที", "ข. ขออนุญาตก่อนส่งอีเมลขายของ", "ค. แต่งกายสุภาพเหมาะสมกับแบรนด์", "ง. บิดเบือนข้อมูลหรือรับรองผลเกินจริงเพื่อปิดยอด"], ans: 3 },
-            { q: "18. การรักษาลูกค้าเดิม (Retention) มีต้นทุนอย่างไรเมื่อเทียบกับลูกค้าใหม่?", options: ["ก. สูงกว่าเพราะต้องดูแลตลอด", "ข. เท่ากันทุกกรณี", "ค. ต่ำกว่าและสร้างกำไรยั่งยืนในระยะยาว", "ง. ไม่มีค่าใช้จ่ายเลย"], ans: 2 },
-            { q: "19. คำว่า 'BANT' ใช้เพื่อวัตถุประสงค์ใด?", options: ["ก. ขอสินเชื่อธนาคาร", "ข. รหัสส่วนลดสวัสดิการพนักงาน", "ค. ระบบจัดการคลังสินค้า", "ง. ประเมินศักยภาพผู้มุ่งหวัง (Lead Qualification)"], ans: 3 },
-            { q: "20. พนักงานขายระดับ Top Sales มักมีลักษณะใดโดดเด่น?", options: ["ก. เลิกพยายามทันทีเมื่อถูกปฏิเสธ", "ข. พูดแทรกเก่งเพื่อแย่งนำเสนอ", "ค. ทำงานตามอารมณ์ไม่ทำตามแผน", "ง. ความเพียรพยายาม (Persistence) และมุ่งเน้นผลลัพธ์ (Results-oriented)"], ans: 3 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
@@ -165,15 +367,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -187,27 +389,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -217,54 +418,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
