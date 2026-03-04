@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Warehouse & Logistics Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,103 +51,307 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบตำแหน่ง คลังสินค้าและขนส่ง</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Warehouse &amp; Logistics
+            </h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Warehouse & Logistics",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Warehouse & Logistics",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. หน้าที่หลักของการบริหารคลังสินค้า (Warehouse Management) คือข้อใด?",
+                qEn: "1. What is the primary function of Warehouse Management?",
+                options: ["ก. บริหารพื้นที่และการจัดวางเพื่อให้สินค้าพร้อมสูงสุด ลดความสูญเสีย", "ข. เน้นเก็บสินค้าให้มากที่สุดแม้จะจ่ายของช้าลง", "ค. จัดการเบิกจ่ายตามความต้องการเร่งด่วนโดยไม่สนยอดจริง", "ง. เพิ่มสต็อกสำรองให้สูงกว่าความต้องการเสมอ"],
+                optionsEn: ["A. Manage space and layout to maximise stock availability and minimise losses.", "B. Store as many goods as possible even if it slows down order fulfilment.", "C. Manage issuance based on urgent demand without tracking actual stock levels.", "D. Always maintain a safety stock higher than demand."],
+                ans: 0
+            },
+            {
+                q: "2. ระบบ 'FIFO' (First-In, First-Out) มีความสำคัญอย่างไร?",
+                qEn: "2. Why is the 'FIFO' (First-In, First-Out) system important?",
+                options: ["ก. เป็นวิธีจัดลำดับงานบัญชีเท่านั้น", "ข. สินค้าที่เข้าก่อนถูกหยิบออกก่อน ลดความเสี่ยงเสื่อมสภาพ/หมดอายุ", "ค. เหมาะสำหรับสินค้าราคาแพงเท่านั้น", "ง. ใช้จัดเรียงสินค้าให้สวยงามโดยไม่สนรอบอายุ"],
+                optionsEn: ["A. It is only an accounting sequencing method.", "B. Goods received first are dispatched first, reducing the risk of deterioration or expiry.", "C. It is only suitable for high-value items.", "D. It is used to arrange goods neatly regardless of expiry dates."],
+                ans: 1
+            },
+            {
+                q: "3. 'Stock Card' มีไว้เพื่อวัตถุประสงค์ใด?",
+                qEn: "3. What is the purpose of a 'Stock Card'?",
+                options: ["ก. ใช้แทนเอกสารจัดซื้อและขาย", "ข. ใช้ประเมินความขยันของพนักงาน", "ค. บันทึกการเคลื่อนไหวรับ–จ่าย–คงเหลือแบบตรวจสอบย้อนหลังได้", "ง. ใช้กำหนดราคาขายสินค้า"],
+                optionsEn: ["A. To substitute purchasing and sales documents.", "B. To evaluate employee diligence.", "C. To record stock movements — received, issued, and balance — in an auditable format.", "D. To determine product selling prices."],
+                ans: 2
+            },
+            {
+                q: "4. หากพบยอดสินค้าจริงไม่ตรงกับยอดในระบบ คุณควรทำอย่างไรเป็นอันดับแรก?",
+                qEn: "4. If the physical stock count does not match the system quantity, what should you do first?",
+                options: ["ก. อายัดการจ่าย ตรวจเอกสารย้อนหลัง และนับซ้ำเพื่อระบุสาเหตุ", "ข. ปรับยอดในระบบให้ตรงทันที", "ค. รอให้ถึงรอบตรวจสต็อกประจำเดือน", "ง. สรุปว่าเป็นความผิดกะก่อนหน้าโดยไม่นับซ้ำ"],
+                optionsEn: ["A. Freeze issuance, review historical documents, and recount to identify the cause.", "B. Immediately adjust the system quantity to match.", "C. Wait until the monthly stock check cycle.", "D. Conclude it was the previous shift's fault without recounting."],
+                ans: 0
+            },
+            {
+                q: "5. อุปกรณ์ใดที่ 'ห้าม' นำมาใช้ในคลังจัดเก็บวัตถุไวไฟเด็ดขาด?",
+                qEn: "5. Which item is absolutely prohibited in a flammable goods storage warehouse?",
+                options: ["ก. พาเลทไม้", "ข. เครื่องสแกนบาร์โค้ด", "ค. รถเข็นแมนนวล", "ง. กิจกรรมที่ก่อประกายไฟ/ความร้อน หรืออุปกรณ์ไม่กันระเบิด"],
+                optionsEn: ["A. Wooden pallets.", "B. Barcode scanners.", "C. Manual trolleys.", "D. Spark-producing or heat-generating activities, or non-explosion-proof equipment."],
+                ans: 3
+            },
+            {
+                q: "6. 'Cycle Count' หมายถึงกระบวนการใด?",
+                qEn: "6. What does 'Cycle Count' refer to?",
+                options: ["ก. การสุ่มนับสต็อกตามรอบที่กำหนดเพื่อลดผลกระทบต่องานปกติ", "ข. การนับสต็อกเฉพาะสิ้นปีเท่านั้น", "ค. การนับเฉพาะสินค้าที่ขายดีมาก", "ง. การนับสต็อกเมื่อมีการเบิกผิดพลาดเท่านั้น"],
+                optionsEn: ["A. A scheduled rolling stock count of selected items to minimise disruption to daily operations.", "B. A stock count conducted only at the end of the year.", "C. A count of only the best-selling items.", "D. A stock count triggered only when an issuing error occurs."],
+                ans: 0
+            },
+            {
+                q: "7. ในการขับรถโฟล์คลิฟท์ (Forklift) ข้อใดคือหลักความปลอดภัยที่ถูกต้อง?",
+                qEn: "7. Which statement reflects correct forklift safety practice?",
+                options: ["ก. บรรทุกให้สูงเกินสายตาได้ถ้าขับช้า", "ข. ยกงาให้สูงตลอดเวลาเพื่อเลี่ยงสิ่งกีดขวาง", "ค. ขับความเร็วเหมาะสม งาอยู่ต่ำเหนือพื้นเล็กน้อย รักษาทัศนวิสัย", "ง. อนุญาตให้คนนั่งบนงาได้ถ้าทางแคบ"],
+                optionsEn: ["A. Loading above the operator's line of sight is acceptable if driving slowly.", "B. Keep the forks raised at all times to avoid obstacles.", "C. Drive at an appropriate speed, keep forks slightly above the ground, and maintain clear visibility.", "D. People may ride on the forks if the aisle is narrow."],
+                ans: 2
+            },
+            {
+                q: "8. 'Cross-Docking' ในทางโลจิสติกส์หมายถึงอะไร?",
+                qEn: "8. What does 'Cross-Docking' mean in logistics?",
+                options: ["ก. การย้ายสินค้าจากคลังหนึ่งไปอีกคลังหนึ่ง", "ข. การเก็บสินค้าตามโซนชั้นวางให้ครบก่อนส่ง", "ค. การลดรอบขนส่งโดยการส่งเที่ยวเดียว", "ง. กระบวนการรับสินค้าแล้วถ่ายโอนส่งต่อทันทีโดยแทบไม่เก็บเข้าคลัง"],
+                optionsEn: ["A. Transferring goods from one warehouse to another.", "B. Filling all rack zones before dispatching goods.", "C. Reducing transport trips by consolidating into a single delivery.", "D. A process where inbound goods are immediately transferred for outbound dispatch with minimal warehousing."],
+                ans: 3
+            },
+            {
+                q: "9. สินค้าที่มีน้ำหนักมาก (Heavy Items) ควรวางไว้ตำแหน่งใดบน Rack?",
+                qEn: "9. Where should heavy items be positioned on a storage rack?",
+                options: ["ก. ชั้นล่างสุดหรือระดับต่ำ เพื่อความมั่นคงและปลอดภัย", "ข. ชั้นกลางระดับสายตา", "ค. ชั้นบนสุดเพื่อป้องกันการหยิบผิด", "ง. วางตำแหน่งใดก็ได้ถ้าใช้พาเลท"],
+                optionsEn: ["A. On the lowest shelf or at a low level for stability and safety.", "B. On the middle shelf at eye level.", "C. On the top shelf to prevent mis-picks.", "D. Anywhere on the rack as long as pallets are used."],
+                ans: 0
+            },
+            {
+                q: "10. คำว่า 'SKU' (Stock Keeping Unit) หมายถึงอะไร?",
+                qEn: "10. What does 'SKU' (Stock Keeping Unit) mean?",
+                options: ["ก. รหัสพิกัดชั้นวาง", "ข. รหัสที่ใช้แยกความแตกต่างของสินค้าแต่ละรายการ (รุ่น/สี/ขนาด)", "ค. หมายเลขการติดตามขนส่ง", "ง. รหัสเอกสารรับสินค้าเข้า"],
+                optionsEn: ["A. A rack location code.", "B. A unique code that distinguishes each individual product variant (model, colour, size).", "C. A shipment tracking number.", "D. A goods-received document code."],
+                ans: 1
+            },
+            {
+                q: "11. ในการวางแผนเส้นทางขนส่ง (Route Planning) ปัจจัยใดสำคัญที่สุด?",
+                qEn: "11. What is the most important factor in transport Route Planning?",
+                options: ["ก. ลดเวลา ระยะทาง และเชื้อเพลิง พร้อมส่งมอบตรงเวลา (SLA)", "ข. เลือกถนนที่ขับสบายที่สุดแม้จะอ้อมไกล", "ค. จัดให้แวะหลายจุดที่สุดเพื่อเพิ่มปริมาณ", "ง. จัดเส้นทางตามความคุ้นชินของคนขับ"],
+                optionsEn: ["A. Minimising time, distance, and fuel while meeting on-time delivery SLAs.", "B. Choosing the most comfortable roads even if they are longer.", "C. Maximising the number of stops to increase volume.", "D. Planning routes based on the driver's familiarity."],
+                ans: 0
+            },
+            {
+                q: "12. เอกสาร 'Bill of Lading' (B/L) มีความสำคัญอย่างไร?",
+                qEn: "12. What is the significance of a 'Bill of Lading' (B/L)?",
+                options: ["ก. ใช้เฉพาะงานนำเข้าเท่านั้น", "ข. เป็นเอกสารด้านภาษีเท่านั้น", "ค. เป็นหลักฐานการรับขนสินค้าและสัญญาการขนส่ง", "ง. เป็นเอกสารภายในคลังไม่มีผลทางกฎหมาย"],
+                optionsEn: ["A. It is only used for import shipments.", "B. It is purely a tax document.", "C. It serves as evidence of cargo receipt and a contract of carriage.", "D. It is an internal warehouse document with no legal standing."],
+                ans: 2
+            },
+            {
+                q: "13. หากเกิดอุบัติเหตุขณะขนส่งสินค้า คุณควรสั่งการอย่างไรเป็นลำดับแรก?",
+                qEn: "13. If an accident occurs during a delivery, what should be the very first action?",
+                options: ["ก. สอบถามมูลค่าความเสียหาย", "ข. สั่งให้รีบส่งของต่อให้ทันกำหนด", "ค. สั่งให้เคลื่อนย้ายรถทันทีโดยไม่ถ่ายรูป", "ง. ตรวจสอบความปลอดภัยของคน ประเมินหน้างาน และรายงานตามลำดับ"],
+                optionsEn: ["A. Ask about the value of the damage.", "B. Instruct the driver to continue the delivery to meet the deadline.", "C. Immediately move the vehicle without taking photos.", "D. Check personnel safety, assess the situation on site, and report through the proper chain."],
+                ans: 3
+            },
+            {
+                q: "14. การบริหารจัดการแบบ 'JIT' (Just-In-Time) ช่วยลดสิ่งใดมากที่สุด?",
+                qEn: "14. What does 'JIT' (Just-In-Time) management reduce the most?",
+                options: ["ก. ลดต้นทุนถือครอง พื้นที่จัดเก็บ และเงินจมในสต็อก", "ข. ลดจำนวนพนักงานคลัง", "ค. ลดความจำเป็นของรถขนส่ง", "ง. ลดความเสี่ยงสินค้าชำรุด"],
+                optionsEn: ["A. Holding costs, storage space, and capital tied up in stock.", "B. The number of warehouse staff required.", "C. The need for transport vehicles.", "D. The risk of product damage."],
+                ans: 0
+            },
+            {
+                q: "15. 'Dead Stock' หมายความถึงสินค้าประเภทใด?",
+                qEn: "15. What does 'Dead Stock' refer to?",
+                options: ["ก. สินค้ายอดนิยมช่วงสั้นๆ", "ข. สินค้ามาใหม่ยังไม่ได้กระจาย", "ค. สินค้าค้างนาน ไม่เคลื่อนไหว ล้าสมัย หรือขายไม่ได้", "ง. สินค้ากักกันคุณภาพ"],
+                optionsEn: ["A. Products that are briefly trending.", "B. Newly arrived goods not yet distributed.", "C. Long-sitting, non-moving, obsolete, or unsellable inventory.", "D. Goods placed in quality quarantine."],
+                ans: 2
+            },
+            {
+                q: "16. ก่อนปิดท้ายรถบรรทุกเพื่อเดินทาง พนักงานควรตรวจสอบสิ่งใด?",
+                qEn: "16. Before closing a truck's cargo doors for departure, what should staff verify?",
+                options: ["ก. ความสะอาดภายในตู้รถ", "ข. ลายเซ็นเอกสารครบถ้วนอย่างเดียว", "ค. เวลารถออกให้ทันกำหนด", "ง. การจัดเรียงแน่นหนา มีการรัด/ล็อค และไม่มีช่องว่างเสี่ยงกระแทก"],
+                optionsEn: ["A. The cleanliness of the cargo compartment.", "B. That all document signatures are complete, and nothing else.", "C. That the vehicle departs on schedule.", "D. That goods are securely arranged, strapped or locked, with no gaps that could cause shifting."],
+                ans: 3
+            },
+            {
+                q: "17. อุปกรณ์ 'Hand Lift' (รถลากพาเลท) มีข้อจำกัดอย่างไร?",
+                qEn: "17. What are the limitations of a 'Hand Lift' (pallet jack)?",
+                options: ["ก. ใช้ได้ตามพิกัดน้ำหนัก พื้นเรียบ ระยะใกล้ ไม่เหมาะยกสูง/ทางลาด", "ข. ใช้ได้ทุกพื้นผิวถ้ามีคนช่วยเข็น", "ค. ใช้แทนโฟล์คลิฟท์ได้เต็มรูปแบบ", "ง. ใช้ได้เฉพาะสินค้าน้ำหนักเบาเท่านั้น"],
+                optionsEn: ["A. Limited to its rated load capacity, flat surfaces, and short distances — not suitable for lifting high or use on ramps.", "B. Can be used on any surface as long as someone assists with pushing.", "C. Can fully replace a forklift in all situations.", "D. Can only be used for lightweight goods."],
+                ans: 0
+            },
+            {
+                q: "18. 'KPI' ที่ใช้บ่อยในงานขนส่งคือข้อใด?",
+                qEn: "18. Which KPIs are most commonly used in transport operations?",
+                options: ["ก. ปริมาณการเติมน้ำมันรถ", "ข. อัตราส่งมอบตรงเวลา (On-Time) และความถูกต้อง/ไม่เสียหาย", "ค. จำนวนเส้นทางที่คนขับจำได้", "ง. จำนวนคำชมจากลูกค้าเท่านั้น"],
+                optionsEn: ["A. Volume of fuel consumed.", "B. On-Time Delivery rate and delivery accuracy/damage-free rate.", "C. The number of routes a driver has memorised.", "D. The number of customer compliments received."],
+                ans: 1
+            },
+            {
+                q: "19. หากลูกค้าปฏิเสธการรับเพราะ 'กล่องบุบ' แต่ของข้างในปกติ คุณควรทำอย่างไร?",
+                qEn: "19. If a customer refuses delivery because the 'box is dented' but the contents appear undamaged, what should you do?",
+                options: ["ก. ให้เซ็นรับไปก่อนแล้วค่อยร้องเรียน", "ข. วางไว้หน้าบ้านถ้าของไม่เสีย", "ค. เจรจา บันทึกสภาพ ทำหลักฐาน และรับกลับเพื่อเปลี่ยนบรรจุภัณฑ์", "ง. ยืนยันให้รับเพราะไม่กระทบสินค้า"],
+                optionsEn: ["A. Ask the customer to sign for receipt first and file a complaint later.", "B. Leave the goods at the door since the contents are intact.", "C. Negotiate, document the condition, gather evidence, and return the item for repackaging.", "D. Insist the customer accepts it since the product itself is unaffected."],
+                ans: 2
+            },
+            {
+                q: "20. จรรยาบรรณที่สำคัญที่สุดของพนักงานคลังสินค้าคือข้อใด?",
+                qEn: "20. What is the most important ethical principle for a warehouse employee?",
+                options: ["ก. ความซื่อสัตย์สุจริต ควบคุมความถูกต้อง และรักษาทรัพย์สินบริษัท", "ข. ความเร็วในการทำงานเป็นหลัก", "ค. การจำรหัสสินค้าได้แม่นยำที่สุด", "ง. การทำงานล่วงเวลาได้ตลอด"],
+                optionsEn: ["A. Integrity, accuracy control, and safeguarding company assets.", "B. Working speed above all else.", "C. Memorising product codes with maximum accuracy.", "D. Always being available for overtime work."],
+                ans: 0
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Warehouse_Logistics';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            { q: "1. หน้าที่หลักของการบริหารคลังสินค้า (Warehouse Management) คือข้อใด?", options: ["ก. บริหารพื้นที่และการจัดวางเพื่อให้สินค้าพร้อมสูงสุด ลดความสูญเสีย", "ข. เน้นเก็บสินค้าให้มากที่สุดแม้จะจ่ายของช้าลง", "ค. จัดการเบิกจ่ายตามความต้องการเร่งด่วนโดยไม่สนยอดจริง", "ง. เพิ่มสต็อกสำรองให้สูงกว่าความต้องการเสมอ"], ans: 0 },
-            { q: "2. ระบบ 'FIFO' (First-In, First-Out) มีความสำคัญอย่างไร?", options: ["ก. เป็นวิธีจัดลำดับงานบัญชีเท่านั้น", "ข. สินค้าที่เข้าก่อนถูกหยิบออกก่อน ลดความเสี่ยงเสื่อมสภาพ/หมดอายุ", "ค. เหมาะสำหรับสินค้าราคาแพงเท่านั้น", "ง. ใช้จัดเรียงสินค้าให้สวยงามโดยไม่สนรอบอายุ"], ans: 1 },
-            { q: "3. 'Stock Card' มีไว้เพื่อวัตถุประสงค์ใด?", options: ["ก. ใช้แทนเอกสารจัดซื้อและขาย", "ข. ใช้ประเมินความขยันของพนักงาน", "ค. บันทึกการเคลื่อนไหวรับ–จ่าย–คงเหลือแบบตรวจสอบย้อนหลังได้", "ง. ใช้กำหนดราคาขายสินค้า"], ans: 2 },
-            { q: "4. หากพบยอดสินค้าจริงไม่ตรงกับยอดในระบบ คุณควรทำอย่างไรเป็นอันดับแรก?", options: ["ก. อายัดการจ่าย ตรวจเอกสารย้อนหลัง และนับซ้ำเพื่อระบุสาเหตุ", "ข. ปรับยอดในระบบให้ตรงทันที", "ค. รอให้ถึงรอบตรวจสต็อกประจำเดือน", "ง. สรุปว่าเป็นความผิดกะก่อนหน้าโดยไม่นับซ้ำ"], ans: 0 },
-            { q: "5. อุปกรณ์ใดที่ 'ห้าม' นำมาใช้ในคลังจัดเก็บวัตถุไวไฟเด็ดขาด?", options: ["ก. พาเลทไม้", "ข. เครื่องสแกนบาร์โค้ด", "ค. รถเข็นแมนนวล", "ง. กิจกรรมที่ก่อประกายไฟ/ความร้อน หรืออุปกรณ์ไม่กันระเบิด"], ans: 3 },
-            { q: "6. 'Cycle Count' หมายถึงกระบวนการใด?", options: ["ก. การสุ่มนับสต็อกตามรอบที่กำหนดเพื่อลดผลกระทบต่องานปกติ", "ข. การนับสต็อกเฉพาะสิ้นปีเท่านั้น", "ค. การนับเฉพาะสินค้าที่ขายดีมาก", "ง. การนับสต็อกเมื่อมีการเบิกผิดพลาดเท่านั้น"], ans: 0 },
-            { q: "7. ในการขับรถโฟล์คลิฟท์ (Forklift) ข้อใดคือหลักความปลอดภัยที่ถูกต้อง?", options: ["ก. บรรทุกให้สูงเกินสายตาได้ถ้าขับช้า", "ข. ยกงาให้สูงตลอดเวลาเพื่อเลี่ยงสิ่งกีดขวาง", "ค. ขับความเร็วเหมาะสม งาอยู่ต่ำเหนือพื้นเล็กน้อย รักษาทัศนวิสัย", "ง. อนุญาตให้คนนั่งบนงาได้ถ้าทางแคบ"], ans: 2 },
-            { q: "8. 'Cross-Docking' ในทางโลจิสติกส์หมายถึงอะไร?", options: ["ก. การย้ายสินค้าจากคลังหนึ่งไปอีกคลังหนึ่ง", "ข. การเก็บสินค้าตามโซนชั้นวางให้ครบก่อนส่ง", "ค. การลดรอบขนส่งโดยการส่งเที่ยวเดียว", "ง. กระบวนการรับสินค้าแล้วถ่ายโอนส่งต่อทันทีโดยแทบไม่เก็บเข้าคลัง"], ans: 3 },
-            { q: "9. สินค้าที่มีน้ำหนักมาก (Heavy Items) ควรวางไว้ตำแหน่งใดบน Rack?", options: ["ก. ชั้นล่างสุดหรือระดับต่ำ เพื่อความมั่นคงและปลอดภัย", "ข. ชั้นกลางระดับสายตา", "ค. ชั้นบนสุดเพื่อป้องกันการหยิบผิด", "ง. วางตำแหน่งใดก็ได้ถ้าใช้พาเลท"], ans: 0 },
-            { q: "10. คำว่า 'SKU' (Stock Keeping Unit) หมายถึงอะไร?", options: ["ก. รหัสพิกัดชั้นวาง", "ข. รหัสที่ใช้แยกความแตกต่างของสินค้าแต่ละรายการ (รุ่น/สี/ขนาด)", "ค. หมายเลขการติดตามขนส่ง", "ง. รหัสเอกสารรับสินค้าเข้า"], ans: 1 },
-            { q: "11. ในการวางแผนเส้นทางขนส่ง (Route Planning) ปัจจัยใดสำคัญที่สุด?", options: ["ก. ลดเวลา ระยะทาง และเชื้อเพลิง พร้อมส่งมอบตรงเวลา (SLA)", "ข. เลือกถนนที่ขับสบายที่สุดแม้จะอ้อมไกล", "ค. จัดให้แวะหลายจุดที่สุดเพื่อเพิ่มปริมาณ", "ง. จัดเส้นทางตามความคุ้นชินของคนขับ"], ans: 0 },
-            { q: "12. เอกสาร 'Bill of Lading' (B/L) มีความสำคัญอย่างไร?", options: ["ก. ใช้เฉพาะงานนำเข้าเท่านั้น", "ข. เป็นเอกสารด้านภาษีเท่านั้น", "ค. เป็นหลักฐานการรับขนสินค้าและสัญญาการขนส่ง", "ง. เป็นเอกสารภายในคลังไม่มีผลทางกฎหมาย"], ans: 2 },
-            { q: "13. หากเกิดอุบัติเหตุขณะขนส่งสินค้า คุณควรสั่งการอย่างไรเป็นลำดับแรก?", options: ["ก. สอบถามมูลค่าความเสียหาย", "ข. สั่งให้รีบส่งของต่อให้ทันกำหนด", "ค. สั่งให้เคลื่อนย้ายรถทันทีโดยไม่ถ่ายรูป", "ง. ตรวจสอบความปลอดภัยของคน ประเมินหน้างาน และรายงานตามลำดับ"], ans: 3 },
-            { q: "14. การบริหารจัดการแบบ 'JIT' (Just-In-Time) ช่วยลดสิ่งใดมากที่สุด?", options: ["ก. ลดต้นทุนถือครอง พื้นที่จัดเก็บ และเงินจมในสต็อก", "ข. ลดจำนวนพนักงานคลัง", "ค. ลดความจำเป็นของรถขนส่ง", "ง. ลดความเสี่ยงสินค้าชำรุด"], ans: 0 },
-            { q: "15. 'Dead Stock' หมายความถึงสินค้าประเภทใด?", options: ["ก. สินค้ายอดนิยมช่วงสั้นๆ", "ข. สินค้ามาใหม่ยังไม่ได้กระจาย", "ค. สินค้าค้างนาน ไม่เคลื่อนไหว ล้าสมัย หรือขายไม่ได้", "ง. สินค้ากักกันคุณภาพ"], ans: 2 },
-            { q: "16. ก่อนปิดท้ายรถบรรทุกเพื่อเดินทาง พนักงานควรตรวจสอบสิ่งใด?", options: ["ก. ความสะอาดภายในตู้รถ", "ข. ลายเซ็นเอกสารครบถ้วนอย่างเดียว", "ค. เวลารถออกให้ทันกำหนด", "ง. การจัดเรียงแน่นหนา มีการรัด/ล็อค และไม่มีช่องว่างเสี่ยงกระแทก"], ans: 3 },
-            { q: "17. อุปกรณ์ 'Hand Lift' (รถลากพาเลท) มีข้อจำกัดอย่างไร?", options: ["ก. ใช้ได้ตามพิกัดน้ำหนัก พื้นเรียบ ระยะใกล้ ไม่เหมาะยกสูง/ทางลาด", "ข. ใช้ได้ทุกพื้นผิวถ้ามีคนช่วยเข็น", "ค. ใช้แทนโฟล์คลิฟท์ได้เต็มรูปแบบ", "ง. ใช้ได้เฉพาะสินค้าน้ำหนักเบาเท่านั้น"], ans: 0 },
-            { q: "18. 'KPI' ที่ใช้บ่อยในงานขนส่งคือข้อใด?", options: ["ก. ปริมาณการเติมน้ำมันรถ", "ข. อัตราส่งมอบตรงเวลา (On-Time) และความถูกต้อง/ไม่เสียหาย", "ค. จำนวนเส้นทางที่คนขับจำได้", "ง. จำนวนคำชมจากลูกค้าเท่านั้น"], ans: 1 },
-            { q: "19. หากลูกค้าปฏิเสธการรับเพราะ 'กล่องบุบ' แต่ของข้างในปกติ คุณควรทำอย่างไร?", options: ["ก. ให้เซ็นรับไปก่อนแล้วค่อยร้องเรียน", "ข. วางไว้หน้าบ้านถ้าของไม่เสีย", "ค. เจรจา บันทึกสภาพ ทำหลักฐาน และรับกลับเพื่อเปลี่ยนบรรจุภัณฑ์", "ง. ยืนยันให้รับเพราะไม่กระทบสินค้า"], ans: 2 },
-            { q: "20. จรรยาบรรณที่สำคัญที่สุดของพนักงานคลังสินค้าคือข้อใด?", options: ["ก. ความซื่อสัตย์สุจริต ควบคุมความถูกต้อง และรักษาทรัพย์สินบริษัท", "ข. ความเร็วในการทำงานเป็นหลัก", "ค. การจำรหัสสินค้าได้แม่นยำที่สุด", "ง. การทำงานล่วงเวลาได้ตลอด"], ans: 0 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
@@ -164,15 +368,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -186,27 +390,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -216,54 +419,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
