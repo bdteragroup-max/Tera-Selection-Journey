@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Branch Management Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,107 +51,310 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">Branch Manager Competency Test</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Branch Management</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Branch Management",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Branch Management",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. บทบาทที่สำคัญที่สุดของผู้จัดการสาขาคืออะไร?",
+                qEn: "1. What is the most important role of a Branch Manager?",
+                options: ["ก. การควบคุมการปฏิบัติงานหน้างานด้วยตนเองทั้งหมด", "ข. การกำกับดูแลจุดรับชำระเงินเพื่อลดความเสี่ยงทุจริต", "ค. การบริหารจัดการทรัพยากร มนุษย์ และงบประมาณ ให้สอดคล้องกับกลยุทธ์องค์กร", "ง. การยืดหยุ่นระเบียบการลาเพื่อรักษาความสัมพันธ์ในทีม"],
+                optionsEn: ["A. Personally overseeing all day-to-day operations hands-on.", "B. Supervising payment points to reduce fraud risk.", "C. Managing people, resources, and budgets in alignment with the organisation's strategy.", "D. Flexibly bending leave policies to maintain team relationships."],
+                ans: 2
+            },
+            {
+                q: "2. หากยอดขายของสาขาลดลงติดต่อกัน 2 เดือน สิ่งแรกที่คุณควรทำคืออะไร?",
+                qEn: "2. If branch sales have declined for two consecutive months, what should you do first?",
+                options: ["ก. ดำเนินการวิเคราะห์ข้อมูล (Root Cause Analysis) เพื่อหาปัจจัยภายในและภายนอก", "ข. ปรับลดโครงสร้างพนักงานเพื่อรักษาระดับกำไร", "ค. ขอส่วนกลางปรับลดเป้าหมายยอดขาย", "ง. จัดแคมเปญลดราคาเชิงรุกทันที"],
+                optionsEn: ["A. Conduct a Root Cause Analysis to identify both internal and external factors.", "B. Restructure the team to maintain profitability.", "C. Request that headquarters lower the sales targets.", "D. Immediately launch an aggressive discount campaign."],
+                ans: 0
+            },
+            {
+                q: "3. ในการบริหารพนักงานที่มีความขัดแย้งกันในทีม คุณควรจัดการอย่างไร?",
+                qEn: "3. If there is a conflict between employees within the team, how should you handle it?",
+                options: ["ก. พิจารณาโยกย้ายบุคลากรเชิงกลยุทธ์", "ข. มอบหมายงานให้แยกส่วนกันอย่างชัดเจนเพื่อเลี่ยงการเผชิญหน้า", "ค. ให้ความสำคัญกับพนักงานที่เป็น High Performer เท่านั้น", "ง. ใช้กระบวนการไกล่เกลี่ย (Mediation) โดยยึดผลประโยชน์องค์กรและหาจุดร่วม"],
+                optionsEn: ["A. Strategically consider reassigning staff.", "B. Assign tasks separately to avoid confrontation.", "C. Focus only on High Performers.", "D. Use a mediation process, keeping the organisation's best interests in mind and finding common ground."],
+                ans: 3
+            },
+            {
+                q: "4. 'Customer Complaint' ที่รุนแรงหน้าสาขา ควรจัดการอย่างไร?",
+                qEn: "4. How should a serious customer complaint at the branch be handled?",
+                options: ["ก. ใช้ทักษะ Active Listening ในพื้นที่ที่เหมาะสม พร้อมเสนอทางแก้ที่เป็นธรรม", "ข. ชี้แจงระเบียบของบริษัทอย่างชัดเจนเพื่อให้ลูกค้าทราบขอบเขต", "ค. มอบหมายให้ Supervisor เป็นผู้รับเรื่องตาม SOP", "ง. ให้ลูกค้าติดต่อ Call Center ส่วนกลางเพื่อตรวจสอบ"],
+                optionsEn: ["A. Apply active listening skills in an appropriate space and offer a fair resolution.", "B. Clearly explain the company's policies so the customer understands the boundaries.", "C. Delegate the matter to the Supervisor to handle per SOP.", "D. Direct the customer to contact the central Call Centre."],
+                ans: 0
+            },
+            {
+                q: "5. การทำ 'Stock Inventory Check' มีวัตถุประสงค์หลักเพื่ออะไร?",
+                qEn: "5. What is the main purpose of conducting a Stock Inventory Check?",
+                options: ["ก. การสร้างระเบียบวินัยและเพิ่มภาระงานเสริม", "ข. การจัดระเบียบพื้นที่จัดเก็บสินค้า (Visual Merchandising)", "ค. การตรวจสอบความเที่ยงตรงของข้อมูล (Data Integrity) เพื่อลดการสูญเสีย", "ง. การคำนวณค่าเสื่อมเพื่อหักงบประมาณค่าตอบแทนพิเศษ"],
+                optionsEn: ["A. To create discipline and add supplementary workload.", "B. To organise product display areas (Visual Merchandising).", "C. To verify data integrity and reduce losses.", "D. To calculate depreciation for deducting special allowance budgets."],
+                ans: 2
+            },
+            {
+                q: "6. KPI ข้อใดที่ผู้จัดการสาขาควรให้ความสำคัญมากที่สุด?",
+                qEn: "6. Which KPI should a Branch Manager focus on the most?",
+                options: ["ก. ประสิทธิภาพของห่วงโซ่อุปทาน (Supply Chain)", "ข. การบริหารสมดุลระหว่างยอดขายสุทธิ และอัตรากำไรขั้นต้น (GP)", "ค. การรักษาความสวยงามและระเบียบวินัยการแต่งกาย", "ง. ดัชนีความสุขของพนักงาน (Employee Engagement)"],
+                optionsEn: ["A. Supply chain efficiency.", "B. Balancing net sales revenue and gross profit margin (GP).", "C. Maintaining staff grooming and dress code standards.", "D. Employee happiness index (Employee Engagement)."],
+                ans: 1
+            },
+            {
+                q: "7. หากพนักงานขาดงานกะทันหันในวันที่ลูกค้าเยอะที่สุด คุณจะแก้ปัญหาอย่างไร?",
+                qEn: "7. If a staff member calls in sick on the busiest day of the week, how will you solve the problem?",
+                options: ["ก. บริหารจัดการกำลังคนแบบยืดหยุ่น (Agile) และลงช่วยหน้างาน", "ข. พิจารณาจำกัดการให้บริการในบางส่วนเพื่อรักษามาตรฐาน", "ค. ใช้มาตรการทางวินัยขั้นสูงสุดทันที", "ง. ให้พนักงานที่เหลืออยู่ดเว้นช่วงเวลาพักทั้งหมด"],
+                optionsEn: ["A. Manage manpower flexibly (Agile) and step in to assist on the floor.", "B. Consider limiting certain services to maintain standards.", "C. Apply the highest level of disciplinary action immediately.", "D. Cancel all remaining staff break periods for that day."],
+                ans: 0
+            },
+            {
+                q: "8. 'P&L Statement' ของสาขาช่วยให้คุณตัดสินใจเรื่องใดได้ดีขึ้น?",
+                qEn: "8. How does the branch's P&L Statement help you make better decisions?",
+                options: ["ก. การจัดทำตารางเวรการทำงานของผู้จัดการ", "ข. การเลือกงบประมาณสำหรับการปรับปรุงทัศนียภาพ", "ค. การจัดหาอุปกรณ์สำนักงานใหม่ล่าสุด", "ง. การปรับโครงสร้างต้นทุน (Cost Optimization) และแผนขยายรายได้"],
+                optionsEn: ["A. Preparing the manager's shift schedule.", "B. Selecting a budget for interior decoration upgrades.", "C. Sourcing the latest office equipment.", "D. Optimising the cost structure and planning revenue expansion."],
+                ans: 3
+            },
+            {
+                q: "9. การสอนงานแบบ 'Coaching' แตกต่างจากการสั่งงานแบบ 'Directing' อย่างไร?",
+                qEn: "9. How does 'Coaching' differ from 'Directing'?",
+                options: ["ก. Coaching เน้นอำนาจพฤติกรรม Directing เน้นอำนาจหน้าที่", "ข. Coaching ใช้กับผู้บริหารระดับสูงเท่านั้น", "ค. Coaching เน้นปลดล็อกศักยภาพและวิธีคิด Directing เน้นทำตามขั้นตอน", "ง. ทั้งสองอย่างมีความหมายเหมือนกัน"],
+                optionsEn: ["A. Coaching focuses on behavioural authority; Directing focuses on positional authority.", "B. Coaching is only used with senior executives.", "C. Coaching unlocks potential and mindset; Directing focuses on following a prescribed process.", "D. Both terms have exactly the same meaning."],
+                ans: 2
+            },
+            {
+                q: "10. กลยุทธ์ 'Upselling' หมายถึงอะไร?",
+                qEn: "10. What does the strategy of 'Upselling' mean?",
+                options: ["ก. การผลักดันสินค้า Old Stock ออกให้เร็วที่สุด", "ข. การโน้มน้าวให้ลูกค้าซื้อสินค้าที่มีมูลค่าสูงกว่าเดิมเพื่อเพิ่มค่าเฉลี่ยต่อบิล", "ค. การลดราคาเชิงเปรียบเทียบเพื่อระบายสินค้า", "ง. การวางแผนผังสินค้าให้อยู่ในระดับสายตา"],
+                optionsEn: ["A. Pushing old stock out as quickly as possible.", "B. Persuading customers to purchase a higher-value product to increase the average transaction value.", "C. Applying comparative discounts to clear inventory.", "D. Positioning products at eye level on the shelf."],
+                ans: 1
+            },
+            {
+                q: "11. ในการคัดเลือกพนักงานใหม่เข้าทีม คุณควรให้ความสำคัญกับสิ่งใดมากที่สุด?",
+                qEn: "11. When selecting a new employee for your team, what should you prioritise the most?",
+                options: ["ก. ทัศนคติเชิงบวก (Growth Mindset) และความสามารถในการปรับตัว", "ข. บุคลิกภาพภายนอกที่สอดคล้องกับภาพลักษณ์แบรนด์", "ค. เกียรติประวัติทางการศึกษาและชื่อเสียงสถาบัน", "ง. ฐานแฟนคลับหรืออิทธิพลในโซเชียลมีเดีย"],
+                optionsEn: ["A. A positive attitude (Growth Mindset) and adaptability.", "B. A physical appearance that aligns with the brand's image.", "C. Academic credentials and the prestige of the institution attended.", "D. A social media following or online influence."],
+                ans: 0
+            },
+            {
+                q: "12. การรักษามาตรฐาน 'SOP' มีประโยชน์อย่างไร?",
+                qEn: "12. What is the benefit of maintaining SOP standards?",
+                options: ["ก. เพื่อเพิ่มขั้นตอนการทำงานให้ซับซ้อนกันลืม", "ข. เพื่อใช้เป็นฐานข้อมูลในการตรวจ Audit เท่านั้น", "ค. เพื่อจำกัดความคิดสร้างสรรค์ให้อยู่ในกรอบ", "ง. เพื่อสร้างความสม่ำเสมอของมาตรฐาน (Consistency) และลดความเสี่ยง"],
+                optionsEn: ["A. To add complexity and ensure steps are not forgotten.", "B. To serve solely as a database for audit purposes.", "C. To restrict creativity within a defined framework.", "D. To create consistency in service standards and reduce operational risk."],
+                ans: 3
+            },
+            {
+                q: "13. หากคุณพบว่ามีการทุจริตในสาขาโดยพนักงานที่สนิทที่สุด คุณจะทำอย่างไร?",
+                qEn: "13. If you discover that fraud has been committed by your closest colleague, what will you do?",
+                options: ["ก. ตักเตือนไม่เป็นทางการเพื่อรักษาความสัมพันธ์", "ข. ดำเนินการตามระเบียบวินัยและหลักจริยธรรม (Code of Conduct) อย่างเคร่งครัด", "ค. เจรจาขอคืนทรัพย์สินและเก็บเป็นความลับ", "ง. ลาออกจากตำแหน่งเพื่อรับผิดชอบ"],
+                optionsEn: ["A. Issue an informal warning to preserve the relationship.", "B. Follow the disciplinary process and Code of Conduct strictly and without exception.", "C. Negotiate for the return of assets and keep the matter confidential.", "D. Resign from your position to take responsibility."],
+                ans: 1
+            },
+            {
+                q: "14. การวิเคราะห์ 'Traffic' ในสาขา ช่วยในการบริหารจัดการเรื่องใด?",
+                qEn: "14. How does analysing branch traffic assist in management?",
+                options: ["ก. การคำนวณอัตราการใช้ไฟฟ้าต่อหัว", "ข. การประมาณการจัดซื้อน้ำดื่มสวัสดิการ", "ค. การจัดทำโครงสร้างตารางกำลังคน (Staff Scheduling) ให้ตรงความต้องการ", "ง. การเลือกประเภทดนตรีที่เหมาะกับความหนาแน่น"],
+                optionsEn: ["A. Calculating electricity consumption per person.", "B. Estimating the purchasing budget for staff drinking water.", "C. Developing a staff scheduling plan to match customer demand.", "D. Selecting the type of music appropriate for the level of foot traffic."],
+                ans: 2
+            },
+            {
+                q: "15. คำว่า 'Shrinkage' ในการบริหารสาขาหมายถึงอะไร?",
+                qEn: "15. What does the term 'Shrinkage' mean in branch management?",
+                options: ["ก. อัตราการหดตัวของส่วนแบ่งการตลาด", "ข. ผลต่างระหว่างสินค้าในระบบกับสินค้าจริง (สูญหาย/เสียหาย/ทุจริต)", "ค. การลดลงของจำนวนพนักงานในสาขา", "ง. การปรับขนาดบรรจุภัณฑ์ให้เล็กลง"],
+                optionsEn: ["A. A decline in market share.", "B. The discrepancy between system stock and physical stock (due to loss, damage, or theft).", "C. A decrease in the number of branch staff.", "D. Reducing packaging size to be smaller."],
+                ans: 1
+            },
+            {
+                q: "16. หากสาขาคู่แข่งจัดกิจกรรมลดราคาครั้งใหญ่ คุณควรทำอย่างไร?",
+                qEn: "16. If a competing branch runs a major discount promotion, what should you do?",
+                options: ["ก. ยุติกิจกรรมการตลาดทั้งหมดเพื่อลดงบ", "ข. ปรับลดราคาให้ต่ำกว่าคู่แข่งทันทีแม้จะขาดทุน", "ค. หาทางลดประสิทธิภาพการทำงานของคู่แข่ง", "ง. วิเคราะห์และนำเสนอคุณค่าที่แตกต่าง (Unique Value Proposition)"],
+                optionsEn: ["A. Halt all marketing activities to reduce costs.", "B. Immediately lower prices below the competitor's even if it causes a loss.", "C. Find ways to reduce the competitor's operational efficiency.", "D. Analyse the situation and present a compelling Unique Value Proposition."],
+                ans: 3
+            },
+            {
+                q: "17. ทักษะ 'Decision Making' ที่ดีของผู้จัดการสาขาควรเป็นอย่างไร?",
+                qEn: "17. What should good decision-making look like for a Branch Manager?",
+                options: ["ก. การตัดสินใจโดยใช้ข้อมูลสนับสนุน (Data-driven) ภายใต้นโยบาย", "ข. การตัดสินใจตามสัญชาตญาณเพื่อให้เกิดความรวดเร็ว", "ค. การส่งต่ออำนาจให้ผู้อื่นตัดสินใจแทนเพื่อลดความเสี่ยง", "ง. การชะลอการตัดสินใจจนกว่าข้อมูลจะครบ 100%"],
+                optionsEn: ["A. Making data-driven decisions within the bounds of company policy.", "B. Deciding based on instinct for speed.", "C. Delegating decision-making authority to others to minimise personal risk.", "D. Delaying decisions until 100% of all data is available."],
+                ans: 0
+            },
+            {
+                q: "18. การประเมินผลการปฏิบัติงาน (Performance Appraisal) ควรทำบ่อยแค่ไหน?",
+                qEn: "18. How often should a Performance Appraisal be conducted?",
+                options: ["ก. ทำเฉพาะเมื่อพนักงานทำผิด", "ข. ไม่จำเป็นต้องทำหากผลประกอบการยังดี", "ค. ทำตามรอบที่กำหนด พร้อมให้ Feedback อย่างสม่ำเสมอ", "ง. ดำเนินการทุกวันหลังจบงาน"],
+                optionsEn: ["A. Only when an employee has made a mistake.", "B. Not necessary if business performance remains strong.", "C. On a scheduled cycle, with regular and consistent feedback provided throughout.", "D. Every day at the end of the shift."],
+                ans: 2
+            },
+            {
+                q: "19. ในฐานะผู้นำสาขา คุณจะสร้าง 'Team Motivation' ได้อย่างไร?",
+                qEn: "19. As a branch leader, how can you build Team Motivation?",
+                options: ["ก. การใช้อำนาจบังคับและข่มขู่เรื่องบทลงโทษ", "ข. การใช้ระบบคุณธรรม (Merit System) ให้รางวัลตามผลงาน", "ค. การรักษาภาพลักษณ์ผู้นำที่เข้าถึงยากเพื่อสร้างความยำเกรง", "ง. การจัดกิจกรรมสันทนาการโดยไม่คำนึงถึงภาระงาน"],
+                optionsEn: ["A. Using authority and threats of punishment.", "B. Applying a Merit System that rewards staff based on performance.", "C. Maintaining an inaccessible leadership image to command fear and respect.", "D. Organising team-building activities without regard for workload."],
+                ans: 1
+            },
+            {
+                q: "20. หากสาขาต้องเปลี่ยนระบบโปรแกรมใหม่และพนักงานต่อต้าน คุณควรทำอย่างไร?",
+                qEn: "20. If the branch is required to migrate to a new software system and staff are resistant, what should you do?",
+                options: ["ก. ออกคำสั่งบังคับใช้อย่างเด็ดขาด", "ข. ชะลอการใช้งานไปก่อนจนกว่าทุกคนจะพร้อม", "ค. ติดตั้งระบบใหม่โดยไม่ต้องแจ้งล่วงหน้า", "ง. สื่อสารวิสัยทัศน์ (Change Management) และสนับสนุนการฝึกอบรม"],
+                optionsEn: ["A. Issue a strict mandatory order to comply immediately.", "B. Postpone the transition until everyone is ready.", "C. Install the new system without any prior notice.", "D. Communicate the vision through Change Management principles and support training efforts."],
+                ans: 3
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Branch_Management';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            { q: "1. บทบาทที่สำคัญที่สุดของผู้จัดการสาขาคืออะไร?", options: ["ก. การควบคุมการปฏิบัติงานหน้างานด้วยตนเองทั้งหมด", "ข. การกำกับดูแลจุดรับชำระเงินเพื่อลดความเสี่ยงทุจริต", "ค. การบริหารจัดการทรัพยากร มนุษย์ และงบประมาณ ให้สอดคล้องกับกลยุทธ์องค์กร", "ง. การยืดหยุ่นระเบียบการลาเพื่อรักษาความสัมพันธ์ในทีม"], ans: 2 },
-            { q: "2. หากยอดขายของสาขาลดลงติดต่อกัน 2 เดือน สิ่งแรกที่คุณควรทำคืออะไร?", options: ["ก. ดำเนินการวิเคราะห์ข้อมูล (Root Cause Analysis) เพื่อหาปัจจัยภายในและภายนอก", "ข. ปรับลดโครงสร้างพนักงานเพื่อรักษาระดับกำไร", "ค. ขอส่วนกลางปรับลดเป้าหมายยอดขาย", "ง. จัดแคมเปญลดราคาเชิงรุกทันที"], ans: 0 },
-            { q: "3. ในการบริหารพนักงานที่มีความขัดแย้งกันในทีม คุณควรจัดการอย่างไร?", options: ["ก. พิจารณาโยกย้ายบุคลากรเชิงกลยุทธ์", "ข. มอบหมายงานให้แยกส่วนกันอย่างชัดเจนเพื่อเลี่ยงการเผชิญหน้า", "ค. ให้ความสำคัญกับพนักงานที่เป็น High Performer เท่านั้น", "ง. ใช้กระบวนการไกล่เกลี่ย (Mediation) โดยยึดผลประโยชน์องค์กรและหาจุดร่วม"], ans: 3 },
-            { q: "4. 'Customer Complaint' ที่รุนแรงหน้าสาขา ควรจัดการอย่างไร?", options: ["ก. ใช้ทักษะ Active Listening ในพื้นที่ที่เหมาะสม พร้อมเสนอทางแก้ที่เป็นธรรม", "ข. ชี้แจงระเบียบของบริษัทอย่างชัดเจนเพื่อให้ลูกค้าทราบขอบเขต", "ค. มอบหมายให้ Supervisor เป็นผู้รับเรื่องตาม SOP", "ง. ให้ลูกค้าติดต่อ Call Center ส่วนกลางเพื่อตรวจสอบ"], ans: 0 },
-            { q: "5. การทำ 'Stock Inventory Check' มีวัตถุประสงค์หลักเพื่ออะไร?", options: ["ก. การสร้างระเบียบวินัยและเพิ่มภาระงานเสริม", "ข. การจัดระเบียบพื้นที่จัดเก็บสินค้า (Visual Merchandising)", "ค. การตรวจสอบความเที่ยงตรงของข้อมูล (Data Integrity) เพื่อลดการสูญเสีย", "ง. การคำนวณค่าเสื่อมเพื่อหักงบประมาณค่าตอบแทนพิเศษ"], ans: 2 },
-            { q: "6. KPI ข้อใดที่ผู้จัดการสาขาควรให้ความสำคัญมากที่สุด?", options: ["ก. ประสิทธิภาพของห่วงโซ่อุปทาน (Supply Chain)", "ข. การบริหารสมดุลระหว่างยอดขายสุทธิ และอัตรากำไรขั้นต้น (GP)", "ค. การรักษาความสวยงามและระเบียบวินัยการแต่งกาย", "ง. ดัชนีความสุขของพนักงาน (Employee Engagement)"], ans: 1 },
-            { q: "7. หากพนักงานขาดงานกะทันหันในวันที่ลูกค้าเยอะที่สุด คุณจะแก้ปัญหาอย่างไร?", options: ["ก. บริหารจัดการกำลังคนแบบยืดหยุ่น (Agile) และลงช่วยหน้างาน", "ข. พิจารณาจำกัดการให้บริการในบางส่วนเพื่อรักษามาตรฐาน", "ค. ใช้มาตรการทางวินัยขั้นสูงสุดทันที", "ง. ให้พนักงานที่เหลืออยู่ดเว้นช่วงเวลาพักทั้งหมด"], ans: 0 },
-            { q: "8. 'P&L Statement' ของสาขาช่วยให้คุณตัดสินใจเรื่องใดได้ดีขึ้น?", options: ["ก. การจัดทำตารางเวรการทำงานของผู้จัดการ", "ข. การเลือกงบประมาณสำหรับการปรับปรุงทัศนียภาพ", "ค. การจัดหาอุปกรณ์สำนักงานใหม่ล่าสุด", "ง. การปรับโครงสร้างต้นทุน (Cost Optimization) และแผนขยายรายได้"], ans: 3 },
-            { q: "9. การสอนงานแบบ 'Coaching' แตกต่างจากการสั่งงานแบบ 'Directing' อย่างไร?", options: ["ก. Coaching เน้นอำนาจพฤติกรรม Directing เน้นอำนาจหน้าที่", "ข. Coaching ใช้กับผู้บริหารระดับสูงเท่านั้น", "ค. Coaching เน้นปลดล็อกศักยภาพและวิธีคิด Directing เน้นทำตามขั้นตอน", "ง. ทั้งสองอย่างมีความหมายเหมือนกัน"], ans: 2 },
-            { q: "10. กลยุทธ์ 'Upselling' หมายถึงอะไร?", options: ["ก. การผลักดันสินค้า Old Stock ออกให้เร็วที่สุด", "ข. การโน้มน้าวให้ลูกค้าซื้อสินค้าที่มีมูลค่าสูงกว่าเดิมเพื่อเพิ่มค่าเฉลี่ยต่อบิล", "ค. การลดราคาเชิงเปรียบเทียบเพื่อระบายสินค้า", "ง. การวางแผนผังสินค้าให้อยู่ในระดับสายตา"], ans: 1 },
-            { q: "11. ในการคัดเลือกพนักงานใหม่เข้าทีม คุณควรให้ความสำคัญกับสิ่งใดมากที่สุด?", options: ["ก. ทัศนคติเชิงบวก (Growth Mindset) และความสามารถในการปรับตัว", "ข. บุคลิกภาพภายนอกที่สอดคล้องกับภาพลักษณ์แบรนด์", "ค. เกียรติประวัติทางการศึกษาและชื่อเสียงสถาบัน", "ง. ฐานแฟนคลับหรืออิทธิพลในโซเชียลมีเดีย"], ans: 0 },
-            { q: "12. การรักษามาตรฐาน 'SOP' มีประโยชน์อย่างไร?", options: ["ก. เพื่อเพิ่มขั้นตอนการทำงานให้ซับซ้อนกันลืม", "ข. เพื่อใช้เป็นฐานข้อมูลในการตรวจ Audit เท่านั้น", "ค. เพื่อจำกัดความคิดสร้างสรรค์ให้อยู่ในกรอบ", "ง. เพื่อสร้างความสม่ำเสมอของมาตรฐาน (Consistency) และลดความเสี่ยง"], ans: 3 },
-            { q: "13. หากคุณพบว่ามีการทุจริตในสาขาโดยพนักงานที่สนิทที่สุด คุณจะทำอย่างไร?", options: ["ก. ตักเตือนไม่เป็นทางการเพื่อรักษาความสัมพันธ์", "ข. ดำเนินการตามระเบียบวินัยและหลักจริยธรรม (Code of Conduct) อย่างเคร่งครัด", "ค. เจรจาขอคืนทรัพย์สินและเก็บเป็นความลับ", "ง. ลาออกจากตำแหน่งเพื่อรับผิดชอบ"], ans: 1 },
-            { q: "14. การวิเคราะห์ 'Traffic' ในสาขา ช่วยในการบริหารจัดการเรื่องใด?", options: ["ก. การคำนวณอัตราการใช้ไฟฟ้าต่อหัว", "ข. การประมาณการจัดซื้อน้ำดื่มสวัสดิการ", "ค. การจัดทำโครงสร้างตารางกำลังคน (Staff Scheduling) ให้ตรงความต้องการ", "ง. การเลือกประเภทดนตรีที่เหมาะกับความหนาแน่น"], ans: 2 },
-            { q: "15. คำว่า 'Shrinkage' ในการบริหารสาขาหมายถึงอะไร?", options: ["ก. อัตราการหดตัวของส่วนแบ่งการตลาด", "ข. ผลต่างระหว่างสินค้าในระบบกับสินค้าจริง (สูญหาย/เสียหาย/ทุจริต)", "ค. การลดลงของจำนวนพนักงานในสาขา", "ง. การปรับขนาดบรรจุภัณฑ์ให้เล็กลง"], ans: 1 },
-            { q: "16. หากสาขาคู่แข่งจัดกิจกรรมลดราคาครั้งใหญ่ คุณควรทำอย่างไร?", options: ["ก. ยุติกิจกรรมการตลาดทั้งหมดเพื่อลดงบ", "ข. ปรับลดราคาให้ต่ำกว่าคู่แข่งทันทีแม้จะขาดทุน", "ค. หาทางลดประสิทธิภาพการทำงานของคู่แข่ง", "ง. วิเคราะห์และนำเสนอคุณค่าที่แตกต่าง (Unique Value Proposition)"], ans: 3 },
-            { q: "17. ทักษะ 'Decision Making' ที่ดีของผู้จัดการสาขาควรเป็นอย่างไร?", options: ["ก. การตัดสินใจโดยใช้ข้อมูลสนับสนุน (Data-driven) ภายใต้นโยบาย", "ข. การตัดสินใจตามสัญชาตญาณเพื่อให้เกิดความรวดเร็ว", "ค. การส่งต่ออำนาจให้ผู้อื่นตัดสินใจแทนเพื่อลดความเสี่ยง", "ง. การชะลอการตัดสินใจจนกว่าข้อมูลจะครบ 100%"], ans: 0 },
-            { q: "18. การประเมินผลการปฏิบัติงาน (Performance Appraisal) ควรทำบ่อยแค่ไหน?", options: ["ก. ทำเฉพาะเมื่อพนักงานทำผิด", "ข. ไม่จำเป็นต้องทำหากผลประกอบการยังดี", "ค. ทำตามรอบที่กำหนด พร้อมให้ Feedback อย่างสม่ำเสมอ", "ง. ดำเนินการทุกวันหลังจบงาน"], ans: 2 },
-            { q: "19. ในฐานะผู้นำสาขา คุณจะสร้าง 'Team Motivation' ได้อย่างไร?", options: ["ก. การใช้อำนาจบังคับและข่มขู่เรื่องบทลงโทษ", "ข. การใช้ระบบคุณธรรม (Merit System) ให้รางวัลตามผลงาน", "ค. การรักษาภาพลักษณ์ผู้นำที่เข้าถึงยากเพื่อสร้างความยำเกรง", "ง. การจัดกิจกรรมสันทนาการโดยไม่คำนึงถึงภาระงาน"], ans: 1 },
-            { q: "20. หากสาขาต้องเปลี่ยนระบบโปรแกรมใหม่และพนักงานต่อต้าน คุณควรทำอย่างไร?", options: ["ก. ออกคำสั่งบังคับใช้อย่างเด็ดขาด", "ข. ชะลอการใช้งานไปก่อนจนกว่าทุกคนจะพร้อม", "ค. ติดตั้งระบบใหม่โดยไม่ต้องแจ้งล่วงหน้า", "ง. สื่อสารวิสัยทัศน์ (Change Management) และสนับสนุนการฝึกอบรม"], ans: 3 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
-                text: item.options[choiceIndex],
+                text: item.options[choiceIndex],   // always store Thai for Sheet
                 isCorrect: choiceIndex === item.ans
             });
 
@@ -164,15 +367,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -186,27 +389,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -216,54 +418,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
