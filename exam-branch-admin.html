@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Branch Admin Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,108 +51,310 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
         }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
     </style>
-</head>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบตำแหน่ง แอดมิน / ธุรการสาขา</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Branch Admin</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Branch Admin",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Branch Admin",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. หน้าที่หลักของพนักงานธุรการสาขาคือข้อใด?",
+                qEn: "1. Which of the following best describes the primary responsibility of a Branch Admin?",
+                options: ["ก. การกำหนดกลยุทธ์ระดับมหาภาค", "ข. การซ่อมแซมโครงสร้างพื้นฐานด้วยตนเอง", "ค. การบริหารจัดการงานเอกสาร ข้อมูล และประสานงานสนับสนุน", "ง. การปฏิบัติหน้าที่ขายเพื่อปิดยอดเพียงอย่างเดียว"],
+                optionsEn: ["A. Defining macro-level business strategy.", "B. Personally carrying out infrastructure repairs.", "C. Managing documents, data, and coordination support.", "D. Performing sales duties solely to close targets."],
+                ans: 2
+            },
+            {
+                q: "2. หากคุณต้องจัดเก็บเอกสารสำคัญจำนวนมาก คุณควรมีหลักการอย่างไร?",
+                qEn: "2. If you need to file a large volume of important documents, what is the correct principle to follow?",
+                options: ["ก. คัดแยกหมวดหมู่ ติดฉลาก และเรียงตามดัชนีเพื่อการสืบค้น", "ข. วางซ้อนกันตามลำดับบนโต๊ะทำงาน", "ค. จัดเก็บรวมกันเน้นประหยัดเนื้อที่เป็นหลัก", "ง. ทำลายเอกสารทันทีหลังประมวลผล"],
+                optionsEn: ["A. Categorise, label, and index documents for easy retrieval.", "B. Stack them in order on the work desk.", "C. Store everything together to save space.", "D. Destroy documents immediately after processing."],
+                ans: 0
+            },
+            {
+                q: "3. เมื่อมีผู้โทรหาผู้จัดการที่ติดประชุมอยู่ คุณควรปฏิบัติอย่างไร?",
+                qEn: "3. When someone calls for the manager who is currently in a meeting, what should you do?",
+                options: ["ก. ตัดสายทันทีหากไม่เร่งด่วน", "ข. ให้ผู้โทรติดต่อกลับมาใหม่เรื่อยๆ", "ค. ยุติการประชุมทันทีเพื่อแจ้งผู้จัดการ", "ง. บันทึกข้อมูลผู้ติดต่อ (Call Log) และวัตถุประสงค์เพื่อประสานงานภายหลัง"],
+                optionsEn: ["A. Hang up immediately if it is not urgent.", "B. Ask the caller to keep trying back.", "C. Interrupt the meeting immediately to inform the manager.", "D. Record the caller's details and purpose in a call log and follow up afterwards."],
+                ans: 3
+            },
+            {
+                q: "4. ทักษะโปรแกรมคอมพิวเตอร์ใดที่จำเป็นที่สุดสำหรับงานธุรการ?",
+                qEn: "4. Which computer skills are most essential for administrative work?",
+                options: ["ก. ชุดโปรแกรมสำนักงาน (Microsoft Office) และ Email", "ข. โปรแกรมตัดต่อวิดีโอความละเอียดสูง", "ค. โปรแกรมออกแบบวิศวกรรม 3 มิติ", "ง. โปรแกรมเขียนชุดคำสั่ง (Coding)"],
+                optionsEn: ["A. Microsoft Office suite and email.", "B. High-definition video editing software.", "C. 3D engineering design software.", "D. Programming and coding software."],
+                ans: 0
+            },
+            {
+                q: "5. หากพบว่ารายงานมีตัวเลขผิดพลาดเล็กน้อยก่อนส่งสำนักงานใหญ่ คุณจะทำอย่างไร?",
+                qEn: "5. If you notice a minor numerical error in a report before submitting it to headquarters, what should you do?",
+                options: ["ก. ปล่อยผ่านหากไม่มีนัยสำคัญ", "ข. ตรวจสอบ Data Integrity และแก้ไขให้ถูกต้องก่อนนำเสนอ", "ค. รายงานว่าเป็นความผิดพลาดของระบบ", "ง. เว้นว่างไว้ให้ผู้อื่นตรวจสอบ"],
+                optionsEn: ["A. Let it pass if it seems insignificant.", "B. Verify data integrity and correct the error before submission.", "C. Report it as a system error.", "D. Leave it blank for someone else to check."],
+                ans: 1
+            },
+            {
+                q: "6. 'Minute of Meeting' คือเอกสารเกี่ยวกับอะไร?",
+                qEn: "6. What is a 'Minute of Meeting'?",
+                options: ["ก. เอกสารเรียกเก็บเงินคู่ค้า", "ข. รายงานบันทึกมติที่ประชุม และ Action Plan", "ค. แบบฟอร์มการลางาน", "ง. คู่มือเทคนิคอุปกรณ์ไฟฟ้า"],
+                optionsEn: ["A. A billing document sent to business partners.", "B. A record of meeting resolutions and action plans.", "C. A leave request form.", "D. A technical manual for electrical equipment."],
+                ans: 1
+            },
+            {
+                q: "7. ในการจัดการ 'Petty Cash' (เงินสดย่อย) สิ่งที่สำคัญที่สุดคือข้อใด?",
+                qEn: "7. When managing petty cash, what is the most important practice?",
+                options: ["ก. ใช้จ่ายส่วนตัวได้หากจำเป็น", "ข. บันทึกบัญชีคุมยอด (Daily Log) พร้อมหลักฐานใบเสร็จครบถ้วน", "ค. จัดสรรตามความพึงพอใจส่วนตัว", "ง. วางเงินไว้ในที่เปิดให้ทุกคนหยิบใช้"],
+                optionsEn: ["A. Personal use is acceptable when necessary.", "B. Maintain a daily log with complete receipt documentation.", "C. Allocate funds based on personal preference.", "D. Keep the cash in an open place accessible to everyone."],
+                ans: 1
+            },
+            {
+                q: "8. หากพัสดุเร่งด่วนส่งถึงพนักงานที่ลางานอยู่ คุณควรทำอย่างไร?",
+                qEn: "8. If an urgent parcel arrives for an employee who is on leave, what should you do?",
+                options: ["ก. ส่งพัสดุคืนผู้ส่งทันที", "ข. เปิดอ่านเนื้อหาภายในทันที", "ค. ประสานงานหัวหน้างานเพื่อพิจารณาความเร่งด่วนตามระเบียบ", "ง. วางทิ้งไว้บนโต๊ะจนกว่าพนักงานจะกลับมา"],
+                optionsEn: ["A. Return the parcel to the sender immediately.", "B. Open it and read the contents right away.", "C. Coordinate with the supervisor to assess urgency in accordance with procedures.", "D. Leave it on the employee's desk until they return."],
+                ans: 2
+            },
+            {
+                q: "9. ทักษะ 'Prioritization' ช่วยงานแอดมินอย่างไร?",
+                qEn: "9. How does 'Prioritization' benefit an admin's work?",
+                options: ["ก. ช่วยให้ทำ Multitasking โดยไม่เรียงลำดับ", "ข. วิเคราะห์ความสำคัญ/เร่งด่วน (Eisenhower Matrix) เพื่อลดปัญหาคอขวด", "ค. หาเหตุผลในการปฏิเสธงานที่ซับซ้อน", "ง. สร้างอำนาจต่อรองในการสั่งงานต่อ"],
+                optionsEn: ["A. It allows multitasking without any particular order.", "B. It helps analyse importance and urgency (Eisenhower Matrix) to reduce bottlenecks.", "C. It provides justification for declining complex tasks.", "D. It creates negotiating power when delegating work."],
+                ans: 1
+            },
+            {
+                q: "10. การประสานงาน (Coordination) ที่ดีควรเริ่มจากอะไร?",
+                qEn: "10. What is the foundation of effective coordination?",
+                options: ["ก. การสื่อสารที่มีประสิทธิภาพ (Effective Communication)", "ข. การใช้อำนาจบังคับบัญชาสั่งการ", "ค. การใช้อีเมลเพียงทางเดียวเพื่อเป็นหลักฐาน", "ง. การคุยเรื่องส่วนตัวก่อนเข้าเรื่องงานทุกครั้ง"],
+                optionsEn: ["A. Effective communication.", "B. Using authoritative command.", "C. Relying solely on email for documentation.", "D. Discussing personal matters before every work conversation."],
+                ans: 0
+            },
+            {
+                q: "11. เมื่อต้องจัดเตรียมห้องประชุม สิ่งใดคือหน้าที่ของแอดมิน?",
+                qEn: "11. When preparing a meeting room, which of the following is the admin's responsibility?",
+                options: ["ก. ตัดสินใจประเด็นสำคัญแทนผู้จัดการ", "ข. บริหารจัดการทรัพยากร (อุปกรณ์โสตฯ, เอกสาร, อาหารว่าง) ให้พร้อม", "ค. จัดเตรียมอาหารมื้อหลักให้ทุกคนในสาขา", "ง. ทำหน้าที่เป็นประธานในที่ประชุม"],
+                optionsEn: ["A. Making key decisions on behalf of the manager.", "B. Ensuring all resources (AV equipment, documents, refreshments) are ready.", "C. Preparing full meals for everyone in the branch.", "D. Acting as the chairperson of the meeting."],
+                ans: 1
+            },
+            {
+                q: "12. หากมีลูกค้าเดินเข้ามาขณะคุณกำลังทำงานติดพันอยู่ คุณควรทำอย่างไร?",
+                qEn: "12. If a customer walks in while you are occupied with a task, what should you do?",
+                options: ["ก. ทำงานเอกสารให้เสร็จก่อนค่อยคุย", "ข. ไล่ให้ไปหาพนักงานคนอื่น", "ค. แสดงการรับรู้ (Acknowledgment) ทักทาย และประสานผู้เกี่ยวข้องมาดูแล", "ง. ปลีกตัวหนีไปที่อื่น"],
+                optionsEn: ["A. Finish the document work first before engaging.", "B. Direct them to another staff member.", "C. Acknowledge and greet the customer, then coordinate with the appropriate person to assist them.", "D. Quietly move away to another area."],
+                ans: 2
+            },
+            {
+                q: "13. การเก็บรักษาความลับของบริษัท (Confidentiality) หมายถึงข้อใด?",
+                qEn: "13. What does maintaining company 'Confidentiality' mean?",
+                options: ["ก. บอกเฉพาะเพื่อนร่วมงานที่สนิท", "ข. เก็บกุญแจและรหัสไว้กับตัวคนเดียว", "ค. คุ้มครองข้อมูลส่วนบุคคลและองค์กรไม่ให้รั่วไหลโดยไม่ได้รับอนุญาต", "ง. ทำลายรหัสผ่านทิ้งทันทีเมื่อย้ายตำแหน่ง"],
+                optionsEn: ["A. Sharing information only with close colleagues.", "B. Keeping all keys and passwords to yourself.", "C. Protecting personal and organisational data from unauthorised disclosure.", "D. Destroying all passwords immediately upon a role change."],
+                ans: 2
+            },
+            {
+                q: "14. เครื่องมือ 'Mail Merge' ใน Microsoft Word มีประโยชน์อย่างไร?",
+                qEn: "14. What is the benefit of the 'Mail Merge' feature in Microsoft Word?",
+                options: ["ก. ป้องกันไวรัสในอีเมล", "ข. ผลิตเอกสารจำนวนมากโดยดึงข้อมูลจากฐานข้อมูล", "ค. สร้างระบบตอบกลับอัตโนมัติ", "ง. แปลภาษาเอกสารอัตโนมัติ"],
+                optionsEn: ["A. It protects emails from viruses.", "B. It produces large volumes of documents by pulling data from a database.", "C. It creates an automated reply system.", "D. It automatically translates documents into another language."],
+                ans: 1
+            },
+            {
+                q: "15. หากอุปกรณ์สำนักงานชำรุด คุณควรจัดการอย่างไร?",
+                qEn: "15. If a piece of office equipment breaks down, what is the correct course of action?",
+                options: ["ก. ซ่อมเองตามความเข้าใจ", "ข. ติดป้ายแจ้งสถานะ (Out of Service) และแจ้งซ่อมตาม SOP", "ค. ปล่อยไว้ให้คนอื่นมาเจอเอง", "ง. จัดซื้อเครื่องใหม่มาแทนทันที"],
+                optionsEn: ["A. Repair it yourself based on your own understanding.", "B. Label it 'Out of Service' and report it for repair following the SOP.", "C. Leave it for someone else to discover.", "D. Immediately purchase a replacement unit."],
+                ans: 1
+            },
+            {
+                q: "16. การตรวจสอบ 'Stationery Stock' ควรทำเมื่อใด?",
+                qEn: "16. When should 'Stationery Stock' be checked?",
+                options: ["ก. ตรวจเมื่อมีคนมาแจ้งว่าของหมด", "ข. ตรวจตามรอบที่กำหนด (Cyclic Count) เพื่อวางแผนจัดซื้อ", "ค. ตรวจทุกครั้งที่จะเบิกใช้เอง", "ง. ตรวจเพียงปีละครั้งตอนปิดงบ"],
+                optionsEn: ["A. Only when someone reports that items have run out.", "B. On a scheduled cycle (cyclic count) to plan purchasing in advance.", "C. Every time you personally need to take something.", "D. Only once a year during the financial year-end closing."],
+                ans: 1
+            },
+            {
+                q: "17. อีเมลที่เป็นทางการ (Professional Email) ควรประกอบด้วยส่วนใด?",
+                qEn: "17. What should a professional email contain?",
+                options: ["ก. ตัวอักษรหลากสีและภาษาที่เป็นกันเอง", "ข. แนบรูปกิจกรรมส่วนตัว", "ค. หัวข้อชัดเจน คำขึ้นต้นเหมาะสม เนื้อหากระชับ และข้อมูลติดต่อกลับ", "ง. เน้นตัวหนาทั้งอีเมล"],
+                optionsEn: ["A. Multiple text colours and casual language.", "B. Attachments of personal activity photos.", "C. A clear subject line, appropriate salutation, concise content, and contact details.", "D. Bold text applied throughout the entire email."],
+                ans: 2
+            },
+            {
+                q: "18. หากคุณทำงานผิดพลาดจนส่งผลกระทบต่อผู้อื่น คุณควรจัดการอย่างไร?",
+                qEn: "18. If you make a mistake that impacts others, how should you handle it?",
+                options: ["ก. หลีกเลี่ยงการเผชิญหน้า", "ข. แสดงความรับผิดชอบ (Accountability) และร่วมเสนอทางแก้ไข", "ค. โยนความผิดให้คนในขั้นตอนก่อนหน้า", "ง. ลาออกทันที"],
+                optionsEn: ["A. Avoid confrontation.", "B. Take accountability and actively propose a solution.", "C. Shift the blame to whoever handled the previous step.", "D. Resign immediately."],
+                ans: 1
+            },
+            {
+                q: "19. ในงานธุรการ 'Attention to Detail' หมายถึงอะไร?",
+                qEn: "19. In administrative work, what does 'Attention to Detail' mean?",
+                options: ["ก. มุ่งเน้นงานเสร็จตามเวลาโดยไม่ดูความถูกต้อง", "ข. ความละเอียดลออในการตรวจทานความถูกต้องในทุกขั้นตอน", "ค. การจับผิดเพื่อนร่วมงานเพื่อรายงานหัวหน้า", "ง. การจดจำความลับส่วนตัวของทุกคนในสาขา"],
+                optionsEn: ["A. Focusing solely on finishing work on time without checking accuracy.", "B. Being meticulous in verifying correctness at every step.", "C. Finding colleagues' mistakes in order to report them to management.", "D. Memorising everyone's personal secrets in the branch."],
+                ans: 1
+            },
+            {
+                q: "20. พฤติกรรมใดที่แสดงถึง 'Service Mind' ในงานธุรการ?",
+                qEn: "20. Which behaviour best demonstrates 'Service Mind' in administrative work?",
+                options: ["ก. ปฏิเสธงานทุกอย่างที่ไม่อยู่ใน JD", "ข. กระตือรือร้นในการอำนวยความสะดวกและแก้ไขอุปสรรคให้ผู้อื่น", "ค. บริการดีเฉพาะกับผู้บริหาร", "ง. ยิ้มแย้มแต่ไม่ยอมทำงานสนับสนุน"],
+                optionsEn: ["A. Refusing any task that falls outside the job description.", "B. Being proactive in facilitating and removing obstacles for others.", "C. Providing good service only to executives.", "D. Being friendly but unwilling to carry out support tasks."],
+                ans: 1
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Branch_Admin';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            { q: "1. หน้าที่หลักของพนักงานธุรการสาขาคือข้อใด?", options: ["ก. การกำหนดกลยุทธ์ระดับมหาภาค", "ข. การซ่อมแซมโครงสร้างพื้นฐานด้วยตนเอง", "ค. การบริหารจัดการงานเอกสาร ข้อมูล และประสานงานสนับสนุน", "ง. การปฏิบัติหน้าที่ขายเพื่อปิดยอดเพียงอย่างเดียว"], ans: 2 },
-            { q: "2. หากคุณต้องจัดเก็บเอกสารสำคัญจำนวนมาก คุณควรมีหลักการอย่างไร?", options: ["ก. คัดแยกหมวดหมู่ ติดฉลาก และเรียงตามดัชนีเพื่อการสืบค้น", "ข. วางซ้อนกันตามลำดับบนโต๊ะทำงาน", "ค. จัดเก็บรวมกันเน้นประหยัดเนื้อที่เป็นหลัก", "ง. ทำลายเอกสารทันทีหลังประมวลผล"], ans: 0 },
-            { q: "3. เมื่อมีผู้โทรหาผู้จัดการที่ติดประชุมอยู่ คุณควรปฏิบัติอย่างไร?", options: ["ก. ตัดสายทันทีหากไม่เร่งด่วน", "ข. ให้ผู้โทรติดต่อกลับมาใหม่เรื่อยๆ", "ค. ยุติการประชุมทันทีเพื่อแจ้งผู้จัดการ", "ง. บันทึกข้อมูลผู้ติดต่อ (Call Log) และวัตถุประสงค์เพื่อประสานงานภายหลัง"], ans: 3 },
-            { q: "4. ทักษะโปรแกรมคอมพิวเตอร์ใดที่จำเป็นที่สุดสำหรับงานธุรการ?", options: ["ก. ชุดโปรแกรมสำนักงาน (Microsoft Office) และ Email", "ข. โปรแกรมตัดต่อวิดีโอความละเอียดสูง", "ค. โปรแกรมออกแบบวิศวกรรม 3 มิติ", "ง. โปรแกรมเขียนชุดคำสั่ง (Coding)"], ans: 0 },
-            { q: "5. หากพบว่ารายงานมีตัวเลขผิดพลาดเล็กน้อยก่อนส่งสำนักงานใหญ่ คุณจะทำอย่างไร?", options: ["ก. ปล่อยผ่านหากไม่มีนัยสำคัญ", "ข. ตรวจสอบ Data Integrity และแก้ไขให้ถูกต้องก่อนนำเสนอ", "ค. รายงานว่าเป็นความผิดพลาดของระบบ", "ง. เว้นว่างไว้ให้ผู้อื่นตรวจสอบ"], ans: 1 },
-            { q: "6. 'Minute of Meeting' คือเอกสารเกี่ยวกับอะไร?", options: ["ก. เอกสารเรียกเก็บเงินคู่ค้า", "ข. รายงานบันทึกมติที่ประชุม และ Action Plan", "ค. แบบฟอร์มการลางาน", "ง. คู่มือเทคนิคอุปกรณ์ไฟฟ้า"], ans: 1 },
-            { q: "7. ในการจัดการ 'Petty Cash' (เงินสดย่อย) สิ่งที่สำคัญที่สุดคือข้อใด?", options: ["ก. ใช้จ่ายส่วนตัวได้หากจำเป็น", "ข. บันทึกบัญชีคุมยอด (Daily Log) พร้อมหลักฐานใบเสร็จครบถ้วน", "ค. จัดสรรตามความพึงพอใจส่วนตัว", "ง. วางเงินไว้ในที่เปิดให้ทุกคนหยิบใช้"], ans: 1 },
-            { q: "8. หากพัสดุเร่งด่วนส่งถึงพนักงานที่ลางานอยู่ คุณควรทำอย่างไร?", options: ["ก. ส่งพัสดุคืนผู้ส่งทันที", "ข. เปิดอ่านเนื้อหาภายในทันที", "ค. ประสานงานหัวหน้างานเพื่อพิจารณาความเร่งด่วนตามระเบียบ", "ง. วางทิ้งไว้บนโต๊ะจนกว่าพนักงานจะกลับมา"], ans: 2 },
-            { q: "9. ทักษะ 'Prioritization' ช่วยงานแอดมินอย่างไร?", options: ["ก. ช่วยให้ทำ Multitasking โดยไม่เรียงลำดับ", "ข. วิเคราะห์ความสำคัญ/เร่งด่วน (Eisenhower Matrix) เพื่อลดปัญหาคอขวด", "ค. หาเหตุผลในการปฏิเสธงานที่ซับซ้อน", "ง. สร้างอำนาจต่อรองในการสั่งงานต่อ"], ans: 1 },
-            { q: "10. การประสานงาน (Coordination) ที่ดีควรเริ่มจากอะไร?", options: ["ก. การสื่อสารที่มีประสิทธิภาพ (Effective Communication)", "ข. การใช้อำนาจบังคับบัญชาสั่งการ", "ค. การใช้อีเมลเพียงทางเดียวเพื่อเป็นหลักฐาน", "ง. การคุยเรื่องส่วนตัวก่อนเข้าเรื่องงานทุกครั้ง"], ans: 0 },
-            { q: "11. เมื่อต้องจัดเตรียมห้องประชุม สิ่งใดคือหน้าที่ของแอดมิน?", options: ["ก. ตัดสินใจประเด็นสำคัญแทนผู้จัดการ", "ข. บริหารจัดการทรัพยากร (อุปกรณ์โสตฯ, เอกสาร, อาหารว่าง) ให้พร้อม", "ค. จัดเตรียมอาหารมื้อหลักให้ทุกคนในสาขา", "ง. ทำหน้าที่เป็นประธานในที่ประชุม"], ans: 1 },
-            { q: "12. หากมีลูกค้าเดินเข้ามาขณะคุณกำลังทำงานติดพันอยู่ คุณควรทำอย่างไร?", options: ["ก. ทำงานเอกสารให้เสร็จก่อนค่อยคุย", "ข. ไล่ให้ไปหาพนักงานคนอื่น", "ค. แสดงการรับรู้ (Acknowledgment) ทักทาย และประสานผู้เกี่ยวข้องมาดูแล", "ง. ปลีกตัวหนีไปที่อื่น"], ans: 2 },
-            { q: "13. การเก็บรักษาความลับของบริษัท (Confidentiality) หมายถึงข้อใด?", options: ["ก. บอกเฉพาะเพื่อนร่วมงานที่สนิท", "ข. เก็บกุญแจและรหัสไว้กับตัวคนเดียว", "ค. คุ้มครองข้อมูลส่วนบุคคลและองค์กรไม่ให้รั่วไหลโดยไม่ได้รับอนุญาต", "ง. ทำลายรหัสผ่านทิ้งทันทีเมื่อย้ายตำแหน่ง"], ans: 2 },
-            { q: "14. เครื่องมือ 'Mail Merge' ใน Microsoft Word มีประโยชน์อย่างไร?", options: ["ก. ป้องกันไวรัสในอีเมล", "ข. ผลิตเอกสารจำนวนมากโดยดึงข้อมูลจากฐานข้อมูล", "ค. สร้างระบบตอบกลับอัตโนมัติ", "ง. แปลภาษาเอกสารอัตโนมัติ"], ans: 1 },
-            { q: "15. หากอุปกรณ์สำนักงานชำรุด คุณควรจัดการอย่างไร?", options: ["ก. ซ่อมเองตามความเข้าใจ", "ข. ติดป้ายแจ้งสถานะ (Out of Service) และแจ้งซ่อมตาม SOP", "ค. ปล่อยไว้ให้คนอื่นมาเจอเอง", "ง. จัดซื้อเครื่องใหม่มาแทนทันที"], ans: 1 },
-            { q: "16. การตรวจสอบ 'Stationery Stock' ควรทำเมื่อใด?", options: ["ก. ตรวจเมื่อมีคนมาแจ้งว่าของหมด", "ข. ตรวจตามรอบที่กำหนด (Cyclic Count) เพื่อวางแผนจัดซื้อ", "ค. ตรวจทุกครั้งที่จะเบิกใช้เอง", "ง. ตรวจเพียงปีละครั้งตอนปิดงบ"], ans: 1 },
-            { q: "17. อีเมลที่เป็นทางการ (Professional Email) ควรประกอบด้วยส่วนใด?", options: ["ก. ตัวอักษรหลากสีและภาษาที่เป็นกันเอง", "ข. แนบรูปกิจกรรมส่วนตัว", "ค. หัวข้อชัดเจน คำขึ้นต้นเหมาะสม เนื้อหากระชับ และข้อมูลติดต่อกลับ", "ง. เน้นตัวหนาทั้งอีเมล"], ans: 2 },
-            { q: "18. หากคุณทำงานผิดพลาดจนส่งผลกระทบต่อผู้อื่น คุณควรจัดการอย่างไร?", options: ["ก. หลีกเลี่ยงการเผชิญหน้า", "ข. แสดงความรับผิดชอบ (Accountability) และร่วมเสนอทางแก้ไข", "ค. โยนความผิดให้คนในขั้นตอนก่อนหน้า", "ง. ลาออกทันที"], ans: 1 },
-            { q: "19. ในงานธุรการ 'Attention to Detail' หมายถึงอะไร?", options: ["ก. มุ่งเน้นงานเสร็จตามเวลาโดยไม่ดูความถูกต้อง", "ข. ความละเอียดลออในการตรวจทานความถูกต้องในทุกขั้นตอน", "ค. การจับผิดเพื่อนร่วมงานเพื่อรายงานหัวหน้า", "ง. การจดจำความลับส่วนตัวของทุกคนในสาขา"], ans: 1 },
-            { q: "20. พฤติกรรมใดที่แสดงถึง 'Service Mind' ในงานธุรการ?", options: ["ก. ปฏิเสธงานทุกอย่างที่ไม่อยู่ใน JD", "ข. กระตือรือร้นในการอำนวยความสะดวกและแก้ไขอุปสรรคให้ผู้อื่น", "ค. บริการดีเฉพาะกับผู้บริหาร", "ง. ยิ้มแย้มแต่ไม่ยอมทำงานสนับสนุน"], ans: 1 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
-                text: item.options[choiceIndex],
+                text: item.options[choiceIndex],   // always store Thai for Sheet
                 isCorrect: choiceIndex === item.ans
             });
 
@@ -165,15 +367,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -187,27 +389,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -217,55 +418,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
-
