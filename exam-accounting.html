@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Accountant Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -74,87 +74,288 @@
             margin-bottom: 10px;
             text-align: right;
         }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
         <header style="text-align: center; margin-bottom: 30px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบมาตรฐานวิชาชีพบัญชี (Accountant)</h1>
+            <h1 id="pageTitle" style="margin-top: 15px;">แบบทดสอบมาตรฐานวิชาชีพบัญชี (Accountant)</h1>
             <p id="userInfo" style="opacity: 0.8;"></p>
         </header>
 
-
-
-        <div id="accountingForm">
-        </div>
+        <div id="accountingForm"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบมาตรฐานวิชาชีพบัญชี (Accountant)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Professional Accounting Competency Assessment",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please do not close this window. Your answers are being sent to our system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. สมการบัญชี (Accounting Equation) ที่ถูกต้องคือข้อใด?",
+                qEn: "1. Which of the following is the correct accounting equation?",
+                options: ["ก. สินทรัพย์ = หนี้สิน - ส่วนของเจ้าของ", "ข. สินทรัพย์ = หนี้สิน + ส่วนของเจ้าของ", "ค. หนี้สิน = สินทรัพย์ + ส่วนของเจ้าของ", "ง. ส่วนของเจ้าของ = หนี้สิน - สินทรัพย์"],
+                optionsEn: ["A. Assets = Liabilities − Owner's Equity", "B. Assets = Liabilities + Owner's Equity", "C. Liabilities = Assets + Owner's Equity", "D. Owner's Equity = Liabilities − Assets"],
+                ans: 1
+            },
+            {
+                q: "2. รายการใดถือเป็น 'สินทรัพย์ไม่หมุนเวียน' (Non-current Assets)?",
+                qEn: "2. Which of the following is classified as a non-current asset?",
+                options: ["ก. เงินสดและเงินฝากธนาคาร", "ข. ลูกหนี้การค้า", "ค. สินค้าคงเหลือ", "ง. ที่ดิน อาคาร และอุปกรณ์"],
+                optionsEn: ["A. Cash and bank deposits", "B. Trade receivables", "C. Inventories", "D. Property, plant and equipment"],
+                ans: 3
+            },
+            {
+                q: "3. การบันทึกบัญชีตามระบบ 'เกณฑ์คงค้าง' (Accrual Basis) หมายถึงอะไร?",
+                qEn: "3. What does recording transactions on an accrual basis mean?",
+                options: ["ก. บันทึกเมื่อรับ/จ่ายเงินสดจริงเท่านั้น", "ข. บันทึกรายได้และค่าใช้จ่ายในงวดที่เกิดขึ้น แม้เงินสดยังไม่รับหรือจ่าย", "ค. บันทึกเฉพาะรายการที่ค้างชำระ", "ง. บันทึกเฉพาะรายการเงินสดเพื่อให้ปิดงบรวดเร็ว"],
+                optionsEn: ["A. Recording transactions only when cash is received or paid.", "B. Recognising revenues and expenses in the period they occur, regardless of when cash is exchanged.", "C. Recording only outstanding payable items.", "D. Recording only cash transactions to speed up the closing process."],
+                ans: 1
+            },
+            {
+                q: "4. หากบริษัทจ่ายเงินค่าเบี้ยประกันภัยล่วงหน้า 1 ปี (Prepaid Insurance) รายการนี้ควรจัดประเภทเป็นอะไร?",
+                qEn: "4. If a company pays one year of insurance premiums in advance (prepaid insurance), how should this item be classified?",
+                options: ["ก. ค่าใช้จ่ายทั้งหมดของงวดทันที", "ข. สินทรัพย์หมุนเวียน (ทยอยตัดเป็นค่าใช้จ่าย)", "ค. หนี้สินหมุนเวียน", "ง. ส่วนของเจ้าของ"],
+                optionsEn: ["A. The full amount as an expense in the current period.", "B. A current asset, expensed progressively over the coverage period.", "C. A current liability.", "D. Owner's equity."],
+                ans: 1
+            },
+            {
+                q: "5. ภาษีเงินได้หัก ณ ที่จ่าย (Withholding Tax) กรณีจ่ายค่าบริการให้บริษัทในประเทศ โดยทั่วไปคือร้อยละเท่าใด?",
+                qEn: "5. What is the standard withholding tax rate applied when paying service fees to a domestic company in Thailand?",
+                options: ["ก. 1%", "ข. 3%", "ค. 5%", "ง. 7%"],
+                optionsEn: ["A. 1%", "B. 3%", "C. 5%", "D. 7%"],
+                ans: 1
+            },
+            {
+                q: "6. 'งบกำไรขาดทุน' (Income Statement) แสดงข้อมูลเกี่ยวกับอะไร?",
+                qEn: "6. What information does an income statement present?",
+                options: ["ก. ฐานะการเงิน ณ วันใดวันหนึ่ง", "ข. ผลการดำเนินงานในช่วงเวลาหนึ่ง (รายได้, ค่าใช้จ่าย, กำไรสุทธิ)", "ค. รายละเอียดหนี้สินแยกตามเจ้าหนี้", "ง. การเปลี่ยนแปลงส่วนของเจ้าของอย่างเดียว"],
+                optionsEn: ["A. The financial position of a company at a specific point in time.", "B. The results of operations over a period (revenues, expenses, and net profit).", "C. A detailed breakdown of liabilities by creditor.", "D. Changes in owner's equity only."],
+                ans: 1
+            },
+            {
+                q: "7. รายการใดต่อไปนี้ที่ 'ไม่ต้อง' นำมาคำนวณค่าเสื่อมราคา (Depreciation)?",
+                qEn: "7. Which of the following assets is NOT subject to depreciation?",
+                options: ["ก. รถยนต์", "ข. เครื่องจักร", "ค. คอมพิวเตอร์", "ง. ที่ดิน"],
+                optionsEn: ["A. Motor vehicles", "B. Machinery", "C. Computers", "D. Land"],
+                ans: 3
+            },
+            {
+                q: "8. การกระทบยอดเงินฝากธนาคาร (Bank Reconciliation) มีวัตถุประสงค์เพื่ออะไร?",
+                qEn: "8. What is the primary purpose of a bank reconciliation?",
+                options: ["ก. ตรวจสอบความแตกต่างระหว่างสมุดบัญชีบริษัทกับ Statement ธนาคาร", "ข. ขอรับดอกเบี้ยเพิ่มจากธนาคาร", "ค. แจ้งยอดหนี้ให้ลูกค้าทราบ", "ง. ใช้สำหรับคำนวณ VAT"],
+                optionsEn: ["A. To identify and explain differences between the company's cash book and the bank statement.", "B. To request additional interest from the bank.", "C. To notify customers of their outstanding balances.", "D. To calculate VAT."],
+                ans: 0
+            },
+            {
+                q: "9. ภาษีมูลค่าเพิ่ม (VAT) ในปัจจุบันของประเทศไทย (อัตราปกติ) คือร้อยละเท่าใด?",
+                qEn: "9. What is the standard VAT rate currently applied in Thailand?",
+                options: ["ก. 3%", "ข. 5%", "ค. 7%", "ง. 10%"],
+                optionsEn: ["A. 3%", "B. 5%", "C. 7%", "D. 10%"],
+                ans: 2
+            },
+            {
+                q: "10. ในระบบบัญชีคู่ รายการซื้อสินค้าเป็นเงินเชื่อ จะบันทึกบัญชีอย่างไร?",
+                qEn: "10. Under the double-entry system, how should a credit purchase of goods be recorded?",
+                options: ["ก. เดบิต ซื้อสินค้า / เครดิต เงินสด", "ข. เดบิต ซื้อสินค้า (หรือสินค้าคงเหลือ) / เครดิต เจ้าหนี้การค้า", "ค. เดบิต เจ้าหนี้การค้า / เครดิต ซื้อสินค้า", "ง. เดบิต เงินสด / เครดิต ขายสินค้า"],
+                optionsEn: ["A. Debit Purchases / Credit Cash", "B. Debit Purchases (or Inventory) / Credit Accounts Payable", "C. Debit Accounts Payable / Credit Purchases", "D. Debit Cash / Credit Sales"],
+                ans: 1
+            },
+            {
+                q: "11. 'ค่าเผื่อหนี้สงสัยจะสูญ' (Allowance for Doubtful Accounts) ถูกจัดประเภทเป็นรายการใด?",
+                qEn: "11. How is the allowance for doubtful accounts classified on the balance sheet?",
+                options: ["ก. หนี้สินหมุนเวียน", "ข. รายได้รอการตัดบัญชี", "ค. รายการปรับลดยอดลูกหนี้ (Contra Asset)", "ง. ส่วนของเจ้าของ"],
+                optionsEn: ["A. A current liability", "B. Deferred income", "C. A contra asset that reduces the gross receivables balance", "D. Owner's equity"],
+                ans: 2
+            },
+            {
+                q: "12. งบแสดงการเปลี่ยนแปลงส่วนของเจ้าของ บอกข้อมูลอะไรแก่ผู้ใช้บัญชี?",
+                qEn: "12. What information does the statement of changes in equity provide to users?",
+                options: ["ก. จำนวนสินค้าคงเหลือที่ขายได้จริง", "ข. รายชื่อเจ้าหนี้ทั้งหมดและยอดคงเหลือ", "ค. การเปลี่ยนแปลงของทุน กำไรสะสม และเงินปันผลในงวด", "ง. ตารางการชำระหนี้ธนาคาร"],
+                optionsEn: ["A. The actual quantity of inventory sold.", "B. A full list of creditors and their outstanding balances.", "C. Movements in capital, retained earnings, and dividends during the period.", "D. A loan repayment schedule."],
+                ans: 2
+            },
+            {
+                q: "13. หลักการ 'ความระมัดระวัง' (Prudence) ในทางการบัญชีหมายถึงอะไร?",
+                qEn: "13. What does the accounting principle of prudence (conservatism) mean?",
+                options: ["ก. บันทึกรายได้ให้สูงไว้ก่อนเพื่อความน่าเชื่อถือ", "ข. ไม่ต้องบันทึกหนี้สินจนกว่าจะถูกฟ้อง", "ค. เก็บเงินสดไว้ให้มากที่สุด", "ง. รับรู้ความสูญเสียเมื่อมีความเป็นไปได้ แต่ไม่รับรู้กำไรเกินจริง"],
+                optionsEn: ["A. Recording revenues as high as possible to appear more credible.", "B. Not recognising liabilities until a lawsuit has been filed.", "C. Retaining as much cash as possible.", "D. Recognising losses when they are probable, but not overstating gains."],
+                ans: 3
+            },
+            {
+                q: "14. ค่าใช้จ่ายใดต่อไปนี้ ถือเป็น 'รายจ่ายต้องห้าม' ในการคำนวณภาษีเงินได้นิติบุคคล?",
+                qEn: "14. Which of the following is a non-deductible expense for corporate income tax purposes?",
+                options: ["ก. เงินเดือนพนักงาน", "ข. ค่าโฆษณาที่มีหลักฐานครบถ้วน", "ค. ค่ารับรองลูกค้าที่อยู่ในเกณฑ์", "ง. รายจ่ายส่วนตัว/เสน่หา/ไม่มีหลักฐานผู้รับเงิน"],
+                optionsEn: ["A. Employee salaries", "B. Advertising expenses with complete supporting documentation", "C. Eligible entertainment expenses within the prescribed limit", "D. Personal expenses, gratuitous payments, or expenses with no identified payee"],
+                ans: 3
+            },
+            {
+                q: "15. FIFO (First-In, First-Out) คือวิธีการคำนวณสิ่งใด?",
+                qEn: "15. What does the FIFO (First-In, First-Out) method relate to?",
+                options: ["ก. วิธีคำนวณภาษีเงินได้", "ข. วิธีการตีราคาสินค้าคงเหลือ (เข้าก่อนออกก่อน)", "ค. วิธีคำนวณค่าเสื่อมราคาเส้นตรง", "ง. วิธีบริหารพนักงานเข้าใหม่"],
+                optionsEn: ["A. An income tax calculation method", "B. An inventory valuation method — goods purchased first are sold first", "C. The straight-line depreciation method", "D. A method for managing newly hired employees"],
+                ans: 1
+            },
+            {
+                q: "16. หากบัญชีด้าน Debit มียอดสูงกว่า Credit ในบัญชีแยกประเภท 'สินทรัพย์' หมายความว่าอย่างไร?",
+                qEn: "16. In an asset ledger account, if the total debits exceed the total credits, what does this indicate?",
+                options: ["ก. สินทรัพย์ลดลง", "ข. บริษัทขาดทุนอย่างรุนแรง", "ค. เกิดข้อผิดพลาด", "ง. สินทรัพย์มียอดคงเหลือปกติ (ยังมีมูลค่าคงเหลือ)"],
+                optionsEn: ["A. The asset has decreased in value.", "B. The company has suffered a significant loss.", "C. An error has occurred.", "D. The asset carries a normal debit balance, meaning it still has remaining value."],
+                ans: 3
+            },
+            {
+                q: "17. กระดาษทำการ (Working Paper) มีความสำคัญอย่างไร?",
+                qEn: "17. What is the significance of working papers in the accounting process?",
+                options: ["ก. ต้องส่งสรรพากรทุกเดือน", "ข. เป็นเครื่องมือรวบรวมข้อมูลเพื่อปรับปรุงบัญชีและปิดงบ", "ค. เป็นใบเสร็จรับเงินชั่วคราว", "ง. เป็นสัญญาจ้างงานพนักงานบัญชี"],
+                optionsEn: ["A. They must be submitted to the Revenue Department every month.", "B. They serve as a tool for gathering and organising information to support adjustments and the closing process.", "C. They function as temporary receipts.", "D. They are employment contracts for accounting staff."],
+                ans: 1
+            },
+            {
+                q: "18. ภาษีซื้อ (Input Tax) จะถือเป็นภาษีต้องห้าม (ขอคืนไม่ได้) ในกรณีใด?",
+                qEn: "18. In which circumstance is input VAT considered a disallowed tax credit (non-refundable)?",
+                options: ["ก. ซื้อวัตถุดิบเพื่อผลิตสินค้า", "ข. ซื้อรถกระบะมาใช้ในกิจการ", "ค. ค่าใช้จ่ายรับรองบางประเภทตามเงื่อนไขสรรพากร", "ง. มีใบกำกับภาษีเต็มรูปแบบถูกต้อง"],
+                optionsEn: ["A. Purchasing raw materials for production", "B. Purchasing a pick-up truck for business use", "C. Certain entertainment expenses as stipulated by the Revenue Department", "D. Transactions supported by a complete and valid full tax invoice"],
+                ans: 2
+            },
+            {
+                q: "19. ในงบกระแสเงินสด กิจกรรมใดที่เกี่ยวข้องกับการกู้ยืมเงินจากธนาคาร?",
+                qEn: "19. In a statement of cash flows, under which activity is a bank loan borrowing classified?",
+                options: ["ก. กิจกรรมดำเนินงาน", "ข. กิจกรรมลงทุน", "ค. กิจกรรมจัดหาเงิน (Financing Activities)", "ง. กิจกรรมบริหารจัดการ"],
+                optionsEn: ["A. Operating activities", "B. Investing activities", "C. Financing activities", "D. Management activities"],
+                ans: 2
+            },
+            {
+                q: "20. จรรยาบรรณวิชาชีพบัญชีข้อใดสำคัญที่สุดเมื่อถูกสั่งให้ตกแต่งตัวเลขกำไร?",
+                qEn: "20. Which professional accounting ethic is most critical when instructed to manipulate profit figures?",
+                options: ["ก. ความเชื่อฟังต่อผู้บังคับบัญชา", "ข. ความรวดเร็วในการส่งงบ", "ค. ความสวยงามของรายงาน", "ง. ความซื่อสัตย์และความเที่ยงธรรม (Integrity & Objectivity)"],
+                optionsEn: ["A. Obedience to superiors", "B. Timeliness in submitting financial statements", "C. The presentational quality of reports", "D. Integrity and objectivity"],
+                ans: 3
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Accounting';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-
-        const questions = [
-            { q: "1. สมการบัญชี (Accounting Equation) ที่ถูกต้องคือข้อใด?", options: ["ก. สินทรัพย์ = หนี้สิน - ส่วนของเจ้าของ", "ข. สินทรัพย์ = หนี้สิน + ส่วนของเจ้าของ", "ค. หนี้สิน = สินทรัพย์ + ส่วนของเจ้าของ", "ง. ส่วนของเจ้าของ = หนี้สิน - สินทรัพย์"], ans: 1 },
-            { q: "2. รายการใดถือเป็น 'สินทรัพย์ไม่หมุนเวียน' (Non-current Assets)?", options: ["ก. เงินสดและเงินฝากธนาคาร", "ข. ลูกหนี้การค้า", "ค. สินค้าคงเหลือ", "ง. ที่ดิน อาคาร และอุปกรณ์"], ans: 3 },
-            { q: "3. การบันทึกบัญชีตามระบบ 'เกณฑ์คงค้าง' (Accrual Basis) หมายถึงอะไร?", options: ["ก. บันทึกเมื่อรับ/จ่ายเงินสดจริงเท่านั้น", "ข. บันทึกรายได้และค่าใช้จ่ายในงวดที่เกิดขึ้น แม้เงินสดยังไม่รับหรือจ่าย", "ค. บันทึกเฉพาะรายการที่ค้างชำระ", "ง. บันทึกเฉพาะรายการเงินสดเพื่อให้ปิดงบรวดเร็ว"], ans: 1 },
-            { q: "4. หากบริษัทจ่ายเงินค่าเบี้ยประกันภัยล่วงหน้า 1 ปี (Prepaid Insurance) รายการนี้ควรจัดประเภทเป็นอะไร?", options: ["ก. ค่าใช้จ่ายทั้งหมดของงวดทันที", "ข. สินทรัพย์หมุนเวียน (ทยอยตัดเป็นค่าใช้จ่าย)", "ค. หนี้สินหมุนเวียน", "ง. ส่วนของเจ้าของ"], ans: 1 },
-            { q: "5. ภาษีเงินได้หัก ณ ที่จ่าย (Withholding Tax) กรณีจ่ายค่าบริการให้บริษัทในประเทศ โดยทั่วไปคือร้อยละเท่าใด?", options: ["ก. 1%", "ข. 3%", "ค. 5%", "ง. 7%"], ans: 1 },
-            { q: "6. 'งบกำไรขาดทุน' (Income Statement) แสดงข้อมูลเกี่ยวกับอะไร?", options: ["ก. ฐานะการเงิน ณ วันใดวันหนึ่ง", "ข. ผลการดำเนินงานในช่วงเวลาหนึ่ง (รายได้, ค่าใช้จ่าย, กำไรสุทธิ)", "ค. รายละเอียดหนี้สินแยกตามเจ้าหนี้", "ง. การเปลี่ยนแปลงส่วนของเจ้าของอย่างเดียว"], ans: 1 },
-            { q: "7. รายการใดต่อไปนี้ที่ 'ไม่ต้อง' นำมาคำนวณค่าเสื่อมราคา (Depreciation)?", options: ["ก. รถยนต์", "ข. เครื่องจักร", "ค. คอมพิวเตอร์", "ง. ที่ดิน"], ans: 3 },
-            { q: "8. การกระทบยอดเงินฝากธนาคาร (Bank Reconciliation) มีวัตถุประสงค์เพื่ออะไร?", options: ["ก. ตรวจสอบความแตกต่างระหว่างสมุดบัญชีบริษัทกับ Statement ธนาคาร", "ข. ขอรับดอกเบี้ยเพิ่มจากธนาคาร", "ค. แจ้งยอดหนี้ให้ลูกค้าทราบ", "ง. ใช้สำหรับคำนวณ VAT"], ans: 0 },
-            { q: "9. ภาษีมูลค่าเพิ่ม (VAT) ในปัจจุบันของประเทศไทย (อัตราปกติ) คือร้อยละเท่าใด?", options: ["ก. 3%", "ข. 5%", "ค. 7%", "ง. 10%"], ans: 2 },
-            { q: "10. ในระบบบัญชีคู่ รายการซื้อสินค้าเป็นเงินเชื่อ จะบันทึกบัญชีอย่างไร?", options: ["ก. เดบิต ซื้อสินค้า / เครดิต เงินสด", "ข. เดบิต ซื้อสินค้า (หรือสินค้าคงเหลือ) / เครดิต เจ้าหนี้การค้า", "ค. เดบิต เจ้าหนี้การค้า / เครดิต ซื้อสินค้า", "ง. เดบิต เงินสด / เครดิต ขายสินค้า"], ans: 1 },
-            { q: "11. 'ค่าเผื่อหนี้สงสัยจะสูญ' (Allowance for Doubtful Accounts) ถูกจัดประเภทเป็นรายการใด?", options: ["ก. หนี้สินหมุนเวียน", "ข. รายได้รอการตัดบัญชี", "ค. รายการปรับลดยอดลูกหนี้ (Contra Asset)", "ง. ส่วนของเจ้าของ"], ans: 2 },
-            { q: "12. งบแสดงการเปลี่ยนแปลงส่วนของเจ้าของ บอกข้อมูลอะไรแก่ผู้ใช้บัญชี?", options: ["ก. จำนวนสินค้าคงเหลือที่ขายได้จริง", "ข. รายชื่อเจ้าหนี้ทั้งหมดและยอดคงเหลือ", "ค. การเปลี่ยนแปลงของทุน กำไรสะสม และเงินปันผลในงวด", "ง. ตารางการชำระหนี้ธนาคาร"], ans: 2 },
-            { q: "13. หลักการ 'ความระมัดระวัง' (Prudence) ในทางการบัญชีหมายถึงอะไร?", options: ["ก. บันทึกรายได้ให้สูงไว้ก่อนเพื่อความน่าเชื่อถือ", "ข. ไม่ต้องบันทึกหนี้สินจนกว่าจะถูกฟ้อง", "ค. เก็บเงินสดไว้ให้มากที่สุด", "ง. รับรู้ความสูญเสียเมื่อมีความเป็นไปได้ แต่ไม่รับรู้กำไรเกินจริง"], ans: 3 },
-            { q: "14. ค่าใช้จ่ายใดต่อไปนี้ ถือเป็น 'รายจ่ายต้องห้าม' ในการคำนวณภาษีเงินได้นิติบุคคล?", options: ["ก. เงินเดือนพนักงาน", "ข. ค่าโฆษณาที่มีหลักฐานครบถ้วน", "ค. ค่ารับรองลูกค้าที่อยู่ในเกณฑ์", "ง. รายจ่ายส่วนตัว/เสน่หา/ไม่มีหลักฐานผู้รับเงิน"], ans: 3 },
-            { q: "15. FIFO (First-In, First-Out) คือวิธีการคำนวณสิ่งใด?", options: ["ก. วิธีคำนวณภาษีเงินได้", "ข. วิธีการตีราคาสินค้าคงเหลือ (เข้าก่อนออกก่อน)", "ค. วิธีคำนวณค่าเสื่อมราคาเส้นตรง", "ง. วิธีบริหารพนักงานเข้าใหม่"], ans: 1 },
-            { q: "16. หากบัญชีด้าน Debit มียอดสูงกว่า Credit ในบัญชีแยกประเภท 'สินทรัพย์' หมายความว่าอย่างไร?", options: ["ก. สินทรัพย์ลดลง", "ข. บริษัทขาดทุนอย่างรุนแรง", "ค. เกิดข้อผิดพลาด", "ง. สินทรัพย์มียอดคงเหลือปกติ (ยังมีมูลค่าคงเหลือ)"], ans: 3 },
-            { q: "17. กระดาษทำการ (Working Paper) มีความสำคัญอย่างไร?", options: ["ก. ต้องส่งสรรพากรทุกเดือน", "ข. เป็นเครื่องมือรวบรวมข้อมูลเพื่อปรับปรุงบัญชีและปิดงบ", "ค. เป็นใบเสร็จรับเงินชั่วคราว", "ง. เป็นสัญญาจ้างงานพนักงานบัญชี"], ans: 1 },
-            { q: "18. ภาษีซื้อ (Input Tax) จะถือเป็นภาษีต้องห้าม (ขอคืนไม่ได้) ในกรณีใด?", options: ["ก. ซื้อวัตถุดิบเพื่อผลิตสินค้า", "ข. ซื้อรถกระบะมาใช้ในกิจการ", "ค. ค่าใช้จ่ายรับรองบางประเภทตามเงื่อนไขสรรพากร", "ง. มีใบกำกับภาษีเต็มรูปแบบถูกต้อง"], ans: 2 },
-            { q: "19. ในงบกระแสเงินสด กิจกรรมใดที่เกี่ยวข้องกับการกู้ยืมเงินจากธนาคาร?", options: ["ก. กิจกรรมดำเนินงาน", "ข. กิจกรรมลงทุน", "ค. กิจกรรมจัดหาเงิน (Financing Activities)", "ง. กิจกรรมบริหารจัดการ"], ans: 2 },
-            { q: "20. จรรยาบรรณวิชาชีพบัญชีข้อใดสำคัญที่สุดเมื่อถูกสั่งให้ตกแต่งตัวเลขกำไร?", options: ["ก. ความเชื่อฟังต่อผู้บังคับบัญชา", "ข. ความรวดเร็วในการส่งงบ", "ค. ความสวยงามของรายงาน", "ง. ความซื่อสัตย์และความเที่ยงธรรม (Integrity & Objectivity)"], ans: 3 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
         window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('accountingForm');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+            const isEn = currentLang === 'en';
+
+            const questionText = isEn ? (item.qEn || item.q) : item.q;
+            const opts = isEn ? (item.optionsEn || item.options) : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
-                text: item.options[choiceIndex],
+                text: item.options[choiceIndex],   // always store Thai for Sheet
                 isCorrect: choiceIndex === item.ans
             });
 
@@ -167,15 +368,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('accountingForm');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 3rem;">
+                    <div style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p>${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
 
             let score = 0;
             const payload = {
@@ -189,27 +390,27 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            // Update modal text to current language
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -219,54 +420,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
