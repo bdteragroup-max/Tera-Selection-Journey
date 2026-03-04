@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,108 +51,313 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        /* Language toggle button */
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <!-- Language Toggle -->
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบตำแหน่ง Business Development (BD)</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Business Development (BD)
+            </h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Business Development (BD)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Business Development (BD)",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. เป้าหมายหลักของตำแหน่ง Business Development (BD) คืออะไร?",
+                qEn: "1. What is the primary goal of a Business Development (BD) role?",
+                options: ["ก. โฟกัสความถูกต้องของเอกสารภายในและงานธุรการ", "ข. สร้างการเติบโตระยะยาวด้วยตลาดใหม่ ลูกค้าใหม่ และพันธมิตรเชิงกลยุทธ์", "ค. ดูแลหลังการขายเชิงเทคนิคและวางแผนบำรุงรักษา", "ง. กำกับระเบียบวินัยบุคลากรและจัดการบทลงโทษ"],
+                optionsEn: ["A. Focusing on the accuracy of internal documents and administrative tasks.", "B. Driving long-term growth through new markets, new customers, and strategic partnerships.", "C. Managing post-sale technical support and maintenance planning.", "D. Overseeing staff discipline and administering penalties."],
+                ans: 1
+            },
+            {
+                q: "2. การวิเคราะห์ SWOT Analysis เครื่องมือใดที่ใช้ประเมิน 'ปัจจัยภายนอก' ที่ควบคุมไม่ได้?",
+                qEn: "2. In a SWOT Analysis, which elements are used to assess external factors that cannot be controlled?",
+                options: ["ก. Strengths และ Weaknesses", "ข. Opportunities และ Threats", "ค. Strengths และ Opportunities", "ง. Weaknesses และ Threats"],
+                optionsEn: ["A. Strengths and Weaknesses", "B. Opportunities and Threats", "C. Strengths and Opportunities", "D. Weaknesses and Threats"],
+                ans: 1
+            },
+            {
+                q: "3. หากคุณต้องขยายธุรกิจไปยังตลาดใหม่ที่มีคู่แข่งเจ้าถิ่นแข็งแกร่งมาก สิ่งแรกที่ควรทำคือ?",
+                qEn: "3. If you need to expand into a new market dominated by strong local competitors, what should you do first?",
+                options: ["ก. ออกโปรโมชันลดราคาต่ำกว่าตลาดทันที", "ข. ลงทุนเปิดสาขาหลายจุดเพื่อยึดพื้นที่", "ค. ทำ Market Research หาช่องว่าง/ปัญหาที่คู่แข่งตอบไม่ดี แล้วออกแบบ Entry Strategy", "ง. เพิ่มงบการตลาดมากกว่าคู่แข่งสองเท่า"],
+                optionsEn: ["A. Immediately launch below-market price promotions.", "B. Invest in opening multiple locations to capture territory.", "C. Conduct market research to identify gaps the competition fails to address, then design an entry strategy.", "D. Spend twice as much on marketing as your competitors."],
+                ans: 2
+            },
+            {
+                q: "4. 'Sales' กับ 'Business Development' มีความแตกต่างกันอย่างไรมากที่สุด?",
+                qEn: "4. What is the biggest difference between 'Sales' and 'Business Development'?",
+                options: ["ก. Sales เน้นปิดดีลระยะสั้น ส่วน BD เน้นสร้างโอกาสเชิงกลยุทธ์และรายได้ยั่งยืน", "ข. Sales ทำงานภาคสนาม ส่วน BD ทำงานออฟฟิศเท่านั้น", "ค. Sales เน้นเอกสาร ส่วน BD เน้นขายอย่างเดียว", "ง. ทั้งสองเหมือนกันทุกอย่าง"],
+                optionsEn: ["A. Sales focuses on closing deals in the short term; BD focuses on creating strategic opportunities and sustainable revenue.", "B. Sales is field-based; BD works only in the office.", "C. Sales focuses on paperwork; BD focuses solely on selling.", "D. They are completely the same."],
+                ans: 0
+            },
+            {
+                q: "5. เมื่อต้องไปนำเสนอแผนงาน (Pitching) กับลูกค้าแต่มีเวลาเพียง 5 นาที คุณควรเน้นส่วนใด?",
+                qEn: "5. When pitching to a client with only 5 minutes available, which area should you focus on?",
+                options: ["ก. เล่าประวัติองค์กรและรางวัลที่เคยได้รับอย่างละเอียด", "ข. Value Proposition ที่แก้ Pain Point ชัดเจน พร้อมผลลัพธ์ที่วัดได้ (ROI)", "ค. อธิบายโครงสร้างผู้บริหารและทีมงานทุกฝ่ายให้ครบ", "ง. เจาะรายละเอียดเทคนิคเชิงลึกเพื่อแสดงความเชี่ยวชาญ"],
+                optionsEn: ["A. Describe the organisation's history and past awards in detail.", "B. A clear value proposition that addresses their pain point with measurable results (ROI).", "C. Explain the full executive structure and every department.", "D. Present deep technical specifications to demonstrate expertise."],
+                ans: 1
+            },
+            {
+                q: "6. Lead Generation หมายถึงอะไรในบริบทของ BD?",
+                qEn: "6. What does 'Lead Generation' mean in a BD context?",
+                options: ["ก. กระบวนการค้นหาและคัดกรองผู้มุ่งหวังเพื่อเติม Pipeline", "ข. การปลดพนักงานที่ทำยอดไม่ได้ตามเป้า", "ค. การผลิตสินค้าให้ได้จำนวนมากที่สุดในเวลาสั้น", "ง. การส่งรายงานประชุมให้หัวหน้าเพื่อเป็นหลักฐาน"],
+                optionsEn: ["A. The process of finding and qualifying prospects to fill the pipeline.", "B. Dismissing employees who fail to hit their quota.", "C. Producing the maximum number of products in the shortest time.", "D. Sending meeting minutes to the manager as a record."],
+                ans: 0
+            },
+            {
+                q: "7. หากพันธมิตรทางธุรกิจ (Partner) ขอยกเลิกสัญญากะทันหัน คุณควรจัดการอย่างไร?",
+                qEn: "7. If a business partner suddenly requests to cancel an agreement, how should you handle it?",
+                options: ["ก. ฟ้องร้องทันทีเพื่อรักษาสิทธิ์", "ข. ปล่อยโครงการไว้ก่อนรอให้สถานการณ์ชัดเจน", "ค. ปกปิดเรื่องนี้ไม่ให้ผู้บริหารทราบ", "ง. หาสาเหตุอย่างเป็นระบบ เจรจา Win-Win ถ้าไม่ได้ให้ใช้แผนสำรองทันที"],
+                optionsEn: ["A. File a lawsuit immediately to protect your rights.", "B. Leave the project on hold until the situation becomes clearer.", "C. Keep the matter from senior management.", "D. Systematically identify the root cause, negotiate for a Win-Win outcome, and if unsuccessful, activate a contingency plan immediately."],
+                ans: 3
+            },
+            {
+                q: "8. 'B2B' แตกต่างจาก 'B2C' อย่างไร?",
+                qEn: "8. How does 'B2B' differ from 'B2C'?",
+                options: ["ก. B2B ขายให้บุคคลทั่วไป ส่วน B2C ขายให้รัฐ", "ข. B2B มีวงจรตัดสินใจยาวกว่า มีผู้เกี่ยวข้องหลายฝ่าย และเน้นเหตุผลทางธุรกิจ/ROI", "ค. B2B ใช้อินฟลูเอนเซอร์ ส่วน B2C ต้องพึ่งสัญญา", "ง. B2B ไม่จำเป็นต้องทำสัญญา"],
+                optionsEn: ["A. B2B sells to individuals; B2C sells to government entities.", "B. B2B typically has a longer decision cycle, involves multiple stakeholders, and emphasises business logic and ROI.", "C. B2B uses influencers; B2C relies on contracts.", "D. B2B does not require formal contracts."],
+                ans: 1
+            },
+            {
+                q: "9. KPI ที่เหมาะสมที่สุดสำหรับสายงาน BD คือข้อใด?",
+                qEn: "9. Which KPIs are most appropriate for a BD role?",
+                options: ["ก. จำนวน Qualified Leads, มูลค่า Pipeline และจำนวนพันธมิตรเชิงกลยุทธ์", "ข. จำนวนครั้งที่มาทำงานสายต่อเดือน", "ค. จำนวนอีเมลที่ส่งในแต่ละวัน", "ง. ความเร็วในการพิมพ์รายงาน"],
+                optionsEn: ["A. Number of qualified leads, pipeline value, and number of strategic partnerships formed.", "B. Number of times the employee was late to work per month.", "C. Number of emails sent per day.", "D. Report typing speed."],
+                ans: 0
+            },
+            {
+                q: "10. คำว่า 'Value Proposition' หมายถึงอะไร?",
+                qEn: "10. What does 'Value Proposition' mean?",
+                options: ["ก. การตั้งราคาถูกที่สุดในตลาด", "ข. งบประมาณการโฆษณาที่ใช้ทั้งหมด", "ค. มูลค่าทรัพย์สินทั้งหมดของบริษัท", "ง. คุณค่าหลักที่ลูกค้าจะได้รับเมื่อเลือกเรา และความแตกต่างจากคู่แข่ง"],
+                optionsEn: ["A. Setting the lowest price in the market.", "B. The total advertising budget allocated.", "C. The total value of all company assets.", "D. The core value a customer receives by choosing your company, and what differentiates you from competitors."],
+                ans: 3
+            },
+            {
+                q: "11. ในการเจรจาต่อรอง 'BATNA' หมายถึงอะไร?",
+                qEn: "11. In negotiation, what does 'BATNA' mean?",
+                options: ["ก. ทางเลือกที่ดีที่สุดที่ยังทำได้หากการเจรจาปัจจุบันล้มเหลว", "ข. การยอมทุกเงื่อนไขเพื่อให้ปิดดีลได้", "ค. การยื่นข้อเสนอเกินจริงเพื่อกดดันอีกฝ่าย", "ง. การใช้อำนาจบังคับให้คู่สัญญาเซ็นชื่อ"],
+                optionsEn: ["A. The best alternative course of action available if the current negotiation fails.", "B. Agreeing to every condition in order to close the deal.", "C. Making an exaggerated opening offer to pressure the other party.", "D. Using authority to compel the counterparty to sign."],
+                ans: 0
+            },
+            {
+                q: "12. หากยอดขายในไตรมาสนี้ลดลง 20% ในฐานะ BD คุณควรทำอย่างไร?",
+                qEn: "12. If quarterly sales are down 20%, what should you do as a BD professional?",
+                options: ["ก. ลดเงินเดือนพนักงานเพื่อคุมต้นทุน", "ข. ทำ Data Analytics วิเคราะห์คอขวด แล้วเสนอแผนสร้าง Pipeline ใหม่", "ค. รอให้เศรษฐกิจดีขึ้นเองในไตรมาสหน้า", "ง. เปลี่ยนโลโก้และภาพลักษณ์ใหม่ทันที"],
+                optionsEn: ["A. Cut employee salaries to control costs.", "B. Use data analytics to identify bottlenecks and propose a plan to build a new pipeline.", "C. Wait for the economy to improve by itself next quarter.", "D. Immediately rebrand with a new logo and visual identity."],
+                ans: 1
+            },
+            {
+                q: "13. การเข้าหาลูกค้าแบบ 'Cold Calling' คืออะไร?",
+                qEn: "13. What is 'Cold Calling'?",
+                options: ["ก. โทรหาคนรู้จักเพื่อขอรายชื่อแนะนำ", "ข. ส่งอีเมลทวงหนี้ลูกค้าที่ค้างชำระ", "ค. การโทรหาผู้มุ่งหวังที่ยังไม่เคยมีสัมพันธ์มาก่อนเพื่อเปิดโอกาสธุรกิจ", "ง. นัดประชุมในห้องที่อุณหภูมิต่ำเพื่อให้ตื่นตัว"],
+                optionsEn: ["A. Calling acquaintances to ask for referrals.", "B. Sending overdue payment reminders to customers.", "C. Contacting a prospect with whom you have had no prior relationship, in order to open a business opportunity.", "D. Scheduling a meeting in a cold room to stay alert."],
+                ans: 2
+            },
+            {
+                q: "14. Strategic Partnership คือการสร้างความสัมพันธ์แบบใด?",
+                qEn: "14. What type of relationship does a 'Strategic Partnership' represent?",
+                options: ["ก. การจ้าง Outsource ทำงานแทนทั้งหมด", "ข. การแลกเปลี่ยนพนักงานกันทำงานชั่วคราว", "ค. การเข้าซื้อกิจการคู่แข่งเพื่อผูกขาด", "ง. ความร่วมมือเชิงกลยุทธ์ที่เสริมจุดแข็งและสร้างคุณค่าใหม่ร่วมกัน"],
+                optionsEn: ["A. Fully outsourcing work to a third party.", "B. Temporarily exchanging employees between organisations.", "C. Acquiring a competitor to achieve a monopoly.", "D. A strategic collaboration that leverages mutual strengths and creates shared new value."],
+                ans: 3
+            },
+            {
+                q: "15. ในการวิเคราะห์คู่แข่ง (Competitor Analysis) ข้อใดสำคัญที่สุด?",
+                qEn: "15. In a 'Competitor Analysis', which aspect is most critical?",
+                options: ["ก. ยี่ห้อรถของทีมขายคู่แข่ง", "ข. Positioning, จุดแข็ง-จุดอ่อน, กลยุทธ์ราคา และช่องทางหาลูกค้า", "ค. จำนวนต้นไม้ในออฟฟิศคู่แข่ง", "ง. ชื่อเล่นของผู้บริหารคู่แข่ง"],
+                optionsEn: ["A. The type of car driven by the competitor's sales team.", "B. Their positioning, strengths and weaknesses, pricing strategy, and customer acquisition channels.", "C. The number of plants in the competitor's office.", "D. The competitor's executives' nicknames."],
+                ans: 1
+            },
+            {
+                q: "16. หากต้องเสนอโครงการให้ผู้บริหารระดับสูง (C-Level) คุณควรทำอย่างไร?",
+                qEn: "16. When presenting a project to C-Level executives, what is the best approach?",
+                options: ["ก. ใส่ข้อมูลละเอียดที่สุดหลายร้อยหน้า", "ข. ทำสไลด์จำนวนมากเพื่อโชว์ความตั้งใจ", "ค. เน้น Executive Summary, ROI, ความเสี่ยง และทางเลือกตัดสินใจ", "ง. เน้นเล่าประวัติส่วนตัวผู้นำเสนอ"],
+                optionsEn: ["A. Include as much detail as possible across hundreds of pages.", "B. Create a large number of slides to demonstrate effort.", "C. Focus on the Executive Summary, ROI, risks, and decision options.", "D. Spend time telling the audience about the presenter's personal background."],
+                ans: 2
+            },
+            {
+                q: "17. Market Penetration คือกลยุทธ์แบบใด?",
+                qEn: "17. What type of strategy is 'Market Penetration'?",
+                options: ["ก. ขายสินค้าเดิมในตลาดเดิม แต่เพิ่มส่วนแบ่งด้วยการเพิ่มการเข้าถึง", "ข. เลิกขายสินค้าเดิมแล้วสร้างสินค้าใหม่ทั้งหมด", "ค. ย้ายสำนักงานใหญ่ไปต่างประเทศ", "ง. ลดจำนวนพนักงานขายลงครึ่งหนึ่งเพื่อคุมงบ"],
+                optionsEn: ["A. Selling the same product in the same market but increasing market share by expanding reach.", "B. Discontinuing existing products and building entirely new ones.", "C. Relocating the head office to another country.", "D. Cutting the sales team in half to reduce costs."],
+                ans: 0
+            },
+            {
+                q: "18. ทักษะ 'Active Listening' สำคัญอย่างไรกับ BD?",
+                qEn: "18. Why is 'Active Listening' important in BD?",
+                options: ["ก. ช่วยให้ฟังวิทยุได้นานขึ้นลดความเครียด", "ข. ช่วยให้พูดแทรกคู่สนทนาได้ตลอดเพื่อคุมเกม", "ค. ช่วยให้จำชื่อลูกค้าได้แม่นยำขึ้นเท่านั้น", "ง. ช่วยจับ Pain Point จริง และสัญญาณความเสี่ยงเพื่อออกแบบข้อเสนอได้ตรงจุด"],
+                optionsEn: ["A. It helps you listen to the radio longer to reduce stress.", "B. It allows you to constantly interrupt the conversation to maintain control.", "C. It only helps you remember the customer's name more accurately.", "D. It helps identify genuine pain points and risk signals to design a more targeted proposal."],
+                ans: 3
+            },
+            {
+                q: "19. CRM Software มีประโยชน์อย่างไรต่อ BD?",
+                qEn: "19. How does 'CRM Software' benefit BD professionals?",
+                options: ["ก. ใช้ออกแบบกราฟิกสื่อโฆษณา", "ข. ใช้จัดการข้อมูลลูกค้า ติดตาม Pipeline และทำ Forecast ยอดขาย", "ค. ใช้คำนวณเงินเดือนพนักงาน", "ง. ใช้จองตั๋วเครื่องบินและที่พัก"],
+                optionsEn: ["A. It is used for designing graphic advertising materials.", "B. It is used to manage customer data, track the pipeline, and forecast sales.", "C. It is used to calculate employee payroll.", "D. It is used to book flights and accommodation."],
+                ans: 1
+            },
+            {
+                q: "20. หากบริษัทต้องการเป็น 'ผู้นำด้านนวัตกรรม' BD ควรโฟกัสสิ่งใด?",
+                qEn: "20. If a company aims to be a 'leader in innovation', what should BD focus on?",
+                options: ["ก. เน้นขายของตกรุ่นราคาถูกเพื่อระบายสต๊อก", "ข. ลดงบวิจัยและพัฒนาเพื่อประหยัดเงิน", "ค. หา Partner/เทคโนโลยีใหม่ สร้าง Use Case และแผน Go-to-Market", "ง. ทำงานแบบเดิมไม่เปลี่ยนกระบวนการ"],
+                optionsEn: ["A. Selling outdated products at discounted prices to clear inventory.", "B. Cutting the research and development budget to save money.", "C. Finding new partners and technologies, building use cases, and developing a Go-to-Market plan.", "D. Maintaining existing processes without change."],
+                ans: 2
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Developer';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-
-        const questions = [
-            { q: "1. เป้าหมายหลักของตำแหน่ง Business Development (BD) คืออะไร?", options: ["ก. โฟกัสความถูกต้องของเอกสารภายในและงานธุรการ", "ข. สร้างการเติบโตระยะยาวด้วยตลาดใหม่ ลูกค้าใหม่ และพันธมิตรเชิงกลยุทธ์", "ค. ดูแลหลังการขายเชิงเทคนิคและวางแผนบำรุงรักษา", "ง. กำกับระเบียบวินัยบุคลากรและจัดการบทลงโทษ"], ans: 1 },
-            { q: "2. การวิเคราะห์ SWOT Analysis เครื่องมือใดที่ใช้ประเมิน 'ปัจจัยภายนอก' ที่ควบคุมไม่ได้?", options: ["ก. Strengths และ Weaknesses", "ข. Opportunities และ Threats", "ค. Strengths และ Opportunities", "ง. Weaknesses และ Threats"], ans: 1 },
-            { q: "3. หากคุณต้องขยายธุรกิจไปยังตลาดใหม่ที่มีคู่แข่งเจ้าถิ่นแข็งแกร่งมาก สิ่งแรกที่ควรทำคือ?", options: ["ก. ออกโปรโมชันลดราคาต่ำกว่าตลาดทันที", "ข. ลงทุนเปิดสาขาหลายจุดเพื่อยึดพื้นที่", "ค. ทำ Market Research หาช่องว่าง/ปัญหาที่คู่แข่งตอบไม่ดี แล้วออกแบบ Entry Strategy", "ง. เพิ่มงบการตลาดมากกว่าคู่แข่งสองเท่า"], ans: 2 },
-            { q: "4. 'Sales' กับ 'Business Development' มีความแตกต่างกันอย่างไรมากที่สุด?", options: ["ก. Sales เน้นปิดดีลระยะสั้น ส่วน BD เน้นสร้างโอกาสเชิงกลยุทธ์และรายได้ยั่งยืน", "ข. Sales ทำงานภาคสนาม ส่วน BD ทำงานออฟฟิศเท่านั้น", "ค. Sales เน้นเอกสาร ส่วน BD เน้นขายอย่างเดียว", "ง. ทั้งสองเหมือนกันทุกอย่าง"], ans: 0 },
-            { q: "5. เมื่อต้องไปนำเสนอแผนงาน (Pitching) กับลูกค้าแต่มีเวลาเพียง 5 นาที คุณควรเน้นส่วนใด?", options: ["ก. เล่าประวัติองค์กรและรางวัลที่เคยได้รับอย่างละเอียด", "ข. Value Proposition ที่แก้ Pain Point ชัดเจน พร้อมผลลัพธ์ที่วัดได้ (ROI)", "ค. อธิบายโครงสร้างผู้บริหารและทีมงานทุกฝ่ายให้ครบ", "ง. เจาะรายละเอียดเทคนิคเชิงลึกเพื่อแสดงความเชี่ยวชาญ"], ans: 1 },
-            { q: "6. Lead Generation หมายถึงอะไรในบริบทของ BD?", options: ["ก. กระบวนการค้นหาและคัดกรองผู้มุ่งหวังเพื่อเติม Pipeline", "ข. การปลดพนักงานที่ทำยอดไม่ได้ตามเป้า", "ค. การผลิตสินค้าให้ได้จำนวนมากที่สุดในเวลาสั้น", "ง. การส่งรายงานประชุมให้หัวหน้าเพื่อเป็นหลักฐาน"], ans: 0 },
-            { q: "7. หากพันธมิตรทางธุรกิจ (Partner) ขอยกเลิกสัญญากะทันหัน คุณควรจัดการอย่างไร?", options: ["ก. ฟ้องร้องทันทีเพื่อรักษาสิทธิ์", "ข. ปล่อยโครงการไว้ก่อนรอให้สถานการณ์ชัดเจน", "ค. ปกปิดเรื่องนี้ไม่ให้ผู้บริหารทราบ", "ง. หาสาเหตุอย่างเป็นระบบ เจรจา Win-Win ถ้าไม่ได้ให้ใช้แผนสำรองทันที"], ans: 3 },
-            { q: "8. 'B2B' แตกต่างจาก 'B2C' อย่างไร?", options: ["ก. B2B ขายให้บุคคลทั่วไป ส่วน B2C ขายให้รัฐ", "ข. B2B มีวงจรตัดสินใจยาวกว่า มีผู้เกี่ยวข้องหลายฝ่าย และเน้นเหตุผลทางธุรกิจ/ROI", "ค. B2B ใช้อินฟลูเอนเซอร์ ส่วน B2C ต้องพึ่งสัญญา", "ง. B2B ไม่จำเป็นต้องทำสัญญา"], ans: 1 },
-            { q: "9. KPI ที่เหมาะสมที่สุดสำหรับสายงาน BD คือข้อใด?", options: ["ก. จำนวน Qualified Leads, มูลค่า Pipeline และจำนวนพันธมิตรเชิงกลยุทธ์", "ข. จำนวนครั้งที่มาทำงานสายต่อเดือน", "ค. จำนวนอีเมลที่ส่งในแต่ละวัน", "ง. ความเร็วในการพิมพ์รายงาน"], ans: 0 },
-            { q: "10. คำว่า 'Value Proposition' หมายถึงอะไร?", options: ["ก. การตั้งราคาถูกที่สุดในตลาด", "ข. งบประมาณการโฆษณาที่ใช้ทั้งหมด", "ค. มูลค่าทรัพย์สินทั้งหมดของบริษัท", "ง. คุณค่าหลักที่ลูกค้าจะได้รับเมื่อเลือกเรา และความแตกต่างจากคู่แข่ง"], ans: 3 },
-            { q: "11. ในการเจรจาต่อรอง 'BATNA' หมายถึงอะไร?", options: ["ก. ทางเลือกที่ดีที่สุดที่ยังทำได้หากการเจรจาปัจจุบันล้มเหลว", "ข. การยอมทุกเงื่อนไขเพื่อให้ปิดดีลได้", "ค. การยื่นข้อเสนอเกินจริงเพื่อกดดันอีกฝ่าย", "ง. การใช้อำนาจบังคับให้คู่สัญญาเซ็นชื่อ"], ans: 0 },
-            { q: "12. หากยอดขายในไตรมาสนี้ลดลง 20% ในฐานะ BD คุณควรทำอย่างไร?", options: ["ก. ลดเงินเดือนพนักงานเพื่อคุมต้นทุน", "ข. ทำ Data Analytics วิเคราะห์คอขวด แล้วเสนอแผนสร้าง Pipeline ใหม่", "ค. รอให้เศรษฐกิจดีขึ้นเองในไตรมาสหน้า", "ง. เปลี่ยนโลโก้และภาพลักษณ์ใหม่ทันที"], ans: 1 },
-            { q: "13. การเข้าหาลูกค้าแบบ 'Cold Calling' คืออะไร?", options: ["ก. โโทรหาคนรู้จักเพื่อขอรายชื่อแนะนำ", "ข. ส่งอีเมลทวงหนี้ลูกค้าที่ค้างชำระ", "ค. การโทรหาผู้มุ่งหวังที่ยังไม่เคยมีสัมพันธ์มาก่อนเพื่อเปิดโอกาสธุรกิจ", "ง. นัดประชุมในห้องที่อุณหภูมิต่ำเพื่อให้ตื่นตัว"], ans: 2 },
-            { q: "14. Strategic Partnership คือการสร้างความสัมพันธ์แบบใด?", options: ["ก. การจ้าง Outsource ทำงานแทนทั้งหมด", "ข. การแลกเปลี่ยนพนักงานกันทำงานชั่วคราว", "ค. การเข้าซื้อกิจการคู่แข่งเพื่อผูกขาด", "ง. ความร่วมมือเชิงกลยุทธ์ที่เสริมจุดแข็งและสร้างคุณค่าใหม่ร่วมกัน"], ans: 3 },
-            { q: "15. ในการวิเคราะห์คู่แข่ง (Competitor Analysis) ข้อใดสำคัญที่สุด?", options: ["ก. ยี่ห้อรถของทีมขายคู่แข่ง", "ข. Positioning, จุดแข็ง-จุดอ่อน, กลยุทธ์ราคา และช่องทางหาลูกค้า", "ค. จำนวนต้นไม้ในออฟฟิศคู่แข่ง", "ง. ชื่อเล่นของผู้บริหารคู่แข่ง"], ans: 1 },
-            { q: "16. หากต้องเสนอโครงการให้ผู้บริหารระดับสูง (C-Level) คุณควรทำอย่างไร?", options: ["ก. ใส่ข้อมูลละเอียดที่สุดหลายร้อยหน้า", "ข. ทำสไลด์จำนวนมากเพื่อโชว์ความตั้งใจ", "ค. เน้น Executive Summary, ROI, ความเสี่ยง และทางเลือกตัดสินใจ", "ง. เน้นเล่าประวัติส่วนตัวผู้นำเสนอ"], ans: 2 },
-            { q: "17. Market Penetration คือกลยุทธ์แบบใด?", options: ["ก. ขายสินค้าเดิมในตลาดเดิม แต่เพิ่มส่วนแบ่งด้วยการเพิ่มการเข้าถึง", "ข. เลิกขายสินค้าเดิมแล้วสร้างสินค้าใหม่ทั้งหมด", "ค. ย้ายสำนักงานใหญ่ไปต่างประเทศ", "ง. ลดจำนวนพนักงานขายลงครึ่งหนึ่งเพื่อคุมงบ"], ans: 0 },
-            { q: "18. ทักษะ 'Active Listening' สำคัญอย่างไรกับ BD?", options: ["ก. ช่วยให้ฟังวิทยุได้นานขึ้นลดความเครียด", "ข. ช่วยให้พูดแทรกคู่สนทนาได้ตลอดเพื่อคุมเกม", "ค. ช่วยให้จำชื่อลูกค้าได้แม่นยำขึ้นเท่านั้น", "ง. ช่วยจับ Pain Point จริง และสัญญาณความเสี่ยงเพื่อออกแบบข้อเสนอได้ตรงจุด"], ans: 3 },
-            { q: "19. CRM Software มีประโยชน์อย่างไรต่อ BD?", options: ["ก. ใช้ออกแบบกราฟิกสื่อโฆษณา", "ข. ใช้จัดการข้อมูลลูกค้า ติดตาม Pipeline และทำ Forecast ยอดขาย", "ค. ใช้คำนวณเงินเดือนพนักงาน", "ง. ใช้จองตั๋วเครื่องบินและที่พัก"], ans: 1 },
-            { q: "20. หากบริษัทต้องการเป็น 'ผู้นำด้านนวัตกรรม' BD ควรโฟกัสสิ่งใด?", options: ["ก. เน้นขายของตกรุ่นราคาถูกเพื่อระบายสต๊อก", "ข. ลดงบวิจัยและพัฒนาเพื่อประหยัดเงิน", "ค. หา Partner/เทคโนโลยีใหม่ สร้าง Use Case และแผน Go-to-Market", "ง. ทำงานแบบเดิมไม่เปลี่ยนกระบวนการ"], ans: 2 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
-                text: item.options[choiceIndex],
+                text: item.options[choiceIndex],          // always store Thai for Sheet
                 isCorrect: choiceIndex === item.ans
             });
 
@@ -165,15 +370,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -187,27 +392,27 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            // Update modal text to current language
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -217,54 +422,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
