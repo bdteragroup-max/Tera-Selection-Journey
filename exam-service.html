@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Business Development Assessment - TERA</title>
+    <title>Service Engineer Assessment - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -16,12 +16,11 @@
         .q-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: 2.2rem;
             border-radius: 15px;
-            margin-bottom: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
@@ -37,10 +36,11 @@
         }
 
         .q-text {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
+            color: #f1c40f;
         }
 
         .options-grid {
@@ -51,104 +51,306 @@
         .opt-btn {
             display: block;
             background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            padding: 1.1rem;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            line-height: 1.4;
             color: white;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #f1c40f;
         }
 
         .progress-text {
-            color: #f1c40f;
+            color: #fff;
+            opacity: 0.6;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
         }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
-        <header style="text-align: center; margin-bottom: 30px; color: white;">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px;">แบบทดสอบตำแหน่ง Service Engineer / ช่างเซอร์วิส</h1>
-            <p id="userInfo" style="opacity: 0.8;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Service Engineer</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
-        <div id="questionsContainer">
-        </div>
-        </form>
+        <div id="questionsContainer"></div>
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง Service Engineer",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Service Engineer",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. หน้าที่หลักที่สำคัญที่สุดของ Service Engineer คืออะไร?",
+                qEn: "1. What is the most important primary responsibility of a Service Engineer?",
+                options: ["ก. ออกแบบเครื่องจักรใหม่ตั้งแต่ศูนย์", "ข. ขายอะไหล่ให้ได้กำไรสูงสุด", "ค. แก้ไขปัญหาเทคนิคให้ระบบกลับมาใช้งานได้เร็ว ปลอดภัย และลด Downtime", "ง. อยู่ประจำออฟฟิศเพื่อรับสายอย่างเดียว"],
+                optionsEn: ["A. Designing new machines from scratch.", "B. Selling spare parts for maximum profit.", "C. Resolving technical issues to restore systems quickly, safely, and with minimal downtime.", "D. Staying in the office solely to answer phone calls."],
+                ans: 2
+            },
+            {
+                q: "2. หากลูกค้าโทรศัพท์มาตำหนิอย่างรุนแรงว่าเครื่องจักรเสียซ้ำซ้อน ควรทำอย่างไรเป็นอันดับแรก?",
+                qEn: "2. If a customer calls to complain aggressively about repeated machine breakdowns, what should you do first?",
+                options: ["ก. ตั้งสติ รับฟังอย่างใจเย็น และเริ่มเก็บข้อมูลประวัติการซ่อม", "ข. บอกลูกค้าว่าต้องซื้อเครื่องใหม่เท่านั้น", "ค. วางสายทันทีเพราะลูกค้าไม่สุภาพ", "ง. ปฏิเสธความรับผิดชอบและชี้ว่าลูกค้าใช้งานผิด"],
+                optionsEn: ["A. Stay calm, listen patiently, and begin collecting the repair history.", "B. Tell the customer they must purchase a new machine.", "C. Hang up immediately because the customer is being impolite.", "D. Deny responsibility and suggest the customer is misusing the machine."],
+                ans: 0
+            },
+            {
+                q: "3. ขั้นตอน 'Troubleshooting' ข้อใดที่เป็นระบบและมีประสิทธิภาพที่สุด?",
+                qEn: "3. Which troubleshooting approach is the most systematic and effective?",
+                options: ["ก. ถอดอุปกรณ์ทั้งหมดก่อนแล้วค่อยลองเปิดใหม่", "ข. สุ่มเปลี่ยนอะไหล่ไปเรื่อยๆ จนกว่าจะติด", "ค. ถามคนอื่นแล้วทำตามโดยไม่ตรวจหน้างาน", "ง. ยืนยันอาการ -> เก็บข้อมูล -> วิเคราะห์สาเหตุ -> แก้ไข -> ทดสอบ"],
+                optionsEn: ["A. Remove all components first, then try restarting.", "B. Randomly replace parts until the machine works.", "C. Ask others and follow their advice without inspecting the site.", "D. Confirm symptoms → Gather data → Analyse root cause → Fix → Test."],
+                ans: 3
+            },
+            {
+                q: "4. การทำ 'Preventive Maintenance' (PM) มีวัตถุประสงค์เพื่ออะไร?",
+                qEn: "4. What is the purpose of 'Preventive Maintenance' (PM)?",
+                options: ["ก. บำรุงรักษาเชิงป้องกัน ลดโอกาสเสียหนัก และลด Downtime", "ข. รอให้เสียก่อนแล้วค่อยเข้าแก้ไข", "ค. ทำเพื่อคิดค่าบริการเพิ่มโดยไม่จำเป็น", "ง. ทำเพื่อเอาอะไหล่เก่ามาทำความสะอาดขายใหม่"],
+                optionsEn: ["A. Proactive maintenance to reduce the chance of serious failure and minimise downtime.", "B. Wait for the machine to break down before intervening.", "C. Perform services to charge additional fees unnecessarily.", "D. Clean old spare parts for resale."],
+                ans: 0
+            },
+            {
+                q: "5. หากต้องเปลี่ยนอะไหล่แพง แต่ลูกค้าขอให้ 'ซ่อมแบบชั่วคราว' ที่เสี่ยงอันตราย คุณจะทำอย่างไร?",
+                qEn: "5. If replacing an expensive part is required but the customer requests a 'temporary fix' that poses a safety risk, what should you do?",
+                options: ["ก. ทำตามลูกค้าเพื่อรักษาความสัมพันธ์", "ข. แอบนำอะไหล่บริษัทไปใช้ปิดงาน", "ค. เดินออกจากหน้างานทันที", "ง. อธิบายความเสี่ยง ทำบันทึกเป็นลายลักษณ์อักษรและแจ้งหัวหน้า"],
+                optionsEn: ["A. Comply with the customer's request to preserve the relationship.", "B. Secretly use company parts to close the job.", "C. Leave the site immediately.", "D. Explain the risks, document the situation in writing, and escalate to your supervisor."],
+                ans: 3
+            },
+            {
+                q: "6. เครื่องมือใดถือเป็นเครื่องมือพื้นฐานที่สายไฟฟ้า/อิเล็กทรอนิกส์ ขาดไม่ได้?",
+                qEn: "6. Which tool is an absolute essential for electrical and electronics work?",
+                options: ["ก. ตลับเมตร", "ข. เลื่อยเหล็ก", "ค. มัลติมิเตอร์", "ง. ค้อนปอนด์"],
+                optionsEn: ["A. Tape measure.", "B. Hacksaw.", "C. Multimeter.", "D. Sledgehammer."],
+                ans: 2
+            },
+            {
+                q: "7. 'Service Report' ที่ดีควรมีลักษณะอย่างไร?",
+                qEn: "7. What should a good 'Service Report' contain?",
+                options: ["ก. มีแต่รูปถ่ายไม่มีรายละเอียด", "ข. ระบุอาการ-สาเหตุ-แนวทางแก้-การทดสอบ-อะไหล่-ข้อเสนอแนะ", "ค. เขียนสั้นๆ ว่า 'ซ่อมเสร็จแล้ว'", "ง. เขียนลายมืออ่านยากไม่ให้ลูกค้าทราบขั้นตอน"],
+                optionsEn: ["A. Photos only, with no written details.", "B. Symptoms, root cause, solution, testing results, parts used, and recommendations.", "C. A brief note saying 'Repair completed'.", "D. Illegible handwriting so the customer cannot understand the process."],
+                ans: 1
+            },
+            {
+                q: "8. หากไปถึงหน้างานแล้วพบว่าไม่มีอะไหล่ที่จำเป็นต้องใช้ในรถบริการ คุณควรทำอย่างไร?",
+                qEn: "8. If you arrive on site and discover the required spare part is not in your service vehicle, what should you do?",
+                options: ["ก. กลับบ้านทันที", "ข. ดัดแปลงใช้อะไหล่ใกล้เคียงแทน", "ค. บอกลูกค้าว่าซ่อมไม่ได้แล้วให้ยกเลิก", "ง. แจ้งลูกค้าตรงๆ ประเมินเวลาจัดหา และนัดหมายกลับมาซ่อมโดยเร็ว"],
+                optionsEn: ["A. Go home immediately.", "B. Adapt a similar part as a substitute.", "C. Tell the customer the repair is impossible and cancel the job.", "D. Be transparent with the customer, estimate the procurement time, and schedule a prompt return visit."],
+                ans: 3
+            },
+            {
+                q: "9. การวัด 'SLA' (Service Level Agreement) ในงานเซอร์วิสหมายถึงอะไร?",
+                qEn: "9. What does 'SLA' (Service Level Agreement) mean in a service context?",
+                options: ["ก. วัดระยะทางไปหน้างาน", "ข. จำนวนครั้งที่ช่างลากิจ", "ค. ความเร็วในการกินข้าว", "ง. ข้อตกลงระดับการให้บริการ เช่น เวลาตอบรับและเวลาปิดงาน"],
+                optionsEn: ["A. The distance to the service site.", "B. The number of times a technician takes leave.", "C. How quickly the technician eats lunch.", "D. A formal agreement on service standards, such as response time and job completion time."],
+                ans: 3
+            },
+            {
+                q: "10. ก่อนที่จะเริ่มรื้อถอนเครื่องจักรเพื่อซ่อมแซม สิ่งที่ต้องทำเพื่อความปลอดภัยคือ?",
+                qEn: "10. Before dismantling a machine for repair, what must you do for safety?",
+                options: ["ก. ถ่ายรูปเซลฟี่กับเครื่องจักร", "ข. สั่งให้ลูกค้าออกไปจากห้อง", "ค. เปิดเพลงเสียงดัง", "ง. ตัดแหล่งพลังงาน (Lock Out / Tag Out) และระบายพลังงานคงค้าง"],
+                optionsEn: ["A. Take a selfie with the machine.", "B. Order the customer to leave the room.", "C. Play loud music.", "D. Isolate the energy source (Lock Out / Tag Out) and dissipate any stored energy."],
+                ans: 3
+            },
+            {
+                q: "11. 'Root Cause Analysis' (RCA) คืออะไร?",
+                qEn: "11. What is 'Root Cause Analysis' (RCA)?",
+                options: ["ก. การหาคนผิดเพื่อเรียกค่าเสียหาย", "ข. การวิเคราะห์หาสาเหตุที่แท้จริงเพื่อป้องกันการเกิดซ้ำ", "ค. การตรวจสอบประวัติพนักงาน", "ง. การตัดรากไม้ที่บังทาง"],
+                optionsEn: ["A. Finding who is at fault in order to claim damages.", "B. Analysing the true underlying cause of a problem to prevent recurrence.", "C. Reviewing an employee's background history.", "D. Cutting tree roots that are blocking a path."],
+                ans: 1
+            },
+            {
+                q: "12. หากต้องทำงานในพื้นที่กฎระเบียบเข้มงวด (เช่น โรงงานสารเคมี) คุณควรปฏิบัติอย่างไร?",
+                qEn: "12. If you must work in a strictly regulated environment (e.g. a chemical plant), how should you proceed?",
+                options: ["ก. ทำตามวิธีตัวเอง", "ข. ขอไม่ทำตามกฎเพราะงานช้า", "ค. แอบเข้าไปทำงานเงียบๆ", "ง. ศึกษากฎ ประสานขอใบอนุญาต (Permit) และปฏิบัติตามเคร่งครัด"],
+                optionsEn: ["A. Follow your own preferred methods.", "B. Request an exemption from the rules because they slow down the work.", "C. Quietly enter and work without notification.", "D. Study the regulations, coordinate to obtain the required work permit, and comply strictly."],
+                ans: 3
+            },
+            {
+                q: "13. คำว่า 'First Fix Rate' หมายความว่าอย่างไร?",
+                qEn: "13. What does 'First Fix Rate' mean?",
+                options: ["ก. ราคาอะไหล่ชิ้นแรก", "ข. จำนวนช่างคนแรก", "ค. เวลาที่ใช้สตาร์ทเครื่องครั้งแรก", "ง. อัตราการซ่อมให้จบได้ภายใน การเข้าบริการครั้งแรก"],
+                optionsEn: ["A. The price of the first spare part.", "B. The first technician assigned to a job.", "C. The time taken to start the machine for the first time.", "D. The rate at which repairs are completed successfully on the first service visit."],
+                ans: 3
+            },
+            {
+                q: "14. เมื่อซ่อมเสร็จแล้ว ขั้นตอนสุดท้ายที่สำคัญที่สุดคืออะไร?",
+                qEn: "14. Once a repair is complete, what is the most important final step?",
+                options: ["ก. ทดสอบการทำงานจริงร่วมกับลูกค้า ยืนยันผล และให้ลูกค้าลงนาม", "ข. เก็บเครื่องมือแล้วกลับทันที", "ค. โทรหาเพื่อนแจ้งว่าปิดงานแล้ว", "ง. ขอทิปจากลูกค้า"],
+                optionsEn: ["A. Test the machine together with the customer, confirm the result, and obtain the customer's signature.", "B. Pack up tools and leave immediately.", "C. Call a friend to report that the job is done.", "D. Ask the customer for a tip."],
+                ans: 0
+            },
+            {
+                q: "15. ทักษะ 'Critical Thinking' ช่วยงาน Service Engineer ได้อย่างไร?",
+                qEn: "15. How does 'Critical Thinking' benefit a Service Engineer?",
+                options: ["ก. ช่วยจำรหัสผ่าน", "ข. ช่วยให้เถียงชนะลูกค้า", "ค. ช่วยวิเคราะห์ข้อมูลอย่างมีเหตุผล ลดการลองผิดลองถูก", "ง. ช่วยคิดข้ออ้างตอนซ่อมไม่เสร็จ"],
+                optionsEn: ["A. It helps with remembering passwords.", "B. It helps win arguments with customers.", "C. It enables logical data analysis and reduces trial-and-error.", "D. It helps come up with excuses when a repair is not completed."],
+                ans: 2
+            },
+            {
+                q: "16. หากลูกค้าถามคำถามเทคนิคที่คุณไม่ทราบคำตอบ ควรทำอย่างไร?",
+                qEn: "16. If a customer asks a technical question you do not know the answer to, what should you do?",
+                options: ["ก. มโนคำตอบให้ดูโปร", "ข. บอกว่าเป็นความลับบริษัท", "ค. นิ่งเงียบไม่ตอบ", "ง. ตอบตรงๆ ว่าขอตรวจสอบข้อมูลก่อน และนัดเวลาอัปเดตที่ชัดเจน"],
+                optionsEn: ["A. Make up a confident-sounding answer.", "B. Say it is a company secret.", "C. Stay silent and avoid the question.", "D. Be honest, say you need to verify the information, and commit to a clear follow-up time."],
+                ans: 3
+            },
+            {
+                q: "17. หากตั้งย่านวัด (Range) เครื่องมือวัดไฟฟ้าผิดจะเกิดอะไรขึ้น?",
+                qEn: "17. What can happen if you set an incorrect measurement range on an electrical measuring instrument?",
+                options: ["ก. แสดงค่าถูกต้องเสมอ", "ข. โรงงานดับทั้งระบบ", "ค. เครื่องมือเสียหาย หรือเกิดอันตรายต่อผู้ใช้ เช่น ช็อต/อาร์ค", "ง. ไม่เกิดอะไรขึ้น"],
+                optionsEn: ["A. The reading will always be correct.", "B. The entire factory will lose power.", "C. The instrument may be damaged, or the user may be harmed (e.g. electric shock or arc flash).", "D. Nothing will happen."],
+                ans: 2
+            },
+            {
+                q: "18. 'Corrective Maintenance' แตกต่างจาก 'Preventive' อย่างไร?",
+                qEn: "18. How does 'Corrective Maintenance' differ from 'Preventive Maintenance'?",
+                options: ["ก. เหมือนกันทุกประการ", "ข. Corrective ใช้เครื่องใหม่เท่านั้น", "ค. Corrective คือซ่อมฟรี", "ง. Corrective คือซ่อมเมื่อเสียแล้ว Preventive คือบำรุงก่อนเสีย"],
+                optionsEn: ["A. They are identical in every way.", "B. Corrective Maintenance only applies to new machines.", "C. Corrective Maintenance means the repair is free of charge.", "D. Corrective Maintenance is performed after a failure; Preventive Maintenance is performed before a failure occurs."],
+                ans: 3
+            },
+            {
+                q: "19. บุคลิกภาพใดที่ลูกค้าคาดหวังจากช่างเซอร์วิสมากที่สุด?",
+                qEn: "19. Which personal quality do customers value most in a service technician?",
+                options: ["ก. แต่งตัวราคาแพง", "ข. ทำงานไวโดยไม่สนความถูกต้อง", "ค. พูดเก่งขายเก่ง", "ง. สุภาพ มีวินัย อธิบายชัดเจน และเน้นความปลอดภัย"],
+                optionsEn: ["A. Wearing expensive clothing.", "B. Working fast without regard for accuracy.", "C. Being a skilled talker and salesperson.", "D. Being polite, disciplined, communicating clearly, and prioritising safety."],
+                ans: 3
+            },
+            {
+                q: "20. หากงานซ่อมต้องใช้เวลานานกว่าที่ประเมินไว้มาก คุณควรทำอย่างไร?",
+                qEn: "20. If a repair takes significantly longer than originally estimated, what should you do?",
+                options: ["ก. แอบหนีกลับบ้าน", "ข. ปิดโทรศัพท์หนี", "ค. ซ่อมแบบลวกๆ ให้ทันเวลา", "ง. อัปเดตสถานการณ์ให้ลูกค้าทราบเป็นระยะ และแจ้ง ETA ใหม่"],
+                optionsEn: ["A. Quietly slip away and go home.", "B. Switch off your phone and avoid contact.", "C. Rush through the repair carelessly to meet the original time.", "D. Provide the customer with regular situation updates and communicate a revised ETA."],
+                ans: 3
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Service';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-        const questions = [
-            { q: "1. หน้าที่หลักที่สำคัญที่สุดของ Service Engineer คืออะไร?", options: ["ก. ออกแบบเครื่องจักรใหม่ตั้งแต่ศูนย์", "ข. ขายอะไหล่ให้ได้กำไรสูงสุด", "ค. แก้ไขปัญหาเทคนิคให้ระบบกลับมาใช้งานได้เร็ว ปลอดภัย และลด Downtime", "ง. อยู่ประจำออฟฟิศเพื่อรับสายอย่างเดียว"], ans: 2 },
-            { q: "2. หากลูกค้าโทรศัพท์มาตำหนิอย่างรุนแรงว่าเครื่องจักรเสียซ้ำซ้อน ควรทำอย่างไรเป็นอันดับแรก?", options: ["ก. ตั้งสติ รับฟังอย่างใจเย็น และเริ่มเก็บข้อมูลประวัติการซ่อม", "ข. บอกลูกค้าว่าต้องซื้อเครื่องใหม่เท่านั้น", "ค. วางสายทันทีเพราะลูกค้าไม่สุภาพ", "ง. ปฏิเสธความรับผิดชอบและชี้ว่าลูกค้าใช้งานผิด"], ans: 0 },
-            { q: "3. ขั้นตอน 'Troubleshooting' ข้อใดที่เป็นระบบและมีประสิทธิภาพที่สุด?", options: ["ก. ถอดอุปกรณ์ทั้งหมดก่อนแล้วค่อยลองเปิดใหม่", "ข. สุ่มเปลี่ยนอะไหล่ไปเรื่อยๆ จนกว่าจะติด", "ค. ถามคนอื่นแล้วทำตามโดยไม่ตรวจหน้างาน", "ง. ยืนยันอาการ -> เก็บข้อมูล -> วิเคราะห์สาเหตุ -> แก้ไข -> ทดสอบ"], ans: 3 },
-            { q: "4. การทำ 'Preventive Maintenance' (PM) มีวัตถุประสงค์เพื่ออะไร?", options: ["ก. บำรุงรักษาเชิงป้องกัน ลดโอกาสเสียหนัก และลด Downtime", "ข. รอให้เสียก่อนแล้วค่อยเข้าแก้ไข", "ค. ทำเพื่อคิดค่าบริการเพิ่มโดยไม่จำเป็น", "ง. ทำเพื่อเอาอะไหล่เก่ามาทำความสะอาดขายใหม่"], ans: 0 },
-            { q: "5. หากต้องเปลี่ยนอะไหล่แพง แต่ลูกค้าขอให้ 'ซ่อมแบบชั่วคราว' ที่เสี่ยงอันตราย คุณจะทำอย่างไร?", options: ["ก. ทำตามลูกค้าเพื่อรักษาความสัมพันธ์", "ข. แอบนำอะไหล่บริษัทไปใช้ปิดงาน", "ค. เดินออกจากหน้างานทันที", "ง. อธิบายความเสี่ยง ทำบันทึกเป็นลายลักษณ์อักษรและแจ้งหัวหน้า"], ans: 3 },
-            { q: "6. เครื่องมือใดถือเป็นเครื่องมือพื้นฐานที่สายไฟฟ้า/อิเล็กทรอนิกส์ ขาดไม่ได้?", options: ["ก. ตลับเมตร", "ข. เลื่อยเหล็ก", "ค. มัลติมิเตอร์", "ง. ค้อนปอนด์"], ans: 2 },
-            { q: "7. 'Service Report' ที่ดีควรมีลักษณะอย่างไร?", options: ["ก. มีแต่รูปถ่ายไม่มีรายละเอียด", "ข. ระบุอาการ-สาเหตุ-แนวทางแก้-การทดสอบ-อะไหล่-ข้อเสนอแนะ", "ค. เขียนสั้นๆ ว่า 'ซ่อมเสร็จแล้ว'", "ง. เขียนลายมืออ่านยากไม่ให้ลูกค้าทราบขั้นตอน"], ans: 1 },
-            { q: "8. หากไปถึงหน้างานแล้วพบว่าไม่มีอะไหล่ที่จำเป็นต้องใช้ในรถบริการ คุณควรทำอย่างไร?", options: ["ก. กลับบ้านทันที", "ข. ดัดแปลงใช้อะไหล่ใกล้เคียงแทน", "ค. บอกลูกค้าว่าซ่อมไม่ได้แล้วให้ยกเลิก", "ง. แจ้งลูกค้าตรงๆ ประเมินเวลาจัดหา และนัดหมายกลับมาซ่อมโดยเร็ว"], ans: 3 },
-            { q: "9. การวัด 'SLA' (Service Level Agreement) ในงานเซอร์วิสหมายถึงอะไร?", options: ["ก. วัดระยะทางไปหน้างาน", "ข. จำนวนครั้งที่ช่างลากิจ", "ค. ความเร็วในการกินข้าว", "ง. ข้อตกลงระดับการให้บริการ เช่น เวลาตอบรับและเวลาปิดงาน"], ans: 3 },
-            { q: "10. ก่อนที่จะเริ่มรื้อถอนเครื่องจักรเพื่อซ่อมแซม สิ่งที่ต้องทำเพื่อความปลอดภัยคือ?", options: ["ก. ถ่ายรูปเซลฟี่กับเครื่องจักร", "ข. สั่งให้ลูกค้าออกไปจากห้อง", "ค. เปิดเพลงเสียงดัง", "ง. ตัดแหล่งพลังงาน (Lock Out / Tag Out) และระบายพลังงานคงค้าง"], ans: 3 },
-            { q: "11. 'Root Cause Analysis' (RCA) คืออะไร?", options: ["ก. การหาคนผิดเพื่อเรียกค่าเสียหาย", "ข. การวิเคราะห์หาสาเหตุที่แท้จริงเพื่อป้องกันการเกิดซ้ำ", "ค. การตรวจสอบประวัติพนักงาน", "ง. การตัดรากไม้ที่บังทาง"], ans: 1 },
-            { q: "12. หากต้องทำงานในพื้นที่กฎระเบียบเข้มงวด (เช่น โรงงานสารเคมี) คุณควรปฏิบัติอย่างไร?", options: ["ก. ทำตามวิธีตัวเอง", "ข. ขอไม่ทำตามกฎเพราะงานช้า", "ค. แอบเข้าไปทำงานเงียบๆ", "ง. ศึกษากฎ ประสานขอใบอนุญาต (Permit) และปฏิบัติตามเคร่งครัด"], ans: 3 },
-            { q: "13. คำว่า 'First Fix Rate' หมายความว่าอย่างไร?", options: ["ก. ราคาอะไหล่ชิ้นแรก", "ข. จำนวนช่างคนแรก", "ค. เวลาที่ใช้สตาร์ทเครื่องครั้งแรก", "ง. อัตราการซ่อมให้จบได้ภายใน การเข้าบริการครั้งแรก"], ans: 3 },
-            { q: "14. เมื่อซ่อมเสร็จแล้ว ขั้นตอนสุดท้ายที่สำคัญที่สุดคืออะไร?", options: ["ก. ทดสอบการทำงานจริงร่วมกับลูกค้า ยืนยันผล และให้ลูกค้าลงนาม", "ข. เก็บเครื่องมือแล้วกลับทันที", "ค. โทรหาเพื่อนแจ้งว่าปิดงานแล้ว", "ง. ขอทิปจากลูกค้า"], ans: 0 },
-            { q: "15. ทักษะ 'Critical Thinking' ช่วยงาน Service Engineer ได้อย่างไร?", options: ["ก. ช่วยจำรหัสผ่าน", "ข. ช่วยให้เถียงชนะลูกค้า", "ค. ช่วยวิเคราะห์ข้อมูลอย่างมีเหตุผล ลดการลองผิดลองถูก", "ง. ช่วยคิดข้ออ้างตอนซ่อมไม่เสร็จ"], ans: 2 },
-            { q: "16. หากลูกค้าถามคำถามเทคนิคที่คุณไม่ทราบคำตอบ ควรทำอย่างไร?", options: ["ก. มโนคำตอบให้ดูโปร", "ข. บอกว่าเป็นความลับบริษัท", "ค. นิ่งเงียบไม่ตอบ", "ง. ตอบตรงๆ ว่าขอตรวจสอบข้อมูลก่อน และนัดเวลาอัปเดตที่ชัดเจน"], ans: 3 },
-            { q: "17. หากตั้งย่านวัด (Range) เครื่องมือวัดไฟฟ้าผิดจะเกิดอะไรขึ้น?", options: ["ก. แสดงค่าถูกต้องเสมอ", "ข. โรงงานดับทั้งระบบ", "ค. เครื่องมือเสียหาย หรือเกิดอันตรายต่อผู้ใช้ เช่น ช็อต/อาร์ค", "ง. ไม่เกิดอะไรขึ้น"], ans: 2 },
-            { q: "18. 'Corrective Maintenance' แตกต่างจาก 'Preventive' อย่างไร?", options: ["ก. เหมือนกันทุกประการ", "ข. Corrective ใช้เครื่องใหม่เท่านั้น", "ค. Corrective คือซ่อมฟรี", "ง. Corrective คือซ่อมเมื่อเสียแล้ว Preventive คือบำรุงก่อนเสีย"], ans: 3 },
-            { q: "19. บุคลิกภาพใดที่ลูกค้าคาดหวังจากช่างเซอร์วิสมากที่สุด?", options: ["ก. แต่งตัวราคาแพง", "ข. ทำงานไวโดยไม่สนความถูกต้อง", "ค. พูดเก่งขายเก่ง", "ง. สุภาพ มีวินัย อธิบายชัดเจน และเน้นความปลอดภัย"], ans: 3 },
-            { q: "20. หากงานซ่อมต้องใช้เวลานานกว่าที่ประเมินไว้มาก คุณควรทำอย่างไร?", options: ["ก. แอบหนีกลับบ้าน", "ข. ปิดโทรศัพท์หนี", "ค. ซ่อมแบบลวกๆ ให้ทันเวลา", "ง. อัปเดตสถานการณ์ให้ลูกค้าทราบเป็นระยะ และแจ้ง ETA ใหม่"], ans: 3 }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
-        window.onload = function () {
-            document.getElementById('userInfo').textContent = `ผู้เข้าสอบ: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
-
             const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <p class="q-text">${item.q}</p>
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
                 <div class="options-grid">
-                    ${item.options.map((opt, i) => `
-                        <button type="button" class="opt-btn" onclick="selectOption(${i})">
-                            ${opt}
-                        </button>
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             container.appendChild(card);
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
@@ -165,15 +367,15 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
-            // เปลี่ยน UI ให้ดูนิ่งขึ้นขณะรอ
             container.innerHTML = `
-        <div class="q-card" style="text-align:center; padding: 3rem;">
-            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f1c40f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h2 style="color:#f1c40f;">กำลังบันทึกข้อมูล...</h2>
-            <p>กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ</p>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -187,27 +389,26 @@
 
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
-                payload[`q${i + 1}_title`] = questions[i].q; // ส่งคำถาม
-                payload[`q${i + 1}_text`] = ans.text;        // ส่งคำตอบ
-                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0"; // ส่งคะแนน
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
             payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
             payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
 
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
-
                 await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
-
-                // ✅ เรียกใช้ Modal แทน alert
                 document.getElementById('customModal').style.display = 'block';
-
             } catch (err) {
                 console.error(err);
-                // ถึงจะ Error แต่ถ้าส่งไปแล้วก็ให้แสดง Modal เพื่อให้คนสอบกลับหน้าแรกได้
                 document.getElementById('customModal').style.display = 'block';
             }
         }
@@ -217,54 +418,27 @@
         }
     </script>
 
-    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
