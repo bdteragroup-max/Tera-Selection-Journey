@@ -67,7 +67,6 @@
             border-color: #f1c40f;
         }
 
-        /* สไตล์พิเศษสำหรับช่องพิมพ์ตอบ */
         .essay-area {
             width: 100%;
             min-height: 180px;
@@ -119,15 +118,41 @@
             margin-bottom: 15px;
             font-weight: bold;
         }
+
+        /* Language toggle button */
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
+
+    <!-- Language Toggle -->
+    <button id="langToggle">🇬🇧 EN</button>
+
     <div class="exam-container">
         <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 style="margin-top: 15px; font-size: 1.8rem;">Assessment: Accounting Manager</h1>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">Assessment: Accounting Manager</h1>
             <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
@@ -135,48 +160,276 @@
     </div>
 
     <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "Assessment: Accounting Manager",
+                userInfo: (name, pos) => `ผู้สมัคร: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                tagChoice: "Management Competency",
+                tagEssay: "Vision & Essay",
+                essayPlaceholder: "เขียนอธิบายคำตอบของคุณที่นี่ (ยิ่งละเอียด ยิ่งดีต่อการพิจารณา)...",
+                btnSaveNext: "บันทึกและถัดไป",
+                alertEssay: "กรุณาพิมพ์คำตอบให้ชัดเจนก่อนไปข้อถัดไปครับ",
+                saving: "กำลังบันทึกบททดสอบ...",
+                savingDesc: "กรุณารอสักครู่ ระบบกำลังนำส่งคำตอบและ Essay ของคุณเข้าสู่ระบบคัดเลือก",
+                modalIcon: "✅",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Accounting Manager",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                tagChoice: "Management Competency",
+                tagEssay: "Vision & Essay",
+                essayPlaceholder: "Write your answer here. The more detail you provide, the better it reflects your thinking...",
+                btnSaveNext: "Save & Continue",
+                alertEssay: "Please provide a more detailed answer before continuing.",
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers and essays to our selection system.",
+                modalIcon: "✅",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            // ---- Choice 1-20 ----
+            {
+                type: "choice",
+                q: "1. หากพบว่างบเดือนล่าสุดกำไรสูงผิดปกติ ทั้งที่ยอดขายไม่เพิ่ม สิ่งที่ควรทำอันดับแรกคือ",
+                qEn: "1. If the latest monthly financial statement shows an unusually high profit despite no increase in sales, what should be your first course of action?",
+                options: ["ก. รายงานผู้บริหารทันทีพร้อมขอตั้งทีมตรวจเร่งด่วน", "ข. ตรวจสอบการบันทึกรายได้/ค่าใช้จ่าย (Cut-off, Accrual, Reclass) และเทียบงบเดือนก่อน", "ค. ปรับปรุงตัวเลขให้ใกล้เคียงความจริงตามประสบการณ์", "ง. รอปิดงบปีเพื่อตรวจพร้อมกันครั้งเดียว"],
+                optionsEn: ["A. Report to management immediately and request an urgent investigation team.", "B. Review revenue and expense entries (cut-off, accruals, reclassifications) and compare with prior months.", "C. Adjust the figures based on experience to bring them closer to what seems reasonable.", "D. Wait until the year-end closing to review everything at once."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "2. ทีมบัญชีปิดงบไม่ทันกำหนดซ้ำๆ ปัญหาน่าจะเกิดจากสาเหตุใดมากที่สุด",
+                qEn: "2. The accounting team consistently misses closing deadlines. What is the most likely root cause?",
+                options: ["ก. ทีมขาดวินัยส่วนบุคคล", "ข. ปริมาณงานมากเกินคนที่มีอยู่", "ค. โครงสร้างงานไม่ชัด ขาด Timeline, Checklist และการบริหารคอขวด", "ง. โปรแกรมบัญชีไม่ดี"],
+                optionsEn: ["A. Team members lack personal discipline.", "B. The workload exceeds the team's capacity.", "C. Unclear work structure — missing timelines, checklists, and bottleneck management.", "D. The accounting software is inadequate."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "3. พบความผิดพลาดที่เกิดจากลูกน้อง แต่ยังไม่ส่งผลเสียภายนอก ควรทำอย่างไร",
+                qEn: "3. You discover a mistake made by a team member that has not yet caused any external impact. What is the most appropriate response?",
+                options: ["ก. เรียกคุยส่วนตัว ระบุข้อผิดพลาด และวางมาตรการป้องกันซ้ำ", "ข. ตำหนิทันทีต่อหน้าทีมเพื่อให้เป็นบทเรียนร่วมกัน", "ค. แก้ไขเองทั้งหมดเพื่อไม่ให้เสียเวลา", "ง. บันทึกโทษตามขั้นตอนทันทีเพื่อให้เข็ดหลาบ"],
+                optionsEn: ["A. Have a private conversation to address the error and establish measures to prevent recurrence.", "B. Reprimand them publicly in front of the team as a shared lesson.", "C. Fix everything yourself to save time.", "D. File a formal disciplinary record immediately as a deterrent."],
+                ans: 0
+            },
+            {
+                type: "choice",
+                q: "4. ผู้บริหารต้องการข้อมูลด่วน แต่ข้อมูลยังไม่ครบ สิ่งที่เหมาะสมที่สุดคือ",
+                qEn: "4. Management needs data urgently, but the information is not yet complete. What is the most appropriate action?",
+                options: ["ก. ส่งข้อมูลเท่าที่มีโดยไม่ต้องอธิบาย", "ข. ชะลอการส่งจนกว่าจะครบ 100%", "ค. คาดการณ์ตัวเลขให้ครบก่อนส่ง", "ง. แจ้งสถานะสิ่งที่มี/ขาด ระดับความเสี่ยง สมมติฐาน และกำหนดเวลาข้อมูลครบ"],
+                optionsEn: ["A. Send whatever data is available without explanation.", "B. Delay submission until the data is 100% complete.", "C. Estimate the missing figures to make the report appear complete.", "D. Communicate what is available, what is missing, the risk level, any assumptions made, and the expected completion time."],
+                ans: 3
+            },
+            {
+                type: "choice",
+                q: "5. ค่าใช้จ่ายบางรายการถูกบันทึกไม่ตรงหมวดซ้ำๆ สะท้อนปัญหาใด",
+                qEn: "5. Certain expenses are repeatedly recorded under incorrect categories. What does this most likely indicate?",
+                options: ["ก. ทีมไม่ตั้งใจ", "ข. ขาดมาตรฐานการจัดหมวด/คู่มือ COA mapping และจุดตรวจสอบ", "ค. โปรแกรมไม่ฉลาดพอ", "ง. งานเร่งเกินไป"],
+                optionsEn: ["A. The team is careless.", "B. There is no standardised category guide, COA mapping, or review checkpoint.", "C. The software is not intelligent enough.", "D. The workload is too rushed."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "6. Auditor ตั้งข้อสังเกตซ้ำในประเด็นเดิมหลายปี แสดงว่าควรปรับปรุงสิ่งใด",
+                qEn: "6. Auditors have raised the same observation for several consecutive years. What does this most clearly indicate needs improvement?",
+                options: ["ก. การชี้แจงให้ละเอียดขึ้นทุกปี", "ข. การปกปิดข้อมูลบางส่วน", "ค. การจัดเรียงเอกสารให้สวยงามขึ้น", "ง. กระบวนการควบคุมภายใน (IC) และการแก้ไขรากเหตุ (Root Cause)"],
+                optionsEn: ["A. Providing more detailed explanations each year.", "B. Concealing certain information from auditors.", "C. Improving the presentation and organisation of documents.", "D. Strengthening internal controls and addressing the root cause of the issue."],
+                ans: 3
+            },
+            {
+                type: "choice",
+                q: "7. ทีมทำงานถูกต้อง แต่บรรยากาศตึงเครียดและลาออกสูง ปัญหาน่าจะมาจาก",
+                qEn: "7. The team produces accurate work, yet the environment is tense and staff turnover is high. What is the most likely cause?",
+                options: ["ก. เงินเดือนต่ำกว่าตลาด", "ข. ภาวะผู้นำ การสื่อสาร และการบริหารความคาดหวัง", "ค. ปริมาณงานเยอะเกินไปอย่างเดียว", "ง. ระบบบัญชีใช้งานยาก"],
+                optionsEn: ["A. Salaries are below market rate.", "B. Leadership style, communication, and the management of expectations.", "C. Workload is simply too high.", "D. The accounting system is difficult to use."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: '8. เมื่อต้องเลือกระหว่าง "งานถูกต้อง" กับ "งานเสร็จเร็วแต่เสี่ยง" ควรเลือกอย่างไร',
+                qEn: "8. When faced with a choice between completing work accurately and completing it quickly but with risk, what is the right approach?",
+                options: ["ก. เสร็จเร็วก่อนค่อยตามแก้", "ข. ทำตามคำสั่งผู้บริหารแม้จะผิดมาตรฐาน", "ค. ยึดความถูกต้องตามมาตรฐาน พร้อมสื่อสารผลกระทบและทางเลือก", "ง. แล้วแต่สถานการณ์ไม่มีเกณฑ์ตายตัว"],
+                optionsEn: ["A. Prioritise speed first and fix errors afterwards.", "B. Follow management's instructions even if they conflict with professional standards.", "C. Uphold accuracy in line with standards, while clearly communicating the impact and available options.", "D. It depends on the situation — there is no fixed rule."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "9. หากต้องลดต้นทุนโดยไม่กระทบคุณภาพข้อมูล ควรเริ่มจาก",
+                qEn: "9. If you need to reduce costs without compromising data quality, where should you start?",
+                options: ["ก. ลดขั้นตอนซ้ำซ้อน/ไม่สร้างมูลค่า และปรับกระบวนการให้ Lean", "ข. ลดพนักงานเพื่อประหยัดค่าแรง", "ค. ลดการตรวจสอบลงเพื่อให้งานไว", "ง. ลดการทำรายงานที่ผู้บริหารขอ"],
+                optionsEn: ["A. Eliminate redundant or non-value-adding steps and streamline processes to be leaner.", "B. Reduce headcount to cut labour costs.", "C. Reduce review steps to speed up the process.", "D. Cut down on management-requested reports."],
+                ans: 0
+            },
+            {
+                type: "choice",
+                q: "10. ลูกน้องเก่งแต่ไม่ร่วมมือกับทีม ผู้จัดการควรทำอย่างไร",
+                qEn: "10. A team member is highly skilled but uncooperative with the rest of the team. What should the manager do?",
+                options: ["ก. แยกงานเดี่ยวให้ทำคนเดียว", "ข. ลงโทษเพื่อให้เป็นตัวอย่าง", "ค. สื่อสารความคาดหวังและตั้งข้อตกลงการทำงานร่วมกัน พร้อมติดตามผล", "ง. มองข้ามเพราะเขาทำผลงานดี"],
+                optionsEn: ["A. Assign them solo tasks so they work alone.", "B. Issue a punishment to set an example.", "C. Communicate expectations clearly, establish a working agreement, and follow up consistently.", "D. Overlook the behaviour because their individual performance is strong."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "11. หากทีมพึ่งพาผู้จัดการมากเกินไป ควรแก้อย่างไร",
+                qEn: "11. If the team is overly dependent on the manager for every decision, how should this be addressed?",
+                options: ["ก. ทำเองทั้งหมดเพื่อให้งานจบ", "ข. กระจายอำนาจ สร้าง Owner จัดทำ SOP และ Coaching ทีมอย่างเป็นระบบ", "ค. ลดปริมาณงานลง", "ง. เพิ่มกฎระเบียบให้มากขึ้น"],
+                optionsEn: ["A. Handle everything yourself to ensure it gets done.", "B. Delegate authority, assign clear ownership, develop SOPs, and coach the team in a structured way.", "C. Reduce the overall workload.", "D. Introduce more rules and procedures."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "12. การวางแผนงานบัญชีที่ดีควรเริ่มจากสิ่งใด",
+                qEn: "12. What should effective accounting work planning begin with?",
+                options: ["ก. วิเคราะห์ความเสี่ยง คอขวด ทรัพยากร และลำดับความสำคัญ", "ข. ยึดเส้นตาย (Deadline) เป็นหลัก", "ค. ดูปริมาณเอกสารเท่านั้น", "ง. ทำตามคำสั่งรายวัน"],
+                optionsEn: ["A. An analysis of risks, bottlenecks, available resources, and priorities.", "B. A strict focus on meeting deadlines.", "C. An assessment of document volume alone.", "D. Following daily instructions as they come."],
+                ans: 0
+            },
+            {
+                type: "choice",
+                q: "13. เมื่อทีมพลาดซ้ำเรื่องเดิม แสดงว่าขาดสิ่งใด",
+                qEn: "13. When the team repeatedly makes the same mistake, what does this most likely indicate is missing?",
+                options: ["ก. การลงโทษที่เด็ดขาด", "ข. ความตั้งใจส่วนบุคคล", "ค. การสอนงาน + ระบบป้องกัน (Checklist/Review) และการติดตามผล", "ง. พนักงานที่เก่งกว่านี้"],
+                optionsEn: ["A. Stricter disciplinary action.", "B. Personal motivation and commitment.", "C. Proper coaching, a preventive system (checklists or reviews), and consistent follow-up.", "D. More capable staff."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "14. ผู้จัดการบัญชีในอุดมคติควรใช้ข้อมูลบัญชีเพื่ออะไร",
+                qEn: "14. What should an ideal accounting manager use financial data for?",
+                options: ["ก. สนับสนุนการตัดสินใจธุรกิจ (Margin, Cash flow, Risk)", "ข. รายงานตัวเลขให้ถูกตามหน้าที่เท่านั้น", "ค. ปิดงบให้ทันเวลาโดยไม่ต้องตีความ", "ง. ตรวจสอบความถูกต้องของเอกสารอย่างเดียว"],
+                optionsEn: ["A. To support business decision-making — including margin analysis, cash flow management, and risk assessment.", "B. To fulfil the duty of reporting accurate figures.", "C. To close accounts on time without the need for interpretation.", "D. To verify the accuracy of documents only."],
+                ans: 0
+            },
+            {
+                type: "choice",
+                q: '15. สิ่งใดสะท้อนการ "ทำงานเป็นระบบ" มากที่สุด',
+                qEn: "15. Which of the following best reflects working in a systematic manner?",
+                options: ["ก. ทำงานเร็วที่สุด", "ข. ทำตามคำสั่งโดยไม่โต้แย้ง", "ค. มีขั้นตอนชัด จุดตรวจสอบเหมาะสม และแก้ไขที่รากเหตุ", "ง. แก้ปัญหาเฉพาะหน้าเก่ง"],
+                optionsEn: ["A. Completing work as quickly as possible.", "B. Following instructions without question.", "C. Having clear procedures, appropriate checkpoints, and addressing issues at their root cause.", "D. Being highly skilled at solving problems on the spot."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "16. หากต้องพัฒนาทีมในระยะยาว สิ่งใดสำคัญที่สุด",
+                qEn: "16. For developing a team over the long term, what is most important?",
+                options: ["ก. การสอนงาน โค้ช และ Feedback ที่ต่อเนื่อง", "ข. การปล่อยให้ทำงานหนักเพื่อฝึกฝนเอง", "ค. การออกกฎระเบียบให้เยอะ", "ง. การควบคุมอย่างเข้มงวดตลอดเวลา"],
+                optionsEn: ["A. Consistent coaching, skills development, and regular feedback.", "B. Allowing team members to learn through hard work on their own.", "C. Introducing an extensive set of rules and regulations.", "D. Maintaining strict control at all times."],
+                ans: 0
+            },
+            {
+                type: "choice",
+                q: "17. ความคิดเชิงพัฒนา (Growth Mindset) ของผู้จัดการบัญชีคือ",
+                qEn: "17. Which of the following best describes a growth mindset in an accounting manager?",
+                options: ["ก. ทำให้ผ่านไปก่อน", "ข. ทำตามเดิมเพื่อลดความเสี่ยง", "ค. ปรับปรุงกระบวนการต่อเนื่อง ลดผิดซ้ำ และเพิ่มความโปร่งใส", "ง. หลีกเลี่ยงปัญหาเพื่อลดแรงเสียดทาน"],
+                optionsEn: ["A. Getting through tasks with minimal effort.", "B. Sticking to existing methods to reduce risk.", "C. Continuously improving processes, reducing recurring errors, and enhancing transparency.", "D. Avoiding problems to minimise friction."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "18. เมื่อเกิดความขัดแย้งในทีม ผู้จัดการควรทำอย่างไร",
+                qEn: "18. When conflict arises within the team, what should the manager do?",
+                options: ["ก. เลือกข้างคนที่เก่งที่สุด", "ข. เพิกเฉยให้แก้กันเอง", "ค. ฟังทุกฝ่าย แยกข้อเท็จจริงและความรู้สึก หาทางออกที่ยอมรับได้", "ง. โอนงานหนีความขัดแย้ง"],
+                optionsEn: ["A. Side with the highest-performing team member.", "B. Ignore it and let them resolve it themselves.", "C. Listen to all parties, separate facts from emotions, and work towards an acceptable resolution.", "D. Reassign tasks to avoid confrontation."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "19. ผู้จัดการบัญชีที่สร้างความยั่งยืนให้องค์กรคือแบบใด",
+                qEn: "19. What type of accounting manager contributes most to long-term organisational sustainability?",
+                options: ["ก. เก่งคนเดียวแบกงานทั้งแผนก", "ข. คุมเข้ม 100% จนลูกน้องไม่กล้าตัดสินใจ", "ค. สร้างทีมและระบบที่ทำงานแทนได้ ลดการพึ่งพาตัวบุคคล", "ง. ทำงานหนักที่สุดเพื่อให้ลูกน้องดูเป็นตัวอย่าง"],
+                optionsEn: ["A. An individual expert who carries the entire department alone.", "B. A manager who exercises 100% control, leaving no room for team members to make decisions.", "C. A manager who builds capable teams and robust systems that function independently, reducing reliance on any single person.", "D. The hardest-working person in the team, setting an example through sheer effort."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: '20. สิ่งใดบ่งบอกว่าผู้จัดการบัญชี "คิดเชิงกลยุทธ"์ (Think Strategically)',
+                qEn: "20. Which of the following best demonstrates strategic thinking in an accounting manager?",
+                options: ["ก. เชื่อมโยงตัวเลขกับผลกระทบธุรกิจและเสนอทางเลือกเชิงเหตุผล", "ข. รู้มาตรฐานบัญชีแม่นยำทุกข้อ", "ค. ทำตามขั้นตอนบริษัทอย่างเคร่งครัด", "ง. ตรวจสอบเอกสารทุกใบด้วยตัวเอง"],
+                optionsEn: ["A. Connecting financial figures to business impact and presenting reasoned options.", "B. Having a precise knowledge of every accounting standard.", "C. Strictly following all company procedures.", "D. Personally reviewing every document."],
+                ans: 0
+            },
+
+            // ---- Essay 21-25 ----
+            {
+                type: "essay",
+                q: "21. เล่าประสบการณ์ที่คุณเคยแก้ปัญหางานบัญชีร่วมกับทีม และบทเรียนที่ได้รับ",
+                qEn: "21. Describe an experience in which you resolved an accounting challenge together with your team. What lessons did you take away from that situation?"
+            },
+            {
+                type: "essay",
+                q: "22. หากทีมงานทำผิดพลาดซ้ำ คุณจะจัดการอย่างไรให้เกิดการพัฒนา ไม่ใช่ความกลัว",
+                qEn: "22. If your team repeatedly makes the same mistake, how would you handle it in a way that fosters genuine improvement rather than fear?"
+            },
+            {
+                type: "essay",
+                q: "23. คุณมองบทบาทผู้จัดการบัญชีต่อความสำเร็จขององค์กรในยุคปัจจุบันอย่างไร",
+                qEn: "23. In your view, what role does an accounting manager play in driving organisational success in today's business environment?"
+            },
+            {
+                type: "essay",
+                q: "24. ยกตัวอย่างการปรับปรุงกระบวนการทำงาน (Process Improvement) ที่คุณเคยทำหรืออยากทำ",
+                qEn: "24. Provide an example of a process improvement initiative you have implemented or would like to implement, and explain the impact it had or could have."
+            },
+            {
+                type: "essay",
+                q: '25. คุณมีกลยุทธ์อย่างไรในการสร้างทีมบัญชีที่ "เก่งขึ้นและอยู่ด้วยกันได้นาน"',
+                qEn: "25. What is your strategy for building an accounting team that continuously improves and maintains long-term cohesion?"
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
         const urlParams = new URLSearchParams(window.location.search);
         const userName = urlParams.get('name') || 'ผู้สมัคร';
         const userPos = urlParams.get('position') || 'Accounting_Mgr';
-        const uuid = urlParams.get('uuid') || "no-uuid";
-
-        const questions = [
-            // ข้อ 1-20 (Choice)
-            { type: "choice", q: "1. หากพบว่างบเดือนล่าสุดกำไรสูงผิดปกติ ทั้งที่ยอดขายไม่เพิ่ม สิ่งที่ควรทำอันดับแรกคือ", options: ["ก. รายงานผู้บริหารทันทีพร้อมขอตั้งทีมตรวจเร่งด่วน", "ข. ตรวจสอบการบันทึกรายได้/ค่าใช้จ่าย (Cut-off, Accrual, Reclass) และเทียบงบเดือนก่อน", "ค. ปรับปรุงตัวเลขให้ใกล้เคียงความจริงตามประสบการณ์", "ง. รอปิดงบปีเพื่อตรวจพร้อมกันครั้งเดียว"], ans: 1 },
-            { type: "choice", q: "2. ทีมบัญชีปิดงบไม่ทันกำหนดซ้ำๆ ปัญหาน่าจะเกิดจากสาเหตุใดมากที่สุด", options: ["ก. ทีมขาดวินัยส่วนบุคคล", "ข. ปริมาณงานมากเกินคนที่มีอยู่", "ค. โครงสร้างงานไม่ชัด ขาด Timeline, Checklist และการบริหารคอขวด", "ง. โปรแกรมบัญชีไม่ดี"], ans: 2 },
-            { type: "choice", q: "3. พบความผิดพลาดที่เกิดจากลูกน้อง แต่ยังไม่ส่งผลเสียภายนอก ควรทำอย่างไร", options: ["ก. เรียกคุยส่วนตัว ระบุข้อผิดพลาด และวางมาตรการป้องกันซ้ำ", "ข. ตำหนิทันทีต่อหน้าทีมเพื่อให้เป็นบทเรียนร่วมกัน", "ค. แก้ไขเองทั้งหมดเพื่อไม่ให้เสียเวลา", "ง. บันทึกโทษตามขั้นตอนทันทีเพื่อให้เข็ดหลาบ"], ans: 0 },
-            { type: "choice", q: "4. ผู้บริหารต้องการข้อมูลด่วน แต่ข้อมูลยังไม่ครบ สิ่งที่เหมาะสมที่สุดคือ", options: ["ก. ส่งข้อมูลเท่าที่มีโดยไม่ต้องอธิบาย", "ข. ชะลอการส่งจนกว่าจะครบ 100%", "ค. คาดการณ์ตัวเลขให้ครบก่อนส่ง", "ง. แจ้งสถานะสิ่งที่มี/ขาด ระดับความเสี่ยง สมมติฐาน และกำหนดเวลาข้อมูลครบ"], ans: 3 },
-            { type: "choice", q: "5. ค่าใช้จ่ายบางรายการถูกบันทึกไม่ตรงหมวดซ้ำๆ สะท้อนปัญหาใด", options: ["ก. ทีมไม่ตั้งใจ", "ข. ขาดมาตรฐานการจัดหมวด/คู่มือ COA mapping และจุดตรวจสอบ", "ค. โปรแกรมไม่ฉลาดพอ", "ง. งานเร่งเกินไป"], ans: 1 },
-            { type: "choice", q: "6. Auditor ตั้งข้อสังเกตซ้ำในประเด็นเดิมหลายปี แสดงว่าควรปรับปรุงสิ่งใด", options: ["ก. การชี้แจงให้ละเอียดขึ้นทุกปี", "ข. การปกปิดข้อมูลบางส่วน", "ค. การจัดเรียงเอกสารให้สวยงามขึ้น", "ง. กระบวนการควบคุมภายใน (IC) และการแก้ไขรากเหตุ (Root Cause)"], ans: 3 },
-            { type: "choice", q: "7. ทีมทำงานถูกต้อง แต่บรรยากาศตึงเครียดและลาออกสูง ปัญหาน่าจะมาจาก", options: ["ก. เงินเดือนต่ำกว่าตลาด", "ข. ภาวะผู้นำ การสื่อสาร และการบริหารความคาดหวัง", "ค. ปริมาณงานเยอะเกินไปอย่างเดียว", "ง. ระบบบัญชีใช้งานยาก"], ans: 1 },
-            { type: "choice", q: "8. เมื่อต้องเลือกระหว่าง “งานถูกต้อง” กับ “งานเสร็จเร็วแต่เสี่ยง” ควรเลือกอย่างไร", options: ["ก. เสร็จเร็วก่อนค่อยตามแก้", "ข. ทำตามคำสั่งผู้บริหารแม้จะผิดมาตรฐาน", "ค. ยึดความถูกต้องตามมาตรฐาน พร้อมสื่อสารผลกระทบและทางเลือก", "ง. แล้วแต่สถานการณ์ไม่มีเกณฑ์ตายตัว"], ans: 2 },
-            { type: "choice", q: "9. หากต้องลดต้นทุนโดยไม่กระทบคุณภาพข้อมูล ควรเริ่มจาก", options: ["ก. ลดขั้นตอนซ้ำซ้อน/ไม่สร้างมูลค่า และปรับกระบวนการให้ Lean", "ข. ลดพนักงานเพื่อประหยัดค่าแรง", "ค. ลดการตรวจสอบลงเพื่อให้งานไว", "ง. ลดการทำรายงานที่ผู้บริหารขอ"], ans: 0 },
-            { type: "choice", q: "10. ลูกน้องเก่งแต่ไม่ร่วมมือกับทีม ผู้จัดการควรทำอย่างไร", options: ["ก. แยกงานเดี่ยวให้ทำคนเดียว", "ข. ลงโทษเพื่อให้เป็นตัวอย่าง", "ค. สื่อสารความคาดหวังและตั้งข้อตกลงการทำงานร่วมกัน พร้อมติดตามผล", "ง. มองข้ามเพราะเขาทำผลงานดี"], ans: 2 },
-            { type: "choice", q: "11. หากทีมพึ่งพาผู้จัดการมากเกินไป ควรแก้อย่างไร", options: ["ก. ทำเองทั้งหมดเพื่อให้งานจบ", "ข. กระจายอำนาจ สร้าง Owner จัดทำ SOP และ Coaching ทีมอย่างเป็นระบบ", "ค. ลดปริมาณงานลง", "ง. เพิ่มกฎระเบียบให้มากขึ้น"], ans: 1 },
-            { type: "choice", q: "12. การวางแผนงานบัญชีที่ดีควรเริ่มจากสิ่งใด", options: ["ก. วิเคราะห์ความเสี่ยง คอขวด ทรัพยากร และลำดับความสำคัญ", "ข. ยึดเส้นตาย (Deadline) เป็นหลัก", "ค. ดูปริมาณเอกสารเท่านั้น", "ง. ทำตามคำสั่งรายวัน"], ans: 0 },
-            { type: "choice", q: "13. เมื่อทีมพลาดซ้ำเรื่องเดิม แสดงว่าขาดสิ่งใด", options: ["ก. การลงโทษที่เด็ดขาด", "ข. ความตั้งใจส่วนตัว", "ค. การสอนงาน + ระบบป้องกัน (Checklist/Review) และการติดตามผล", "ง. พนักงานที่เก่งกว่านี้"], ans: 2 },
-            { type: "choice", q: "14. ผู้จัดการบัญชีในอุดมคติควรใช้ข้อมูลบัญชีเพื่ออะไร", options: ["ก. สนับสนุนการตัดสินใจธุรกิจ (Margin, Cash flow, Risk)", "ข. รายงานตัวเลขให้ถูกตามหน้าที่เท่านั้น", "ค. ปิดงบให้ทันเวลาโดยไม่ต้องตีความ", "ง. ตรวจสอบความถูกต้องของเอกสารอย่างเดียว"], ans: 0 },
-            { type: "choice", q: "15. สิ่งใดสะท้อนการ “ทำงานเป็นระบบ” มากที่สุด", options: ["ก. ทำงานเร็วที่สุด", "ข. ทำตามคำสั่งโดยไม่โต้แย้ง", "ค. มีขั้นตอนชัด จุดตรวจสอบเหมาะสม และแก้ไขที่รากเหตุ", "ง. แก้ปัญหาเฉพาะหน้าเก่ง"], ans: 2 },
-            { type: "choice", q: "16. หากต้องพัฒนาทีมในระยะยาว สิ่งใดสำคัญที่สุด", options: ["ก. การสอนงาน โค้ช และ Feedback ที่ต่อเนื่อง", "ข. การปล่อยให้ทำงานหนักเพื่อฝึกฝนเอง", "ค. การออกกฎระเบียบให้เยอะ", "ง. การควบคุมอย่างเข้มงวดตลอดเวลา"], ans: 0 },
-            { type: "choice", q: "17. ความคิดเชิงพัฒนา (Growth Mindset) ของผู้จัดการบัญชีคือ", options: ["ก. ทำให้ผ่านไปก่อน", "ข. ทำตามเดิมเพื่อลดความเสี่ยง", "ค. ปรับปรุงกระบวนการต่อเนื่อง ลดผิดซ้ำ และเพิ่มความโปร่งใส", "ง. หลีกเลี่ยงปัญหาเพื่อลดแรงเสียดทาน"], ans: 2 },
-            { type: "choice", q: "18. เมื่อเกิดความขัดแย้งในทีม ผู้จัดการควรทำอย่างไร", options: ["ก. เลือกข้างคนที่เก่งที่สุด", "ข. เพิกเฉยให้แก้กันเอง", "ค. ฟังทุกฝ่าย แยกข้อเท็จจริงและความรู้สึก หาทางออกที่ยอมรับได้", "ง. โอนงานหนีความขัดแย้ง"], ans: 2 },
-            { type: "choice", q: "19. ผู้จัดการบัญชีที่สร้างความยั่งยืนให้องค์กรคือแบบใด", options: ["ก. เก่งคนเดียวแบกงานทั้งแผนก", "ข. คุมเข้ม 100% จนลูกน้องไม่กล้าตัดสินใจ", "ค. สร้างทีมและระบบที่ทำงานแทนได้ ลดการพึ่งพาตัวบุคคล", "ง. ทำงานหนักที่สุดเพื่อให้ลูกน้องดูเป็นตัวอย่าง"], ans: 2 },
-            { type: "choice", q: "20. สิ่งใดบ่งบอกว่าผู้จัดการบัญชี “คิดเชิงกลยุทธ์” (Think Strategically)", options: ["ก. เชื่อมโยงตัวเลขกับผลกระทบธุรกิจและเสนอทางเลือกเชิงเหตุผล", "ข. รู้มาตรฐานบัญชีแม่นยำทุกข้อ", "ค. ทำตามขั้นตอนบริษัทอย่างเคร่งครัด", "ง. ตรวจสอบเอกสารทุกใบด้วยตัวเอง"], ans: 0 },
-
-            // ข้อ 21-25 (Essay - พิมพ์ตอบ)
-            { type: "essay", q: "21. เล่าประสบการณ์ที่คุณเคยแก้ปัญหางานบัญชีร่วมกับทีม และบทเรียนที่ได้รับ" },
-            { type: "essay", q: "22. หากทีมงานทำผิดพลาดซ้ำ คุณจะจัดการอย่างไรให้เกิดการพัฒนา ไม่ใช่ความกลัว" },
-            { type: "essay", q: "23. คุณมองบทบาทผู้จัดการบัญชีต่อความสำเร็จขององค์กรในยุคปัจจุบันอย่างไร" },
-            { type: "essay", q: "24. ยกตัวอย่างการปรับปรุงกระบวนการทำงาน (Process Improvement) ที่คุณเคยทำหรืออยากทำ" },
-            { type: "essay", q: "25. คุณมีกลยุทธ์อย่างไรในการสร้างทีมบัญชีที่ “เก่งขึ้นและอยู่ด้วยกันได้นาน”" }
-        ];
+        const uuid = urlParams.get('uuid') || 'no-uuid';
 
         let currentStep = 0;
         const userAnswers = [];
 
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            // Re-render current question in new language
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
         window.onload = () => {
-            document.getElementById('userInfo').textContent = `ผู้สมัคร: คุณ ${userName} | ตำแหน่ง: ${userPos}`;
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
             renderQuestion();
         };
 
@@ -184,45 +437,51 @@
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
             const item = questions[currentStep];
+            const t = ui[currentLang];
             const card = document.createElement('div');
             card.className = 'q-card';
 
-            let htmlContent = `
-                <div class="progress-text">ข้อที่ ${currentStep + 1} / ${questions.length}</div>
-                <div class="manager-tag">${item.type === 'choice' ? 'Management Competency' : 'Vision & Essay'}</div>
-                <p class="q-text">${item.q}</p>`;
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            let html = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <div class="manager-tag">${item.type === 'choice' ? t.tagChoice : t.tagEssay}</div>
+                <p class="q-text">${questionText}</p>`;
 
             if (item.type === "choice") {
-                htmlContent += `<div class="options-grid">
-                    ${item.options.map((opt, i) => `
+                html += `<div class="options-grid">
+                    ${opts.map((opt, i) => `
                         <button type="button" class="opt-btn" onclick="processNext(${i})">${opt}</button>
                     `).join('')}
                 </div>`;
             } else {
-                htmlContent += `
-                    <textarea id="essayInput" class="essay-area" placeholder="เขียนอธิบายคำตอบของคุณที่นี่ (ยิ่งละเอียด ยิ่งดีต่อการพิจารณา)..."></textarea>
-                    <button class="btn-next" onclick="processNext(null)">บันทึกและถัดไป</button>`;
+                html += `
+                    <textarea id="essayInput" class="essay-area" placeholder="${t.essayPlaceholder}"></textarea>
+                    <button class="btn-next" onclick="processNext(null)">${t.btnSaveNext}</button>`;
             }
 
-            card.innerHTML = htmlContent;
+            card.innerHTML = html;
             container.appendChild(card);
-
-            // Focus textarea อัตโนมัติถ้าเป็นข้อเขียน
             if (item.type === "essay") document.getElementById('essayInput').focus();
         }
 
+        /* ============================================================
+           Logic
+        ============================================================ */
         async function processNext(choiceIndex) {
             const item = questions[currentStep];
+            const t = ui[currentLang];
 
             if (item.type === "choice") {
                 userAnswers.push({
-                    text: item.options[choiceIndex],
+                    text: item.options[choiceIndex],   // always store Thai for Sheet
                     score: choiceIndex === item.ans ? 1 : 0
                 });
             } else {
                 const textVal = document.getElementById('essayInput').value.trim();
                 if (textVal.length < 5) {
-                    alert("กรุณาพิมพ์คำตอบให้ชัดเจนก่อนไปข้อถัดไปครับ");
+                    alert(t.alertEssay);
                     return;
                 }
                 userAnswers.push({ text: textVal, score: 0 });
@@ -237,12 +496,13 @@
         }
 
         async function finishExam() {
+            const t = ui[currentLang];
             const container = document.getElementById('questionsContainer');
             container.innerHTML = `
                 <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
-                    <div class="spinner" style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
-                    <h2 style="color:#f1c40f;">กำลังบันทึกบททดสอบ...</h2>
-                    <p style="opacity:0.8;">กรุณารอสักครู่ ระบบกำลังนำส่งคำตอบและ Essay ของคุณเข้าสู่ระบบคัดเลือก</p>
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
                 </div>
                 <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
 
@@ -265,6 +525,12 @@
             payload.totalScore = String(score);
             payload.hrStatus = score >= 16 ? "🟢 ผ่านเกณฑ์ (โดดเด่น)" : (score >= 12 ? "🟡 พิจารณา Essay เพิ่มเติม" : "🔴 ไม่ผ่านเกณฑ์ทางเทคนิค");
 
+            // Update modal text to current language
+            document.getElementById('modalIcon').textContent = t.modalIcon;
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
             try {
                 const body = new URLSearchParams();
                 for (const key in payload) { body.append(key, payload[key]); }
@@ -281,54 +547,27 @@
         }
     </script>
 
+    <!-- Modal -->
     <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
            background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-
         <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         </div>
-
-        <div style="background: rgba(255, 255, 255, 0.1); 
-                backdrop-filter: blur(15px); 
-                -webkit-backdrop-filter: blur(15px);
-                color: white; 
-                margin: 12% auto; 
-                padding: 3rem 2rem; 
-                border-radius: 20px; 
-                width: 85%; 
-                max-width: 450px; 
-                text-align: center; 
-                border: 1px solid rgba(255, 255, 255, 0.2); 
-                box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-                animation: fadeIn 0.5s ease-in-out;">
-
-            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
-
-            <h2 style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                ขอบคุณสำหรับคำตอบ!
-            </h2>
-
-            <p style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
-                ขอให้คุณโชคดีในการสัมภาษณ์
-            </p>
-
-            <button onclick="goHome()" style="background: #27ae60; 
-                   color: white; 
-                   border: none; 
-                   padding: 15px 40px; 
-                   border-radius: 12px; 
-                   cursor: pointer; 
-                   font-size: 1.2rem; 
-                   font-weight: bold; 
-                   transition: 0.3s; 
-                   width: 100%;
-                   box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);">
-                ตกลง
-            </button>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div id="modalIcon" style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
         </div>
     </div>
 </body>
 
-
 </html>
-
-
