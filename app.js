@@ -379,6 +379,8 @@ const EXAM_CHOICES = [
   { label: "Telesales / โทรขาย", labelEn: "Telesales", url: "exam-telesales.html" },
   { label: "Sales / AE / ฝ่ายขาย", labelEn: "Sales / AE", url: "exam-sales.html" },
   { label: "จัดซื้อ", labelEn: "Purchasing", url: "exam-purchasing.html" },
+  { label: "ธุรการประสานงานโครงการ", labelEn: "Project Coordinator", url: "exam_coordinator.html" },
+  { label: "วิศวกรไฟฟ้า", labelEn: "Electrical Engineer", url: "exam_electrical_engineer.html" },
   { label: "ช่างไฟฟ้า", labelEn: "Electrician", url: "exam-electrician.html" },
   { label: "วิศวกร", labelEn: "Engineer", url: "exam-engineer.html" },
   { label: "บริการ / Service", labelEn: "Service", url: "exam-service.html" },
