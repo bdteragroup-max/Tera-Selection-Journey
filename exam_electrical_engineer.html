@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Electrical Engineer Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง วิศวกรไฟฟ้า</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง วิศวกรไฟฟ้า",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Electrical Engineer",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            {
+                q: "1. วัตถุประสงค์หลักของการติดตั้ง Circuit Breaker ในระบบไฟฟ้าคืออะไร",
+                qEn: "1. What is the primary purpose of installing a Circuit Breaker in an electrical system?",
+                options: ["ก. เพิ่มแรงดันไฟฟ้า", "ข. ป้องกันกระแสไฟฟ้าเกินและลัดวงจร", "ค. ลดแรงดันไฟฟ้า", "ง. เพิ่มกำลังไฟฟ้า"],
+                optionsEn: ["A. Increase voltage", "B. Protect against overcurrent and short circuits", "C. Reduce voltage", "D. Increase power"],
+                ans: 1
+            },
+            {
+                q: "2. หากโหลดในระบบเพิ่มขึ้นมากเกินไป สิ่งใดมีโอกาสเกิดขึ้นมากที่สุด",
+                qEn: "2. If the load in a system increases excessively, what is most likely to occur?",
+                options: ["ก. แรงดันไฟเพิ่มขึ้น", "ข. กระแสไฟลดลง", "ค. กระแสไฟเพิ่มขึ้น", "ง. ความถี่เพิ่มขึ้น"],
+                optionsEn: ["A. Voltage increases", "B. Current decreases", "C. Current increases", "D. Frequency increases"],
+                ans: 2
+            },
+            {
+                q: "3. สูตรคำนวณกำลังไฟฟ้าในระบบไฟฟ้า 1 เฟสคือข้อใด",
+                qEn: "3. Which formula is used to calculate electrical power in a single-phase system?",
+                options: ["ก. P = V + I", "ข. P = V × I", "ค. P = V ÷ I", "ง. P = I²"],
+                optionsEn: ["A. P = V + I", "B. P = V × I", "C. P = V ÷ I", "D. P = I²"],
+                ans: 1
+            },
+            {
+                q: "4. อุปกรณ์ใดใช้สำหรับป้องกันไฟฟ้าลัดวงจรในวงจรไฟฟ้า",
+                qEn: "4. Which device is used to protect an electrical circuit from a short circuit?",
+                options: ["ก. Fuse", "ข. Capacitor", "ค. Transformer", "ง. Motor"],
+                optionsEn: ["A. Fuse", "B. Capacitor", "C. Transformer", "D. Motor"],
+                ans: 0
+            },
+            {
+                q: "5. Power Factor ที่ต่ำส่งผลอย่างไรต่อระบบไฟฟ้า",
+                qEn: "5. What effect does a low Power Factor have on an electrical system?",
+                options: ["ก. ระบบมีประสิทธิภาพสูงขึ้น", "ข. กระแสไฟฟ้าเพิ่มขึ้นในระบบ", "ค. แรงดันไฟเพิ่มขึ้น", "ง. ความถี่ลดลง"],
+                optionsEn: ["A. The system becomes more efficient.", "B. Current in the system increases.", "C. Voltage increases.", "D. Frequency decreases."],
+                ans: 1
+            },
+            {
+                q: "6. หากมอเตอร์ไฟฟ้ามีกระแสเริ่มต้นสูงมาก ควรใช้วิธีใดในการสตาร์ท",
+                qEn: "6. If an electric motor has a very high starting current, which starting method should be used?",
+                options: ["ก. Direct Online (DOL)", "ข. Star-Delta Starter", "ค. Capacitor", "ง. Fuse"],
+                optionsEn: ["A. Direct Online (DOL)", "B. Star-Delta Starter", "C. Capacitor", "D. Fuse"],
+                ans: 1
+            },
+            {
+                q: "7. หม้อแปลงไฟฟ้ามีหน้าที่หลักคืออะไร",
+                qEn: "7. What is the primary function of a transformer?",
+                options: ["ก. เพิ่มหรือลดแรงดันไฟฟ้า", "ข. เพิ่มความถี่ไฟฟ้า", "ค. ลดกระแสไฟฟ้า", "ง. เก็บพลังงานไฟฟ้า"],
+                optionsEn: ["A. Step up or step down voltage", "B. Increase electrical frequency", "C. Reduce electrical current", "D. Store electrical energy"],
+                ans: 0
+            },
+            {
+                q: "8. เครื่องมือใดใช้วัดความต้านทานของสายดิน (Ground Resistance)",
+                qEn: "8. Which instrument is used to measure ground resistance?",
+                options: ["ก. Clamp Meter", "ข. Earth Tester", "ค. Voltmeter", "ง. Wattmeter"],
+                optionsEn: ["A. Clamp Meter", "B. Earth Tester", "C. Voltmeter", "D. Wattmeter"],
+                ans: 1
+            },
+            {
+                q: "9. ระบบไฟฟ้า 3 เฟสมีข้อดีข้อใด",
+                qEn: "9. What is an advantage of a 3-phase electrical system?",
+                options: ["ก. ใช้สายไฟมากกว่า", "ข. ส่งกำลังไฟฟ้าได้มีประสิทธิภาพสูงกว่า", "ค. แรงดันไฟฟ้าต่ำกว่า", "ง. ใช้พลังงานมากกว่า"],
+                optionsEn: ["A. Uses more cable", "B. Transmits power more efficiently", "C. Lower voltage", "D. Uses more energy"],
+                ans: 1
+            },
+            {
+                q: "10. หากพบว่าเบรกเกอร์ทริปบ่อยในระบบไฟฟ้า ควรตรวจสอบสิ่งใดก่อน",
+                qEn: "10. If a breaker is tripping frequently in an electrical system, what should be checked first?",
+                options: ["ก. สีของสายไฟ", "ข. โหลดเกินหรือไฟฟ้าลัดวงจร", "ค. อุณหภูมิห้อง", "ง. ความยาวสายไฟ"],
+                optionsEn: ["A. Wire colour", "B. Overload or short circuit", "C. Room temperature", "D. Wire length"],
+                ans: 1
+            },
+            {
+                q: "11. อุปกรณ์ใดใช้สำหรับแก้ไขค่า Power Factor",
+                qEn: "11. Which equipment is used to correct Power Factor?",
+                options: ["ก. Capacitor Bank", "ข. Fuse", "ค. Relay", "ง. Transformer"],
+                optionsEn: ["A. Capacitor Bank", "B. Fuse", "C. Relay", "D. Transformer"],
+                ans: 0
+            },
+            {
+                q: "12. Relay ในระบบไฟฟ้ามีหน้าที่หลักคืออะไร",
+                qEn: "12. What is the primary function of a Relay in an electrical system?",
+                options: ["ก. วัดแรงดัน", "ข. ควบคุมและป้องกันระบบไฟฟ้า", "ค. เพิ่มกำลังไฟฟ้า", "ง. ลดความถี่"],
+                optionsEn: ["A. Measure voltage", "B. Control and protect the electrical system", "C. Increase power", "D. Reduce frequency"],
+                ans: 1
+            },
+            {
+                q: "13. หากสายไฟมีขนาดเล็กเกินไปสำหรับโหลด จะเกิดผลอย่างไร",
+                qEn: "13. If a wire is undersized for the load, what will happen?",
+                options: ["ก. กระแสไฟลดลง", "ข. สายไฟร้อนและอาจเกิดไฟไหม้", "ค. แรงดันไฟเพิ่มขึ้น", "ง. ระบบทำงานดีขึ้น"],
+                optionsEn: ["A. Current decreases.", "B. The wire overheats and may cause a fire.", "C. Voltage increases.", "D. The system performs better."],
+                ans: 1
+            },
+            {
+                q: "14. เครื่องมือใดใช้วัดกระแสไฟโดยไม่ต้องตัดวงจร",
+                qEn: "14. Which instrument measures current without breaking the circuit?",
+                options: ["ก. Clamp Meter", "ข. Voltmeter", "ค. Multimeter", "ง. Wattmeter"],
+                optionsEn: ["A. Clamp Meter", "B. Voltmeter", "C. Multimeter", "D. Wattmeter"],
+                ans: 0
+            },
+            {
+                q: "15. หากแรงดันไฟฟ้าตก (Voltage Drop) มากเกินไปในสายส่ง ควรแก้ไขอย่างไร",
+                qEn: "15. If there is excessive Voltage Drop in a transmission line, how should it be corrected?",
+                options: ["ก. ใช้สายไฟขนาดใหญ่ขึ้น", "ข. ลดจำนวนสาย", "ค. เพิ่มความยาวสาย", "ง. ลดฉนวน"],
+                optionsEn: ["A. Use a larger wire size.", "B. Reduce the number of conductors.", "C. Increase wire length.", "D. Reduce insulation."],
+                ans: 0
+            },
+            {
+                q: "16. การทำ Preventive Maintenance ในระบบไฟฟ้ามีวัตถุประสงค์หลักคืออะไร",
+                qEn: "16. What is the main purpose of Preventive Maintenance in an electrical system?",
+                options: ["ก. ซ่อมเมื่อเสีย", "ข. ป้องกันปัญหาก่อนเกิดความเสียหาย", "ค. ลดจำนวนอุปกรณ์", "ง. ลดแรงดันไฟฟ้า"],
+                optionsEn: ["A. Repair after failure", "B. Prevent problems before damage occurs", "C. Reduce the number of equipment", "D. Reduce voltage"],
+                ans: 1
+            },
+            {
+                q: "17. หากมอเตอร์ทำงานแล้วมีเสียงดังผิดปกติ ควรตรวจสอบสิ่งใดก่อน",
+                qEn: "17. If a motor produces an abnormal noise during operation, what should be checked first?",
+                options: ["ก. แบริ่งและการหล่อลื่น", "ข. สีของมอเตอร์", "ค. ขนาดสายไฟ", "ง. อุณหภูมิห้อง"],
+                optionsEn: ["A. Bearings and lubrication", "B. Motor colour", "C. Wire size", "D. Room temperature"],
+                ans: 0
+            },
+            {
+                q: "18. อุปกรณ์ใดใช้ป้องกันไฟฟ้ารั่วเพื่อความปลอดภัยของผู้ใช้งาน",
+                qEn: "18. Which device protects users from electric leakage?",
+                options: ["ก. MCB", "ข. ELCB / RCD", "ค. Fuse", "ง. Capacitor"],
+                optionsEn: ["A. MCB", "B. ELCB / RCD", "C. Fuse", "D. Capacitor"],
+                ans: 1
+            },
+            {
+                q: "19. การลัดวงจร (Short Circuit) คืออะไร",
+                qEn: "19. What is a Short Circuit?",
+                options: ["ก. กระแสไฟฟ้าไหลผ่านเส้นทางที่มีความต้านทานต่ำมาก", "ข. แรงดันไฟลดลง", "ค. ความถี่ไฟฟ้าเพิ่มขึ้น", "ง. กระแสไฟลดลง"],
+                optionsEn: ["A. Electrical current flows through a path with very low resistance.", "B. Voltage decreases.", "C. Electrical frequency increases.", "D. Current decreases."],
+                ans: 0
+            },
+            {
+                q: "20. หากต้องออกแบบระบบไฟฟ้าในโรงงาน สิ่งใดสำคัญที่สุด",
+                qEn: "20. When designing an electrical system for a factory, what is most important?",
+                options: ["ก. ความสวยงามของสายไฟ", "ข. ความปลอดภัยและมาตรฐานระบบไฟฟ้า", "ค. จำนวนปลั๊กไฟ", "ง. สีของตู้ไฟ"],
+                optionsEn: ["A. Aesthetics of the wiring", "B. Safety and electrical system standards", "C. Number of power outlets", "D. Colour of the distribution board"],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Electrical Engineer';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
+            payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
