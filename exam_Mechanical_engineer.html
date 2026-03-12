@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mechanical Engineer Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง วิศวกรเครื่องกล</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง วิศวกรเครื่องกล",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Mechanical Engineer",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            {
+                q: "1. กฎข้อที่ 1 ของอุณหพลศาสตร์กล่าวถึงเรื่องใด",
+                qEn: "1. What does the First Law of Thermodynamics state?",
+                options: ["ก. พลังงานไม่สามารถสร้างหรือทำลายได้", "ข. ความร้อนเคลื่อนที่จากเย็นไปหาร้อน", "ค. ความดันเพิ่มตามอุณหภูมิ", "ง. พลังงานสูญหายได้"],
+                optionsEn: ["A. Energy cannot be created or destroyed.", "B. Heat moves from cold to hot.", "C. Pressure increases with temperature.", "D. Energy can be lost."],
+                ans: 0
+            },
+            {
+                q: "2. เครื่องมือใดใช้วัดความดันในระบบท่อ",
+                qEn: "2. Which instrument is used to measure pressure in a pipe system?",
+                options: ["ก. Thermometer", "ข. Pressure Gauge", "ค. Flow Meter", "ง. Tachometer"],
+                optionsEn: ["A. Thermometer", "B. Pressure Gauge", "C. Flow Meter", "D. Tachometer"],
+                ans: 1
+            },
+            {
+                q: "3. หากเพลาหมุนมีแรงบิด (Torque) เพิ่มขึ้น ผลที่เกิดขึ้นคืออะไร",
+                qEn: "3. If the Torque on a rotating shaft increases, what is the result?",
+                options: ["ก. ความเร็วลดลงเสมอ", "ข. แรงที่ส่งไปยังโหลดเพิ่มขึ้น", "ค. อุณหภูมิลดลง", "ง. ความดันลดลง"],
+                optionsEn: ["A. Speed always decreases.", "B. Force transmitted to the load increases.", "C. Temperature decreases.", "D. Pressure decreases."],
+                ans: 1
+            },
+            {
+                q: "4. หน้าที่หลักของ Bearing ในเครื่องจักรคืออะไร",
+                qEn: "4. What is the primary function of a Bearing in a machine?",
+                options: ["ก. เพิ่มแรงบิด", "ข. ลดแรงเสียดทานของการหมุน", "ค. เพิ่มความเร็ว", "ง. ลดอุณหภูมิ"],
+                optionsEn: ["A. Increase torque", "B. Reduce rotational friction", "C. Increase speed", "D. Reduce temperature"],
+                ans: 1
+            },
+            {
+                q: "5. หากระบบท่อมีการสูญเสียแรงดันสูง ควรตรวจสอบสิ่งใดก่อน",
+                qEn: "5. If a pipe system has high pressure loss, what should be checked first?",
+                options: ["ก. ความยาวท่อและการอุดตัน", "ข. สีของท่อ", "ค. ขนาดปั๊ม", "ง. อุณหภูมิห้อง"],
+                optionsEn: ["A. Pipe length and blockage", "B. Pipe colour", "C. Pump size", "D. Room temperature"],
+                ans: 0
+            },
+            {
+                q: "6. เครื่องมือใดใช้วัดอัตราการไหลของของเหลวในท่อ",
+                qEn: "6. Which instrument measures the flow rate of liquid in a pipe?",
+                options: ["ก. Flow Meter", "ข. Pressure Gauge", "ค. Thermometer", "ง. Multimeter"],
+                optionsEn: ["A. Flow Meter", "B. Pressure Gauge", "C. Thermometer", "D. Multimeter"],
+                ans: 0
+            },
+            {
+                q: "7. ปั๊มชนิดใดเหมาะกับการส่งของเหลวปริมาณมากอย่างต่อเนื่อง",
+                qEn: "7. Which type of pump is suitable for continuously delivering large volumes of liquid?",
+                options: ["ก. Centrifugal Pump", "ข. Gear Pump", "ค. Diaphragm Pump", "ง. Piston Pump"],
+                optionsEn: ["A. Centrifugal Pump", "B. Gear Pump", "C. Diaphragm Pump", "D. Piston Pump"],
+                ans: 0
+            },
+            {
+                q: "8. หากเครื่องจักรเกิดการสั่นสะเทือนมากผิดปกติ ควรตรวจสอบสิ่งใดก่อน",
+                qEn: "8. If a machine vibrates abnormally, what should be checked first?",
+                options: ["ก. การบาลานซ์ของเพลา", "ข. สีเครื่องจักร", "ค. ความยาวสายไฟ", "ง. อุณหภูมิห้อง"],
+                optionsEn: ["A. Shaft balancing", "B. Machine colour", "C. Cable length", "D. Room temperature"],
+                ans: 0
+            },
+            {
+                q: "9. การหล่อลื่น (Lubrication) มีวัตถุประสงค์หลักคืออะไร",
+                qEn: "9. What is the primary purpose of Lubrication?",
+                options: ["ก. เพิ่มความเร็ว", "ข. ลดแรงเสียดทานและการสึกหรอ", "ค. เพิ่มแรงดัน", "ง. เพิ่มน้ำหนักเครื่องจักร"],
+                optionsEn: ["A. Increase speed", "B. Reduce friction and wear", "C. Increase pressure", "D. Add machine weight"],
+                ans: 1
+            },
+            {
+                q: "10. หน่วยของแรงบิด (Torque) คืออะไร",
+                qEn: "10. What is the unit of Torque?",
+                options: ["ก. Newton", "ข. Newton-meter", "ค. Watt", "ง. Pascal"],
+                optionsEn: ["A. Newton", "B. Newton-meter", "C. Watt", "D. Pascal"],
+                ans: 1
+            },
+            {
+                q: "11. Heat Exchanger มีหน้าที่หลักคืออะไร",
+                qEn: "11. What is the primary function of a Heat Exchanger?",
+                options: ["ก. เพิ่มแรงดัน", "ข. แลกเปลี่ยนความร้อนระหว่างของไหล", "ค. เพิ่มความเร็ว", "ง. ลดแรงเสียดทาน"],
+                optionsEn: ["A. Increase pressure", "B. Transfer heat between fluids", "C. Increase speed", "D. Reduce friction"],
+                ans: 1
+            },
+            {
+                q: "12. หากมอเตอร์ขับปั๊มแล้วปั๊มไม่ทำงาน สาเหตุที่เป็นไปได้คืออะไร",
+                qEn: "12. If a motor drives a pump but the pump does not operate, what is a likely cause?",
+                options: ["ก. ไม่มีน้ำในระบบ", "ข. อุณหภูมิห้องต่ำ", "ค. สีปั๊มซีด", "ง. สายไฟยาว"],
+                optionsEn: ["A. No liquid in the system", "B. Low room temperature", "C. Faded pump colour", "D. Long cable"],
+                ans: 0
+            },
+            {
+                q: "13. หากสายพาน (Belt) ของเครื่องจักรหย่อนเกินไป จะเกิดผลอย่างไร",
+                qEn: "13. If a machine's Belt is too loose, what will happen?",
+                options: ["ก. ความเร็วเพิ่มขึ้น", "ข. การส่งกำลังไม่มีประสิทธิภาพ", "ค. แรงบิดเพิ่ม", "ง. เครื่องจักรหยุดทันที"],
+                optionsEn: ["A. Speed increases.", "B. Power transmission becomes inefficient.", "C. Torque increases.", "D. The machine stops immediately."],
+                ans: 1
+            },
+            {
+                q: "14. การทำ Preventive Maintenance มีวัตถุประสงค์เพื่ออะไร",
+                qEn: "14. What is the purpose of Preventive Maintenance?",
+                options: ["ก. ซ่อมเมื่อเสีย", "ข. ป้องกันความเสียหายก่อนเกิดปัญหา", "ค. ลดจำนวนเครื่องจักร", "ง. เพิ่มแรงดัน"],
+                optionsEn: ["A. Repair after failure", "B. Prevent damage before problems occur", "C. Reduce machine count", "D. Increase pressure"],
+                ans: 1
+            },
+            {
+                q: "15. หน่วยของกำลัง (Power) ในระบบเครื่องกลคืออะไร",
+                qEn: "15. What is the unit of Power in a mechanical system?",
+                options: ["ก. Newton", "ข. Watt", "ค. Pascal", "ง. Meter"],
+                optionsEn: ["A. Newton", "B. Watt", "C. Pascal", "D. Meter"],
+                ans: 1
+            },
+            {
+                q: "16. หากแบริ่ง (Bearing) มีอุณหภูมิสูงผิดปกติ ควรตรวจสอบสิ่งใดก่อน",
+                qEn: "16. If a Bearing has abnormally high temperature, what should be checked first?",
+                options: ["ก. ระบบหล่อลื่น", "ข. สีเครื่องจักร", "ค. แรงดันน้ำ", "ง. ความยาวท่อ"],
+                optionsEn: ["A. Lubrication system", "B. Machine colour", "C. Water pressure", "D. Pipe length"],
+                ans: 0
+            },
+            {
+                q: "17. หากต้องการลดการสั่นสะเทือนของเครื่องจักร ควรทำอย่างไร",
+                qEn: "17. To reduce machine vibration, what should be done?",
+                options: ["ก. เพิ่มน้ำหนักเครื่อง", "ข. ติดตั้งฐานรองรับและทำการบาลานซ์", "ค. ลดแรงดัน", "ง. เพิ่มความเร็ว"],
+                optionsEn: ["A. Add machine weight", "B. Install mounting base and perform balancing", "C. Reduce pressure", "D. Increase speed"],
+                ans: 1
+            },
+            {
+                q: "18. Compressor มีหน้าที่หลักคืออะไร",
+                qEn: "18. What is the primary function of a Compressor?",
+                options: ["ก. เพิ่มแรงดันของก๊าซ", "ข. ลดแรงดันของก๊าซ", "ค. เพิ่มอุณหภูมิ", "ง. ลดความเร็ว"],
+                optionsEn: ["A. Increase gas pressure", "B. Decrease gas pressure", "C. Increase temperature", "D. Reduce speed"],
+                ans: 0
+            },
+            {
+                q: "19. หากระบบท่อมีการรั่วไหล สิ่งใดควรทำเป็นอันดับแรก",
+                qEn: "19. If there is a leak in a pipe system, what should be done first?",
+                options: ["ก. ปิดวาล์วและหยุดการทำงานของระบบ", "ข. เพิ่มแรงดัน", "ค. เปิดปั๊มเพิ่ม", "ง. ไม่ต้องทำอะไร"],
+                optionsEn: ["A. Close the valve and shut down the system", "B. Increase pressure", "C. Add more pumps", "D. Do nothing"],
+                ans: 0
+            },
+            {
+                q: "20. สิ่งสำคัญที่สุดในการออกแบบเครื่องจักรคืออะไร",
+                qEn: "20. What is the most important factor when designing a machine?",
+                options: ["ก. ความสวยงาม", "ข. ความปลอดภัยและประสิทธิภาพการทำงาน", "ค. สีเครื่องจักร", "ง. ขนาดสกรู"],
+                optionsEn: ["A. Aesthetics", "B. Safety and operational efficiency", "C. Machine colour", "D. Screw size"],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfvCXdieV_wEsn9RUH7icZpeyjSRuZ0AWHO0IUxrmNxkwnp4RE1V3fKA5WnOUo705Xpg/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Mechanical Engineer';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
+            payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
