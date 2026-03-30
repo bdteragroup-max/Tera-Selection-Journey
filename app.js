@@ -381,7 +381,7 @@ const EXAM_CHOICES = [
   { label: "จัดซื้อ", labelEn: "Purchasing", url: "exam-purchasing.html" },
   { label: "ธุรการประสานงานโครงการ", labelEn: "Project Coordinator", url: "exam_coordinator.html" },
   { label: "วิศวกรไฟฟ้า", labelEn: "Electrical Engineer", url: "exam_electrical_engineer.html" },
-  { label: "วิศวกรเครื่องกล", labelEn: "Mechanical Engineer", url: "exam_mechanical_engineer.html" }, // ✅ เพิ่มใหม่
+  { label: "วิศวกรเครื่องกล", labelEn: "Mechanical Engineer", url: "exam_Mechanical_engineer.html" }, // ✅ เพิ่มใหม่
   { label: "ช่างไฟฟ้า", labelEn: "Electrician", url: "exam-electrician.html" },
   { label: "วิศวกร", labelEn: "Engineer", url: "exam-engineer.html" },
   { label: "บริการ / Service", labelEn: "Service", url: "exam-service.html" },
