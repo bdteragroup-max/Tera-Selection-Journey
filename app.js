@@ -3,7 +3,7 @@ const $ = (id) => document.getElementById(id);
 
 /** วาง URL /exec จาก Deploy ของ Apps Script */
 const SCRIPT_URL =
- "https://script.google.com/macros/s/AKfycbxMgMAZHS2kAiQ2xdbvMkcmok5WERh-2uJtD_UYK43Jz1doQ6uXj4jp83huR-ohB1M/exec";
+"https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
 
 /* ===== i18n / Language Toggle ===== */
 let currentLang = "th";
