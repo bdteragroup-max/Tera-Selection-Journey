@@ -386,6 +386,7 @@ const EXAM_CHOICES = [
   { label: "วิศวกร", labelEn: "Engineer", url: "exam-engineer.html" },
   { label: "บริการ / Service", labelEn: "Service", url: "exam-service.html" },
   { label: "คลังสินค้า / Logistic", labelEn: "Warehouse / Logistics", url: "exam-warehouse-logistics.html" },
+  { label: "โฟร์แมน / หัวหน้างาน", labelEn: "Foreman / Site Supervisor", url: "exam_foreman.html" },
 ];
 
 
