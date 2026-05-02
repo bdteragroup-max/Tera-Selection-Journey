@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Foreman Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        /* Track picker */
+        .track-picker-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.5rem 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .track-picker-card h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #f1c40f;
+            margin-bottom: 0.6rem;
+        }
+
+        .track-picker-card p {
+            opacity: 0.75;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .track-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 520px) {
+            .track-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .track-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.8rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .track-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .track-btn small {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 400;
+            opacity: 0.6;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง โฟร์แมน / หัวหน้างาน</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <!-- Track Picker -->
+        <div id="trackPicker">
+            <div class="track-picker-card">
+                <h2 id="pickTitle">กรุณาเลือกสายงาน</h2>
+                <p id="pickDesc">เลือกชุดข้อสอบให้ตรงกับตำแหน่งที่สมัคร</p>
+                <div class="track-grid">
+                    <button class="track-btn" onclick="startExam('civil')">
+                        <span id="civilLabel">สายงานโยธา</span>
+                        <small id="civilSub">Civil Foreman</small>
+                    </button>
+                    <button class="track-btn" onclick="startExam('electrical')">
+                        <span id="elecLabel">สายงานไฟฟ้า</span>
+                        <small id="elecSub">Electrical Foreman</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions rendered here -->
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "EN",
+                pageTitle: "แบบทดสอบตำแหน่ง โฟร์แมน / หัวหน้างาน",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                pickTitle: "กรุณาเลือกสายงาน",
+                pickDesc: "เลือกชุดข้อสอบให้ตรงกับตำแหน่งที่สมัคร",
+                civilLabel: "สายงานโยธา",
+                elecLabel: "สายงานไฟฟ้า",
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "TH",
+                pageTitle: "Assessment: Foreman / Site Supervisor",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                pickTitle: "Please Select a Track",
+                pickDesc: "Choose the exam set that matches your applied position.",
+                civilLabel: "Civil Works",
+                elecLabel: "Electrical Works",
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const QUESTIONS = {
+            civil: [
+                { q: "1. คอนกรีตกำลังอัดต่ำกว่ามาตรฐาน ควรทำอย่างไร", qEn: "1. Concrete compressive strength is below standard. What should you do?", options: ["ก. ใช้งานต่อ", "ข. ทุบออก", "ค. Core Test เพิ่ม", "ง. ทาสี"], optionsEn: ["A. Continue using it", "B. Break it out", "C. Conduct additional Core Tests", "D. Apply paint"], ans: 2 },
+                { q: "2. Slump สูงเกินไป ส่งผลอย่างไร", qEn: "2. What is the effect of excessively high slump?", options: ["ก. แข็งแรงขึ้น", "ข. กำลังอัดลด", "ค. ไม่มีผล", "ง. แข็งตัวเร็ว"], optionsEn: ["A. Increased strength", "B. Reduced compressive strength", "C. No effect", "D. Sets faster"], ans: 1 },
+                { q: "3. Honeycomb เกิดจากอะไร", qEn: "3. What causes honeycombing in concrete?", options: ["ก. ปูนแข็งเร็ว", "ข. อัดแน่นไม่ดี", "ค. น้ำมาก", "ง. เทช้า"], optionsEn: ["A. Cement sets too fast", "B. Poor compaction", "C. Excess water", "D. Slow pouring"], ans: 1 },
+                { q: "4. Cover ไม่พอ ส่งผล", qEn: "4. Insufficient concrete cover results in:", options: ["ก. สีไม่สวย", "ข. เหล็กเป็นสนิม", "ค. แข็งแรงขึ้น", "ง. เทยาก"], optionsEn: ["A. Poor appearance", "B. Rebar corrosion", "C. Increased strength", "D. Difficult to pour"], ans: 1 },
+                { q: "5. การบ่มคอนกรีตสำคัญช่วงใด", qEn: "5. When is concrete curing most critical?", options: ["ก. ก่อนเท", "ข. 1–3 วันแรก", "ค. 28 วัน", "ง. หลังขัด"], optionsEn: ["A. Before pouring", "B. First 1–3 days", "C. At 28 days", "D. After polishing"], ans: 1 },
+                { q: "6. เหล็กเสริมวางผิดตำแหน่ง ส่งผล", qEn: "6. Misplaced rebar results in:", options: ["ก. ไม่มีผล", "ข. รับแรงผิด", "ค. งานเร็ว", "ง. ประหยัด"], optionsEn: ["A. No effect", "B. Incorrect load distribution", "C. Faster work", "D. Cost savings"], ans: 1 },
+                { q: "7. แบบหล่อโก่ง ควร", qEn: "7. If formwork deflects or bows, you should:", options: ["ก. เทต่อ", "ข. หยุดเสริมค้ำ", "ค. เพิ่มน้ำ", "ง. ลดคน"], optionsEn: ["A. Continue pouring", "B. Stop and add bracing", "C. Add more water", "D. Reduce workers"], ans: 1 },
+                { q: "8. Soil Settlement ส่งผล", qEn: "8. Soil settlement causes:", options: ["ก. สี", "ข. โครงสร้างทรุด", "ค. เวลา", "ง. ค่าแรง"], optionsEn: ["A. Colour issues", "B. Structural settlement", "C. Time delays", "D. Labour cost increase"], ans: 1 },
+                { q: "9. วิธีวัดระดับแม่นยำ", qEn: "9. The most accurate method for leveling is:", options: ["ก. สายตา", "ข. เชือก", "ค. เครื่อง Level", "ง. ไม้"], optionsEn: ["A. By eye", "B. String line", "C. Level instrument", "D. Timber"], ans: 2 },
+                { q: "10. งานล่าช้าเพราะฝน ควร", qEn: "10. Work is delayed due to rain. You should:", options: ["ก. หยุด", "ข. ปรับแผน", "ค. เร่ง", "ง. ลดคุณภาพ"], optionsEn: ["A. Stop all work", "B. Adjust the schedule", "C. Rush the work", "D. Reduce quality"], ans: 1 },
+                { q: "11. Slab แตก Hairline เกิดจาก", qEn: "11. Hairline cracks in a slab are caused by:", options: ["ก. เหล็กเยอะ", "ข. หดตัว", "ค. น้ำมาก", "ง. เทเร็ว"], optionsEn: ["A. Too much rebar", "B. Shrinkage", "C. Excess water", "D. Pouring too fast"], ans: 1 },
+                { q: "12. Formwork ไม่แข็งแรง ส่งผล", qEn: "12. Weak formwork results in:", options: ["ก. สี", "ข. รูปร่างผิด", "ค. เวลา", "ง. ค่าแรง"], optionsEn: ["A. Colour issues", "B. Dimensional inaccuracy", "C. Time loss", "D. Labour cost increase"], ans: 1 },
+                { q: "13. งานดินอ่อน ควรแก้ไข", qEn: "13. When working on soft soil, you should:", options: ["ก. เททันที", "ข. ปรับปรุงดิน", "ค. ลดเหล็ก", "ง. เพิ่มน้ำ"], optionsEn: ["A. Pour immediately", "B. Improve the soil", "C. Reduce rebar", "D. Add more water"], ans: 1 },
+                { q: "14. Rebar สนิม ควร", qEn: "14. Rusted rebar should be:", options: ["ก. ใช้ได้", "ข. ทำความสะอาด", "ค. ทิ้ง", "ง. ทาสี"], optionsEn: ["A. Used as-is", "B. Cleaned thoroughly", "C. Discarded", "D. Painted"], ans: 1 },
+                { q: "15. Concrete Segregation เกิดจาก", qEn: "15. Concrete segregation is caused by:", options: ["ก. เทถูก", "ข. เทสูงเกิน", "ค. บ่มดี", "ง. อัดดี"], optionsEn: ["A. Correct pouring method", "B. Pouring from excessive height", "C. Good curing", "D. Good compaction"], ans: 1 },
+                { q: "16. การตั้งแนวเสาใช้เครื่องมือใด", qEn: "16. Which tool is used to set column alignment?", options: ["ก. เชือก", "ข. ลูกดิ่ง", "ค. Level", "ง. ไม้"], optionsEn: ["A. String line", "B. Plumb bob", "C. Level instrument", "D. Timber"], ans: 1 },
+                { q: "17. Curing ไม่ดี ส่งผล", qEn: "17. Poor curing results in:", options: ["ก. แข็งแรงขึ้น", "ข. แตกร้าว", "ค. สีสวย", "ง. ไม่มีผล"], optionsEn: ["A. Increased strength", "B. Cracking", "C. Better appearance", "D. No effect"], ans: 1 },
+                { q: "18. Concrete Set ช้า เพราะ", qEn: "18. Slow concrete setting is caused by:", options: ["ก. ร้อน", "ข. เย็น", "ค. น้ำมาก", "ง. ถูกทุกข้อ"], optionsEn: ["A. Hot weather", "B. Cold weather", "C. Excess water", "D. All of the above"], ans: 3 },
+                { q: "19. เทคอนกรีตช่วงฝน ต้อง", qEn: "19. When pouring concrete during rain, you must:", options: ["ก. เทเลย", "ข. ป้องกันน้ำ", "ค. เร่ง", "ง. ลดคน"], optionsEn: ["A. Pour immediately", "B. Protect against water ingress", "C. Rush the work", "D. Reduce workers"], ans: 1 },
+                { q: "20. ตรวจคุณภาพหน้างานใช้", qEn: "20. Site quality inspection should be based on:", options: ["ก. ความรู้สึก", "ข. มาตรฐาน", "ค. เวลา", "ง. คนงาน"], optionsEn: ["A. Feeling", "B. Standards", "C. Time", "D. Workers"], ans: 1 }
+            ],
+            electrical: [
+                { q: "1. เลือกสายไฟดูจาก", qEn: "1. Cable selection is based on:", options: ["ก. สี", "ข. กระแส", "ค. ราคา", "ง. ความยาว"], optionsEn: ["A. Colour", "B. Current rating", "C. Price", "D. Length"], ans: 1 },
+                { q: "2. สายไฟร้อนเพราะ", qEn: "2. Cable overheating is caused by:", options: ["ก. แรงดัน", "ข. กระแสเกิน", "ค. สี", "ง. ยาว"], optionsEn: ["A. Voltage", "B. Overcurrent", "C. Colour", "D. Length"], ans: 1 },
+                { q: "3. MCCB ใช้", qEn: "3. An MCCB is used for:", options: ["ก. วัด", "ข. ป้องกัน", "ค. เพิ่มไฟ", "ง. ลดไฟ"], optionsEn: ["A. Measurement", "B. Protection", "C. Increasing power", "D. Reducing power"], ans: 1 },
+                { q: "4. Grounding มีหน้าที่", qEn: "4. The function of grounding is:", options: ["ก. เพิ่มแรงดัน", "ข. ป้องกันไฟดูด", "ค. ลดไฟ", "ง. เพิ่มโหลด"], optionsEn: ["A. Increase voltage", "B. Prevent electric shock", "C. Reduce power", "D. Increase load"], ans: 1 },
+                { q: "5. LOTO ใช้เมื่อ", qEn: "5. LOTO is applied when:", options: ["ก. ทำงานทั่วไป", "ข. ซ่อม", "ค. ตรวจ", "ง. เปิด"], optionsEn: ["A. General work", "B. Repair / Maintenance", "C. Inspection", "D. Starting up"], ans: 1 },
+                { q: "6. PF ต่ำ ส่งผล", qEn: "6. Low power factor results in:", options: ["ก. ค่าไฟลด", "ข. ค่าไฟเพิ่ม", "ค. ไม่มี", "ง. ไฟแรง"], optionsEn: ["A. Lower electricity bill", "B. Higher electricity bill", "C. No effect", "D. Higher voltage"], ans: 1 },
+                { q: "7. Overload คือ", qEn: "7. Overload is defined as:", options: ["ก. ไฟตก", "ข. กระแสเกิน", "ค. แรงดันสูง", "ง. ไฟรั่ว"], optionsEn: ["A. Voltage drop", "B. Excess current", "C. High voltage", "D. Current leakage"], ans: 1 },
+                { q: "8. Short Circuit คือ", qEn: "8. A short circuit is:", options: ["ก. ไฟตก", "ข. กระแสสูงมาก", "ค. แรงดันต่ำ", "ง. ไม่มี"], optionsEn: ["A. Voltage drop", "B. Extremely high current", "C. Low voltage", "D. None of the above"], ans: 1 },
+                { q: "9. ELCB ใช้", qEn: "9. An ELCB is used for:", options: ["ก. ป้องกันลัดวงจร", "ข. ป้องกันไฟรั่ว", "ค. วัดไฟ", "ง. ลดโหลด"], optionsEn: ["A. Short-circuit protection", "B. Leakage current protection", "C. Power measurement", "D. Load reduction"], ans: 1 },
+                { q: "10. Fuse ทำงานเมื่อ", qEn: "10. A fuse operates when:", options: ["ก. ไฟตก", "ข. กระแสเกิน", "ค. โหลดต่ำ", "ง. ปกติ"], optionsEn: ["A. Voltage drops", "B. Current exceeds rating", "C. Load is low", "D. Normal operation"], ans: 1 },
+                { q: "11. Voltage Drop เกิดจาก", qEn: "11. Voltage drop is caused by:", options: ["ก. สั้น", "ข. ยาว", "ค. สี", "ง. คน"], optionsEn: ["A. Short cable", "B. Long cable", "C. Colour", "D. Personnel"], ans: 1 },
+                { q: "12. Cable Size ต้อง", qEn: "12. Cable size must be:", options: ["ก. เท่ากัน", "ข. มากกว่าโหลด", "ค. น้อยกว่า", "ง. เท่าเดิม"], optionsEn: ["A. Equal to load", "B. Greater than the load", "C. Less than the load", "D. The same as before"], ans: 1 },
+                { q: "13. Earthing ไม่ดี ส่งผล", qEn: "13. Poor earthing results in:", options: ["ก. ไม่มี", "ข. อันตราย", "ค. ประหยัด", "ง. เร็ว"], optionsEn: ["A. No effect", "B. Danger / hazard", "C. Cost savings", "D. Faster work"], ans: 1 },
+                { q: "14. Panel ร้อนผิดปกติ เพราะ", qEn: "14. Abnormal panel overheating is due to:", options: ["ก. โหลดต่ำ", "ข. โหลดเกิน", "ค. สี", "ง. อากาศ"], optionsEn: ["A. Low load", "B. Overload", "C. Colour", "D. Ambient temperature"], ans: 1 },
+                { q: "15. Relay ใช้", qEn: "15. A relay is used for:", options: ["ก. ตัดวงจร", "ข. ควบคุม", "ค. เพิ่มไฟ", "ง. ลดไฟ"], optionsEn: ["A. Circuit breaking", "B. Control", "C. Increasing power", "D. Reducing power"], ans: 1 },
+                { q: "16. Transformer ทำหน้าที่", qEn: "16. A transformer functions to:", options: ["ก. เพิ่ม/ลดแรงดัน", "ข. เพิ่มกระแส", "ค. ลดโหลด", "ง. วัดไฟ"], optionsEn: ["A. Step voltage up/down", "B. Increase current", "C. Reduce load", "D. Measure power"], ans: 0 },
+                { q: "17. Insulation เสีย ส่งผล", qEn: "17. Failed insulation results in:", options: ["ก. ไม่มี", "ข. ลัดวงจร", "ค. เร็ว", "ง. ถูก"], optionsEn: ["A. No effect", "B. Short circuit", "C. Faster work", "D. Lower cost"], ans: 1 },
+                { q: "18. Circuit Breaker ทำงานเมื่อ", qEn: "18. A circuit breaker trips when:", options: ["ก. ปกติ", "ข. Overcurrent", "ค. โหลดต่ำ", "ง. สี"], optionsEn: ["A. Normal operation", "B. Overcurrent", "C. Low load", "D. Colour change"], ans: 1 },
+                { q: "19. Motor กระแสสูงเพราะ", qEn: "19. High motor current is caused by:", options: ["ก. โหลดต่ำ", "ข. โหลดเกิน", "ค. สี", "ง. อากาศ"], optionsEn: ["A. Low load", "B. Overload", "C. Colour", "D. Ambient temperature"], ans: 1 },
+                { q: "20. Safety ไฟฟ้าสำคัญที่สุดคือ", qEn: "20. The most critical electrical safety measure is:", options: ["ก. เร็ว", "ข. PPE", "ค. ราคา", "ง. คน"], optionsEn: ["A. Speed", "B. Personal Protective Equipment (PPE)", "C. Cost", "D. Personnel"], ans: 1 }
+            ]
+        };
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Foreman';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentTrack = null;
+        let currentStep = 0;
+        let userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            document.getElementById('pickTitle').textContent = t.pickTitle;
+            document.getElementById('pickDesc').textContent = t.pickDesc;
+            document.getElementById('civilLabel').textContent = t.civilLabel;
+            document.getElementById('elecLabel').textContent = t.elecLabel;
+            if (currentTrack) renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+        };
+
+        function startExam(track) {
+            currentTrack = track;
+            currentStep = 0;
+            userAnswers = [];
+            document.getElementById('trackPicker').style.display = 'none';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = QUESTIONS[currentTrack][currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="progress-text">${t.progress(currentStep + 1, QUESTIONS[currentTrack].length)}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = QUESTIONS[currentTrack][currentStep];
+
+            userAnswers.push({
+                q: item.q,
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            if (currentStep < QUESTIONS[currentTrack].length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            const qs = QUESTIONS[currentTrack];
+            let score = 0;
+            const payload = {
+                targetTab: `Foreman-${currentTrack}`,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                track: currentTrack,
+                answersCount: qs.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = qs[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 14 ? "ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "พิจารณาพิเศษ" : "ไม่ผ่าน");
+            payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">&#10003;</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
