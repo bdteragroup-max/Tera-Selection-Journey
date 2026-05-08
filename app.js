@@ -383,7 +383,7 @@ const EXAM_CHOICES = [
   { label: "วิศวกรไฟฟ้า", labelEn: "Electrical Engineer", url: "exam_electrical_engineer.html" },
   { label: "วิศวกรเครื่องกล", labelEn: "Mechanical Engineer", url: "exam_Mechanical_engineer.html" }, // ✅ เพิ่มใหม่
   { label: "ช่างไฟฟ้า", labelEn: "Electrician", url: "exam-electrician.html" },
-  { label: "วิศวกร", labelEn: "Engineer", url: "exam-engineer.html" },
+  { label: "Project Engineer", labelEn: "Engineer", url: "exam-engineer.html" },
   { label: "บริการ / Service", labelEn: "Service", url: "exam-service.html" },
   { label: "คลังสินค้า / Logistic", labelEn: "Warehouse / Logistics", url: "exam-warehouse-logistics.html" },
   { label: "โฟร์แมน / หัวหน้างาน", labelEn: "Foreman / Site Supervisor", url: "exam_foreman.html" },
