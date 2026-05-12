@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Executive Driver Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .btn-next {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-next:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .manager-tag {
+            display: inline-block;
+            background: #2c3e50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">Assessment: พนักงานขับรถผู้บริหาร</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "Assessment: พนักงานขับรถผู้บริหาร",
+                userInfo: (name, pos) => `ผู้สมัคร: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                tagChoice: "Executive Driver Competency",
+                saving: "กำลังบันทึกบททดสอบ...",
+                savingDesc: "กรุณารอสักครู่ ระบบกำลังนำส่งคำตอบของคุณเข้าสู่ระบบคัดเลือก",
+                modalIcon: "✅",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Executive Driver",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                tagChoice: "Executive Driver Competency",
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalIcon: "✅",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            {
+                type: "choice",
+                q: '1. ผู้บริหารแจ้งเปลี่ยนเส้นทางกะทันหันไปพบลูกค้าสำคัญ ซึ่งเส้นทางใหม่มีความเสี่ยงรถติดสูง คนขับควรทำสิ่งใด "ดีที่สุด"',
+                qEn: "1. An executive suddenly changes the route to meet an important client, and the new route has a high risk of traffic congestion. What is the best thing the driver should do?",
+                options: ["ก. ขับเส้นเดิมเพราะคุ้นเคย", "ข. ใช้ GPS อย่างเดียว", "ค. ประเมินเวลา เส้นทางสำรอง และแจ้งผลกระทบล่วงหน้า", "ง. เร่งความเร็วเพื่อชดเชยเวลา"],
+                optionsEn: ["A. Take the usual route because it's familiar.", "B. Rely solely on GPS.", "C. Assess travel time, prepare alternative routes, and inform the executive of potential impacts in advance.", "D. Speed up to compensate for lost time."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "2. ระหว่างรอผู้บริหาร คนขับได้ยินข้อมูลธุรกิจสำคัญจากการประชุม สิ่งใดเหมาะสมที่สุด",
+                qEn: "2. While waiting for the executive, the driver overhears important business information from a meeting. What is the most appropriate action?",
+                options: ["ก. เก็บไว้เล่าเฉพาะคนสนิท", "ข. บอกเฉพาะคนในบริษัท", "ค. ถือเป็นข้อมูลลับและไม่เปิดเผย", "ง. แชร์เฉพาะเรื่องที่ไม่น่ามีผลกระทบ"],
+                optionsEn: ["A. Share it only with close friends.", "B. Tell only people within the company.", "C. Treat it as confidential and do not disclose it.", "D. Share only information that seems harmless."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "3. หากผู้บริหารมีอาการเครียดหนักและสั่งการด้วยอารมณ์ คนขับควรวางตัวอย่างไร",
+                qEn: "3. If the executive is highly stressed and gives instructions emotionally, how should the driver conduct themselves?",
+                options: ["ก. โต้ตอบเพื่ออธิบายเหตุผล", "ข. เงียบผิดปกติจนไม่ตอบสนอง", "ค. รับคำสั่งอย่างสุภาพและควบคุมอารมณ์ตนเอง", "ง. แสดงความคิดเห็นเรื่องอารมณ์ผู้บริหาร"],
+                optionsEn: ["A. Argue back to explain their reasoning.", "B. Go unusually silent and unresponsive.", "C. Accept instructions politely and maintain emotional self-control.", "D. Comment on the executive's emotional state."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "4. คนขับสังเกตว่ามีรถติดตามต่อเนื่องหลายจุดผิดปกติ สิ่งที่ควรทำที่สุดคืออะไร",
+                qEn: "4. The driver notices a vehicle following them suspiciously through multiple turns. What is the best course of action?",
+                options: ["ก. ขับเร็วหนีทันที", "ข. จอดเผชิญหน้า", "ค. เปลี่ยนเส้นทางไปจุดปลอดภัยและแจ้งผู้บริหาร", "ง. ถ่ายรูปทะเบียนรถไว้ก่อน"],
+                optionsEn: ["A. Speed away immediately.", "B. Pull over and confront them.", "C. Change route to a safe location and inform the executive.", "D. Take a photo of the licence plate first."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "5. หากผู้บริหารลืมโทรศัพท์ไว้ในรถ และมีสายเข้าอย่างต่อเนื่อง คนขับควรทำอย่างไร",
+                qEn: "5. If the executive leaves their phone in the car and it keeps ringing, what should the driver do?",
+                options: ["ก. รับสายแทน", "ข. ปิดเครื่อง", "ค. เก็บรักษาและส่งคืนโดยไม่เข้าถึงข้อมูล", "ง. เปิดดูว่าใครโทรมา"],
+                optionsEn: ["A. Answer the calls.", "B. Turn off the phone.", "C. Safeguard it and return it without accessing any information.", "D. Check who is calling."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: 'ข้อใดสะท้อน "Professional Executive Driver" มากที่สุด',
+                qEn: '6. Which best reflects a "Professional Executive Driver"?',
+                options: ["ก. ขับเร็วแต่ถึงตรงเวลา", "ข. พูดเก่งและสนิทกับผู้บริหาร", "ค. คาดการณ์ปัญหาล่วงหน้าและลดผลกระทบได้", "ง. รู้จักเส้นทางลัดจำนวนมาก"],
+                optionsEn: ["A. Drives fast but arrives on time.", "B. Is talkative and builds rapport with executives.", "C. Anticipates problems in advance and mitigates their impact.", "D. Knows many shortcut routes."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "7. หากรถเสียระหว่างทางไปสนามบิน และเวลาจำกัดมาก สิ่งใดคือการตัดสินใจที่ดีที่สุด",
+                qEn: "7. If the car breaks down on the way to the airport with very limited time, what is the best decision?",
+                options: ["ก. ซ่อมเองทันที", "ข. รอประกันโดยไม่แจ้งใคร", "ค. ประเมินทางเลือกสำรอง เช่น รถสำรอง/แท็กซี่ พร้อมแจ้งผู้บริหาร", "ง. ให้ผู้บริหารจัดการเอง"],
+                optionsEn: ["A. Try to fix it yourself immediately.", "B. Wait for insurance without informing anyone.", "C. Assess backup options such as a spare car or taxi and inform the executive.", "D. Let the executive handle it themselves."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: '8. สิ่งใดเป็น "ความเสี่ยงสูงสุด" ของพนักงานขับรถผู้บริหาร',
+                qEn: '8. What is the "highest risk" for an executive driver?',
+                options: ["ก. ไม่รู้ทาง", "ข. บุคลิกเงียบเกินไป", "ค. ขาดวินัยและการตัดสินใจภายใต้แรงกดดัน", "ง. แต่งกายธรรมดา"],
+                optionsEn: ["A. Not knowing the route.", "B. Being too quiet.", "C. Lacking discipline and the ability to make decisions under pressure.", "D. Dressing plainly."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "9. หากผู้บริหารขอให้ขับฝ่าไฟเหลือง/แดงเพราะรีบมาก คนขับควรทำอย่างไร",
+                qEn: "9. If the executive asks you to run a yellow/red light because they are in a rush, what should the driver do?",
+                options: ["ก. ทำตามเพื่อรักษาความพอใจ", "ข. ปฏิเสธอย่างสุภาพและยึดความปลอดภัย", "ค. ขับเร็วเฉพาะช่วงไม่มีตำรวจ", "ง. เปิดไฟฉุกเฉินแทน"],
+                optionsEn: ["A. Comply to keep the executive satisfied.", "B. Politely decline and prioritise safety.", "C. Speed up only when there are no police around.", "D. Turn on hazard lights instead."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "10. ผู้บริหารมักโทรศัพท์ประชุมบนรถตลอดเวลา คนขับควรใส่ใจสิ่งใดมากที่สุด",
+                qEn: "10. The executive frequently takes conference calls in the car. What should the driver pay most attention to?",
+                options: ["ก. ความเร็ว", "ข. ความเงียบ ความนุ่มนวล และความเป็นส่วนตัว", "ค. การพูดคุยสร้างบรรยากาศ", "ง. เปิดเพลงลดความเครียด"],
+                optionsEn: ["A. Speed.", "B. Quietness, smooth driving, and privacy.", "C. Making conversation to create a pleasant atmosphere.", "D. Playing music to reduce stress."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "11. หากเกิดอุบัติเหตุเล็กน้อย แต่ผู้บริหารมีประชุมสำคัญมาก คนขับควรทำอย่างไร",
+                qEn: "11. If a minor accident occurs but the executive has a very important meeting, what should the driver do?",
+                options: ["ก. ขับต่อโดยไม่สนใจเหตุการณ์", "ข. ให้คู่กรณีรอ", "ค. จัดลำดับความปลอดภัย ประสานงาน และหาทางให้ผู้บริหารไปต่อได้", "ง. ยกเลิกทุกแผนทันที"],
+                optionsEn: ["A. Drive on and ignore the incident.", "B. Ask the other party to wait.", "C. Prioritise safety, coordinate with relevant parties, and find a way for the executive to continue.", "D. Cancel all plans immediately."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: '12. สิ่งใดแสดงถึง "การเตรียมพร้อมเชิงรุก" ของคนขับผู้บริหาร',
+                qEn: '12. What demonstrates "proactive readiness" in an executive driver?',
+                options: ["ก. เติมน้ำมันเมื่อใกล้หมด", "ข. ตรวจรถเฉพาะก่อนเดินทางไกล", "ค. วางแผนเส้นทาง สภาพจราจร และจุดเสี่ยงล่วงหน้า", "ง. รอคำสั่งก่อนทุกครั้ง"],
+                optionsEn: ["A. Refuelling only when nearly empty.", "B. Inspecting the car only before long trips.", "C. Planning routes, traffic conditions, and risk points in advance.", "D. Waiting for instructions every time."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "13. หากผู้บริหารชอบเปลี่ยนกำหนดการแบบกะทันหัน คนขับที่มีประสิทธิภาพควรมีทักษะใดมากที่สุด",
+                qEn: "13. If the executive frequently changes plans at short notice, which skill is most important for an effective driver?",
+                options: ["ก. ความเร็วในการขับ", "ข. การจำเส้นทาง", "ค. Adaptability และ Time Management", "ง. การพูดคุยเก่ง"],
+                optionsEn: ["A. Driving speed.", "B. Route memorisation.", "C. Adaptability and Time Management.", "D. Conversational skills."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "14. หากมีบุคคลพยายามติดสินบนคนขับเพื่อขอข้อมูลผู้บริหาร สิ่งใดถูกต้องที่สุด",
+                qEn: "14. If someone attempts to bribe the driver for information about the executive, what is the correct response?",
+                options: ["ก. รับไว้ก่อนแล้วค่อยปฏิเสธ", "ข. ให้ข้อมูลบางส่วนที่ไม่สำคัญ", "ค. ปฏิเสธและรักษาความลับอย่างเด็ดขาด", "ง. ขอปรึกษาเพื่อนร่วมงานก่อน"],
+                optionsEn: ["A. Accept it first and decline later.", "B. Provide some non-critical information.", "C. Firmly refuse and maintain strict confidentiality.", "D. Consult a colleague first."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: '15. คนขับที่ "ขับรถดี" แต่ผู้บริหารไม่ไว้วางใจ มักเกิดจากปัญหาใดมากที่สุด',
+                qEn: '15. A driver who "drives well" but is not trusted by the executive — what is the most likely cause?',
+                options: ["ก. ขับช้าเกินไป", "ข. ขาด Professional Conduct และ Confidentiality", "ค. ใช้ GPS ไม่เก่ง", "ง. ไม่รู้เส้นทางลัด"],
+                optionsEn: ["A. Driving too slowly.", "B. Lacking Professional Conduct and Confidentiality.", "C. Poor GPS skills.", "D. Not knowing shortcut routes."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "16. หากคนขับเริ่มมีอาการอ่อนล้าระหว่างเดินทางกลางคืน สิ่งใดคือ Professional Decision",
+                qEn: "16. If the driver starts feeling fatigued during a night journey, what is the Professional Decision?",
+                options: ["ก. ฝืนขับต่อให้ถึง", "ข. ดื่มกาแฟอย่างเดียว", "ค. แจ้งและหาวิธีพักอย่างปลอดภัย", "ง. เปิดเพลงเสียงดัง"],
+                optionsEn: ["A. Push through and keep driving.", "B. Only drink coffee.", "C. Inform the executive and find a safe way to rest.", "D. Turn up the music."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: 'ข้อใดสะท้อน "Mindset ของ Executive Driver" มากที่สุด',
+                qEn: '17. Which best reflects the "Mindset of an Executive Driver"?',
+                options: ["ก. ทำหน้าที่ขับรถเท่านั้น", "ข. รับคำสั่งทุกอย่างโดยไม่คิด", "ค. สนับสนุนภารกิจผู้บริหารอย่างปลอดภัยและเป็นมืออาชีพ", "ง. พยายามสนิทกับผู้บริหารให้มากที่สุด"],
+                optionsEn: ["A. Only fulfil the role of driving.", "B. Follow every instruction without thinking.", "C. Support the executive's mission safely and professionally.", "D. Try to become as close to the executive as possible."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "18. หากผู้บริหารทำเอกสารสำคัญตกในรถหลังส่งลงสนามบิน คนขับควรทำอย่างไร",
+                qEn: "18. If the executive leaves important documents in the car after being dropped off at the airport, what should the driver do?",
+                options: ["ก. เปิดดูว่าเป็นอะไร", "ข. ส่งคืนตามช่องทางที่ปลอดภัยและรวดเร็ว", "ค. ฝากพนักงานสนามบิน", "ง. ถ่ายรูปส่งถามก่อน"],
+                optionsEn: ["A. Open and check what they are.", "B. Return them via a secure and prompt channel.", "C. Leave them with airport staff.", "D. Take a photo and ask first."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "19. หากมีเหตุชุมนุมหรือความไม่ปลอดภัยบนเส้นทาง คนขับควรตัดสินใจอย่างไร",
+                qEn: "19. If there is a protest or unsafe situation on the route, how should the driver decide?",
+                options: ["ก. ขับผ่านให้เร็วที่สุด", "ข. รอให้สถานการณ์สงบ", "ค. หลีกเลี่ยงพื้นที่เสี่ยงและเลือกเส้นทางปลอดภัย", "ง. ถามคนในพื้นที่ก่อน"],
+                optionsEn: ["A. Drive through as quickly as possible.", "B. Wait for the situation to calm down.", "C. Avoid the risky area and choose a safe route.", "D. Ask locals first."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "20. คุณสมบัติใดสำคัญที่สุดของพนักงานขับรถผู้บริหารระดับสูง",
+                qEn: "20. What is the most important quality of a senior executive driver?",
+                options: ["ก. ขับรถเร็ว", "ข. รู้จักผู้คนเยอะ", "ค. วุฒิภาวะ การรักษาความลับ และการตัดสินใจภายใต้แรงกดดัน", "ง. ใช้ GPS คล่อง"],
+                optionsEn: ["A. Driving fast.", "B. Knowing many people.", "C. Maturity, confidentiality, and decision-making under pressure.", "D. Fluency with GPS."],
+                ans: 2
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Executive_Driver';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+            const card = document.createElement('div');
+            card.className = 'q-card';
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            let html = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <div class="manager-tag">${t.tagChoice}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="processNext(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+
+            card.innerHTML = html;
+            container.appendChild(card);
+        }
+
+        async function processNext(choiceIndex) {
+            const item = questions[currentStep];
+
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                score: choiceIndex === item.ans ? 1 : 0
+            });
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.score === 1) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = String(ans.score);
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "🟢 ผ่านเกณฑ์ (โดดเด่น)" : (score >= 12 ? "🟡 พิจารณาเพิ่มเติม" : "🔴 ไม่ผ่านเกณฑ์ทางเทคนิค");
+
+            document.getElementById('modalIcon').textContent = t.modalIcon;
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div id="modalIcon" style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
