@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HR Manager Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .essay-area {
+            width: 100%;
+            min-height: 180px;
+            background: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            color: #2c3e50;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-next {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-next:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .manager-tag {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">Assessment: HR Manager</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "Assessment: HR Manager",
+                userInfo: (name, pos) => `ผู้สมัคร: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                tagChoice: "HR Management Competency",
+                tagEssay: "Vision & Essay",
+                essayPlaceholder: "เขียนอธิบายคำตอบของคุณที่นี่ (ยิ่งละเอียด ยิ่งดีต่อการพิจารณา)...",
+                btnSaveNext: "บันทึกและถัดไป",
+                alertEssay: "กรุณาพิมพ์คำตอบให้ชัดเจนก่อนไปข้อถัดไปครับ",
+                saving: "กำลังบันทึกบททดสอบ...",
+                savingDesc: "กรุณารอสักครู่ ระบบกำลังนำส่งคำตอบและ Essay ของคุณเข้าสู่ระบบคัดเลือก",
+                modalIcon: "✅",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: HR Manager",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                tagChoice: "HR Management Competency",
+                tagEssay: "Vision & Essay",
+                essayPlaceholder: "Write your answer here. The more detail you provide, the better it reflects your thinking...",
+                btnSaveNext: "Save & Continue",
+                alertEssay: "Please provide a more detailed answer before continuing.",
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers and essays to our selection system.",
+                modalIcon: "✅",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            {
+                type: "choice",
+                q: "1. หากบริษัทต้องการลด Turnover Rate อย่างเร่งด่วน สิ่งแรกที่ HR Manager ควรทำคือ?",
+                qEn: "1. If the company urgently needs to reduce its Turnover Rate, what should the HR Manager do first?",
+                options: ["ก. ขึ้นเงินเดือนให้ทุกคนทันที", "ข. ทำ Exit Interview และวิเคราะห์ Data เพื่อหา Root Cause", "ค. จัดกิจกรรม Outing เพื่อสร้างความสุข", "ง. รับสมัครพนักงานใหม่เพิ่มเพื่อทดแทนคนเก่า"],
+                optionsEn: ["A. Give everyone an immediate salary increase.", "B. Conduct Exit Interviews and analyse data to identify the Root Cause.", "C. Organise an outing activity to boost happiness.", "D. Recruit more new employees to replace those who left."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "2. ข้อใดคือความแตกต่างหลักระหว่าง KPI และ OKRs?",
+                qEn: "2. What is the main difference between KPIs and OKRs?",
+                options: ["ก. KPI เน้นผลลัพธ์ตามเป้าหมาย (Output), OKRs เน้นความท้าทายและการขับเคลื่อน (Outcome)", "ข. KPI ใช้เฉพาะกับระดับล่าง, OKRs ใช้เฉพาะระดับบริหาร", "ค. KPI วัดผลรายปีเท่านั้น, OKRs วัดผลรายวัน", "ง. ไม่มีความแตกต่างกัน"],
+                optionsEn: ["A. KPIs focus on output against targets, while OKRs focus on challenging outcomes and driving progress.", "B. KPIs are only for lower-level staff; OKRs are only for management.", "C. KPIs are measured annually only; OKRs are measured daily.", "D. There is no difference between them."],
+                ans: 0
+            },
+            {
+                type: "choice",
+                q: "3. การวางแผนสืบทอดตำแหน่ง (Succession Planning) ควรเน้นที่กลุ่มใดเป็นหลัก?",
+                qEn: "3. Succession Planning should primarily focus on which group?",
+                options: ["ก. พนักงานที่อยู่นานที่สุด", "ข. พนักงานทุกคนในบริษัท", "ค. กลุ่มคนที่มีศักยภาพสูง (High Potential) และตำแหน่งวิกฤต", "ง. พนักงานที่มีความใกล้ชิดกับผู้บริหาร"],
+                optionsEn: ["A. Employees with the longest tenure.", "B. Every employee in the company.", "C. High-Potential individuals and those in critical positions.", "D. Employees who are closest to senior management."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "4. ตามกฎหมายแรงงานไทย หากเลิกจ้างพนักงานที่ทำงานมา 6 ปี โดยไม่มีความผิด ต้องจ่ายค่าชดเชยเท่าใด?",
+                qEn: "4. Under Thai labour law, if an employee who has worked for 6 years is terminated without cause, how much severance pay is required?",
+                options: ["ก. 90 วัน", "ข. 120 วัน", "ค. 180 วัน", "ง. 240 วัน"],
+                optionsEn: ["A. 90 days", "B. 120 days", "C. 180 days", "D. 240 days"],
+                ans: 3
+            },
+            {
+                type: "choice",
+                q: "5. Competency-Based Interview คือการสัมภาษณ์ที่เน้นเรื่องใด?",
+                qEn: "5. What does a Competency-Based Interview primarily focus on?",
+                options: ["ก. การคาดเดาพฤติกรรมในอนาคตจากทัศนคติ", "ข. การตรวจสอบหลักฐานการทำงานในอดีตเพื่อยืนยันความสามารถ", "ค. การถามคำถามเชิงจิตวิทยาที่ซับซ้อน", "ง. การดูบุคลิกภาพภายนอกเป็นหลัก"],
+                optionsEn: ["A. Predicting future behaviour based on attitudes.", "B. Examining past work evidence to verify competence.", "C. Asking complex psychological questions.", "D. Primarily assessing external appearance and personality."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "6. Employee Value Proposition (EVP) มีความสำคัญอย่างไร?",
+                qEn: "6. Why is the Employee Value Proposition (EVP) important?",
+                options: ["ก. ช่วยประหยัดงบประมาณการตลาด", "ข. สร้างภาพลักษณ์เพื่อดึงดูดและรักษาพนักงานที่มีความสามารถ", "ค. เป็นการกำหนดเกณฑ์การหักเงินเดือน", "ง. ถูกทุกข้อ"],
+                optionsEn: ["A. It helps save marketing budgets.", "B. It builds an employer brand to attract and retain talented employees.", "C. It sets the criteria for salary deductions.", "D. All of the above."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "7. การวิเคราะห์ ROI ในงาน HRD หมายถึงอะไร?",
+                qEn: "7. What does ROI analysis in HRD refer to?",
+                options: ["ก. การวัดความพึงพอใจหลังการอบรม", "ข. การวัดผลตอบแทนจากการลงทุนในการพัฒนาบุคลากรเทียบกับค่าใช้จ่าย", "ค. จำนวนพนักงานที่ผ่านการอบรม", "ง. เวลาที่ใช้ในการฝึกอบรม"],
+                optionsEn: ["A. Measuring satisfaction after training.", "B. Measuring the return on investment in people development compared to costs.", "C. The number of employees who completed training.", "D. The time spent on training programmes."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "8. หากเกิดความขัดแย้งระหว่างหัวหน้างานและลูกน้อง HR ควรมีบทบาทอย่างไร?",
+                qEn: "8. When conflict arises between a supervisor and a subordinate, what role should HR play?",
+                options: ["ก. เข้าข้างฝ่ายที่อาวุโสกว่า", "ข. เป็นตัวกลางในการไกล่เกลี่ยด้วยข้อมูลที่เป็นธรรม (Mediator)", "ค. ปล่อยให้ตกลงกันเองเพื่อไม่ให้ดูแทรกแซง", "ง. ออกใบเตือนทั้งสองฝ่าย"],
+                optionsEn: ["A. Side with the more senior party.", "B. Act as a fair Mediator using objective information.", "C. Let them resolve it themselves to avoid seeming intrusive.", "D. Issue warnings to both parties."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "9. Strategic HR ต่างจาก Traditional HR อย่างไร?",
+                qEn: "9. How does Strategic HR differ from Traditional HR?",
+                options: ["ก. เน้นงานเอกสารน้อยลง", "ข. เน้นการทำกิจกรรมสันทนาการมากขึ้น", "ค. เน้นการเชื่อมโยงการบริหารคนเข้ากับเป้าหมายทางธุรกิจ", "ง. เน้นการบังคับใช้กฎระเบียบที่เคร่งครัดขึ้น"],
+                optionsEn: ["A. It focuses less on paperwork.", "B. It focuses more on recreational activities.", "C. It aligns people management with business objectives.", "D. It enforces stricter rules and regulations."],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "10. ข้อใดคือเครื่องมือในการทำ Job Analysis ที่มีประสิทธิภาพที่สุด?",
+                qEn: "10. Which is the most effective tool for conducting a Job Analysis?",
+                options: ["ก. การนั่งเดาจากชื่อตำแหน่ง", "ข. การสัมภาษณ์ผู้ดำรงตำแหน่ง, การสังเกตการณ์ และการใช้แบบสอบถาม", "ค. การดู JD ของบริษัทคู่แข่งเพียงอย่างเดียว", "ง. การใช้ระบบ AI ทั้งหมดโดยไม่สอบทาน"],
+                optionsEn: ["A. Guessing based on the job title alone.", "B. Interviewing incumbents, conducting observations, and using questionnaires.", "C. Only reviewing competitor JDs.", "D. Using AI systems entirely without verification."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "11. หากพบว่าโครงสร้างเงินเดือนเริ่มไม่สามารถแข่งขันกับตลาดได้ สิ่งแรกที่คุณควรเสนอคือ?",
+                qEn: "11. If the salary structure is becoming uncompetitive, what should you propose first?",
+                options: ["ก. ปรับเงินเดือนพนักงานทุกคนขึ้น 10% ทันที", "ข. ทำการสำรวจค่าจ้าง (Salary Survey) เทียบกับกลุ่มอุตสาหกรรมเดียวกัน", "ค. เพิ่มสวัสดิการด้านสันทนาการแทนการขึ้นเงินเดือน", "ง. ยกเลิกการจ้างงานพนักงานที่มีเงินเดือนสูงเกินค่าเฉลี่ย"],
+                optionsEn: ["A. Give all employees a 10% raise immediately.", "B. Conduct a Salary Survey benchmarked against the same industry.", "C. Add recreational benefits instead of salary increases.", "D. Terminate employees whose salaries exceed the average."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: '12. การทำ "Human Resource Audit" มีวัตถุประสงค์หลักเพื่ออะไร?',
+                qEn: "12. What is the primary purpose of a Human Resource Audit?",
+                options: ["ก. ตรวจสอบว่าพนักงานมาทำงานสายหรือไม่", "ข. ประเมินประสิทธิภาพและความถูกต้องตามกฎหมายของนโยบายและกระบวนการ HR", "ค. ตรวจสอบการทุจริตทางการเงินของฝ่ายบัญชี", "ง. คัดเลือกพนักงานดีเด่นประจำปี"],
+                optionsEn: ["A. To check whether employees arrive late.", "B. To evaluate the effectiveness and legal compliance of HR policies and processes.", "C. To investigate financial fraud in the accounting department.", "D. To select the employee of the year."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "13. หากพนักงานทำผิดวินัยขั้นร้ายแรง บริษัทสามารถเลิกจ้างได้โดยไม่จ่ายค่าชดเชย ตามมาตราใด?",
+                qEn: "13. Under which section of the law can a company terminate an employee for serious misconduct without paying severance?",
+                options: ["ก. มาตรา 118", "ข. มาตรา 119", "ค. มาตรา 120", "ง. มาตรา 121"],
+                optionsEn: ["A. Section 118", "B. Section 119", "C. Section 120", "D. Section 121"],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: '14. เครื่องมือใดที่ช่วยระบุ "Successor" ที่มีศักยภาพสูงสุด?',
+                qEn: "14. Which tool best identifies the highest-potential Successor?",
+                options: ["ก. 9-Box Grid (Performance vs Potential)", "ข. SWOT Analysis", "ค. Balance Scorecard", "ง. PESTEL Analysis"],
+                optionsEn: ["A. 9-Box Grid (Performance vs Potential)", "B. SWOT Analysis", "C. Balanced Scorecard", "D. PESTEL Analysis"],
+                ans: 0
+            },
+            {
+                type: "choice",
+                q: "15. ในการคำนวณอัตราการลาออก (Turnover Rate) ข้อใดคือสูตรที่ถูกต้อง?",
+                qEn: "15. Which is the correct formula for calculating the Turnover Rate?",
+                options: ["ก. (จำนวนคนลาออก / จำนวนพนักงานทั้งหมด ณ ต้นเดือน) x 100", "ข. (จำนวนคนลาออก / จำนวนพนักงานเฉลี่ยในช่วงเวลานั้น) x 100", "ค. (จำนวนคนรับเข้า / จำนวนคนลาออก) x 100", "ง. จำนวนคนลาออกทั้งหมดในปีนั้น"],
+                optionsEn: ["A. (Number of leavers / Total employees at the start of the month) × 100", "B. (Number of leavers / Average number of employees during the period) × 100", "C. (Number of new hires / Number of leavers) × 100", "D. Total number of leavers in that year."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "16. พนักงานหญิงลาคลอดบุตร ตามกฎหมายได้รับสิทธิลาได้กี่วัน และได้รับค่าจ้างจากนายจ้างกี่วัน?",
+                qEn: "16. Under Thai law, how many days of maternity leave is a female employee entitled to, and how many days are paid by the employer?",
+                options: ["ก. ลาได้ 90 วัน ได้รับค่าจ้าง 90 วัน", "ข. ลาได้ 98 วัน ได้รับค่าจ้าง 45 วัน", "ค. ลาได้ 98 วัน ได้รับค่าจ้าง 98 วัน", "ง. ลาได้ 120 วัน ได้รับค่าจ้าง 60 วัน"],
+                optionsEn: ["A. 90 days leave, 90 days paid.", "B. 98 days leave, 45 days paid by employer.", "C. 98 days leave, 98 days paid.", "D. 120 days leave, 60 days paid."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: '17. ข้อใดคือหัวใจสำคัญของการทำ "Organization Development" (OD)?',
+                qEn: "17. What is the core essence of Organisation Development (OD)?",
+                options: ["ก. การจัดสัมมนาประจำปี", "ข. การเพิ่มประสิทธิภาพองค์กรผ่านการปรับปรุงระบบ พฤติกรรม และวัฒนธรรม", "ค. การเปลี่ยนตัวผู้บริหารระดับสูง", "ง. การลดจำนวนพนักงานเพื่อลดต้นทุน"],
+                optionsEn: ["A. Organising annual seminars.", "B. Enhancing organisational effectiveness through improvements in systems, behaviour, and culture.", "C. Replacing senior management.", "D. Reducing headcount to cut costs."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: '18. "Soft Skills" ที่สำคัญที่สุดสำหรับ HR Manager ในยุค Digital คือข้อใด?',
+                qEn: "18. Which Soft Skills are most important for an HR Manager in the Digital era?",
+                options: ["ก. ทักษะการพิมพ์ดีดเร็ว", "ข. ทักษะการปรับตัว (Adaptability) และความฉลาดทางอารมณ์ (EQ)", "ค. ทักษะการใช้โปรแกรม Excel ขั้นสูง", "ง. ทักษะการจดบันทึกการประชุม"],
+                optionsEn: ["A. Fast typing skills.", "B. Adaptability and Emotional Intelligence (EQ).", "C. Advanced Excel skills.", "D. Meeting minute-taking skills."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: '19. การประเมินผลระบบ "360-degree Feedback" คืออะไร?',
+                qEn: "19. What is 360-degree Feedback?",
+                options: ["ก. การประเมินโดยหัวหน้างานเพียงคนเดียว", "ข. การประเมินรอบทิศทางจากหัวหน้า เพื่อนร่วมงาน ลูกน้อง และตนเอง", "ค. การประเมินผลวันละ 360 นาที", "ง. การประเมินเฉพาะทักษะด้านเทคนิคเท่านั้น"],
+                optionsEn: ["A. An evaluation by the supervisor only.", "B. A multi-directional evaluation from supervisors, peers, subordinates, and self.", "C. An evaluation lasting 360 minutes per day.", "D. An evaluation of technical skills only."],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: '20. พนักงานจะได้รับ "เงินทดแทน" จากประกันสังคมในกรณีใดบ้าง?',
+                qEn: "20. In which cases can employees receive benefits from the Social Security Fund?",
+                options: ["ก. เจ็บป่วย คลอดบุตร ทุพพลภาพ ตาย สงเคราะห์บุตร ชราภาพ ว่างงาน", "ข. ซื้อบ้านใหม่ แต่งงาน ลาบวช", "ค. เฉพาะกรณีตกงานเท่านั้น", "ง. เฉพาะกรณีเกิดอุบัติเหตุจากการทำงานเท่านั้น"],
+                optionsEn: ["A. Illness, childbirth, disability, death, child allowance, old age, and unemployment.", "B. Buying a new house, getting married, ordination leave.", "C. Only in cases of unemployment.", "D. Only in cases of work-related accidents."],
+                ans: 0
+            },
+            // Essay 21-25
+            {
+                type: "essay",
+                q: "21. หากทีม HR Performance ต่ำ คุณจัดการอย่างไร",
+                qEn: "21. If your HR team's performance is low, how would you manage the situation?"
+            },
+            {
+                type: "essay",
+                q: "22. มอง Recruitment Trend ปัจจุบันอย่างไร",
+                qEn: "22. How do you view current Recruitment Trends?"
+            },
+            {
+                type: "essay",
+                q: "23. HR สามารถช่วยธุรกิจเติบโตได้อย่างไร",
+                qEn: "23. How can HR help drive business growth?"
+            },
+            {
+                type: "essay",
+                q: "24. สิ่งที่ HR ต้องระวังมากที่สุดด้านกฎหมายคืออะไร",
+                qEn: "24. What legal issues should HR be most cautious about?"
+            },
+            {
+                type: "essay",
+                q: '25. หากต้องเลือกระหว่าง "รักษาคนเก่ง" กับ "รักษากฎ" จะตัดสินใจอย่างไร',
+                qEn: '25. If you had to choose between "retaining top talent" and "upholding the rules", how would you decide?'
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'HR_Manager';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+            const card = document.createElement('div');
+            card.className = 'q-card';
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            let html = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <div class="manager-tag">${item.type === 'choice' ? t.tagChoice : t.tagEssay}</div>
+                <p class="q-text">${questionText}</p>`;
+
+            if (item.type === "choice") {
+                html += `<div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="processNext(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            } else {
+                html += `
+                    <textarea id="essayInput" class="essay-area" placeholder="${t.essayPlaceholder}"></textarea>
+                    <button class="btn-next" onclick="processNext(null)">${t.btnSaveNext}</button>`;
+            }
+
+            card.innerHTML = html;
+            container.appendChild(card);
+            if (item.type === "essay") document.getElementById('essayInput').focus();
+        }
+
+        async function processNext(choiceIndex) {
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            if (item.type === "choice") {
+                userAnswers.push({
+                    text: item.options[choiceIndex],
+                    score: choiceIndex === item.ans ? 1 : 0
+                });
+            } else {
+                const textVal = document.getElementById('essayInput').value.trim();
+                if (textVal.length < 5) {
+                    alert(t.alertEssay);
+                    return;
+                }
+                userAnswers.push({ text: textVal, score: 0 });
+            }
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.score === 1) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = String(ans.score);
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "🟢 ผ่านเกณฑ์ (โดดเด่น)" : (score >= 12 ? "🟡 พิจารณา Essay เพิ่มเติม" : "🔴 ไม่ผ่านเกณฑ์ทางเทคนิค");
+
+            document.getElementById('modalIcon').textContent = t.modalIcon;
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div id="modalIcon" style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
