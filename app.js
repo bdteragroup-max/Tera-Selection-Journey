@@ -437,7 +437,11 @@ function renderExamPicker_(totalScore) {
       uuid: appData.uuid || "",
       preScore: String(totalScore || 0)
     });
-    setTimeout(() => { window.location.href = `${url}?${qs.toString()}`; }, 400);
+        setTimeout(() => {
+      const fullUrl = `${url}?${qs.toString()}`;
+      console.log("Redirecting to:", fullUrl);
+      window.location.href = fullUrl;
+    }, 400);
   });
 }
 
