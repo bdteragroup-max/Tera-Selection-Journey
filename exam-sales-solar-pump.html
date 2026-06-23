@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sales Manager (Solar Pump) Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง ผู้จัดการฝ่ายขาย (Solar
+                Pump)</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง ผู้จัดการฝ่ายขาย (Solar Pump)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Sales Manager (Solar Pump)",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. ในการบริหารช่องทางจัดจำหน่าย (Dealer Management) ต่างจังหวัด คุณพบว่าร้านค้าส่งรายใหญ่ (Wholesaler) ตัดราคาขายปั๊มน้ำโซลาร์เซลล์แข่งกับร้านค้าย่อย (Retailer) ในพื้นที่เดียวกัน จนทำให้ร้านค้าย่อยแบนแบรนด์ของคุณ ในฐานะผู้จัดการฝ่ายขาย คุณควรแก้ปัญหานี้อย่างไรให้ยั่งยืนที่สุด?",
+                options: [
+                    "ก. ยกเลิกสัญญากับร้านค้าส่งรายใหญ่ทันทีเพื่อปกป้องร้านค้าย่อย",
+                    "ข. ประกาศโครงสร้างราคาขั้นต่ำ (Minimum Advertised Price - MAP) พร้อมทั้งแยกเกรดสินค้าหรือจัดเซ็ตของแถมเฉพาะตัวให้ร้านค้าย่อย เพื่อสร้างความต่างของโปรดักต์ (Product Differentiation)",
+                    "ค. ลดราคาต้นทุนให้ร้านค้าย่อยลงไปอีก 20% เพื่อให้ไปดัมพ์ราคาแข่งกับร้านค้าส่งได้",
+                    "ง. ปล่อยให้เป็นไปตามกลไกตลาดเสรี แต่เพิ่มงบการตลาดไปทำโฆษณาออนไลน์ในพื้นที่นั้นแทน"
+                ],
+                ans: 1
+            },
+            {
+                q: "2. บริษัทของคุณกำลังจะเปิดตัว \"ปั๊มน้ำบาดาลโซลาร์เซลล์กระแสสลับ (AC Submersible Solar Pump)\" ระดับไฮเอนด์ที่มีราคาสูงกว่าท้องตลาด 40% แต่ประหยัดพลังงานและทนทานกว่ามาก กลุ่มเป้าหมายใดต่อไปนี้ที่ทีมขายของคุณควรโฟกัสเพื่อสร้างยอดขาย (Quick Win) ได้เร็วที่สุด?",
+                options: [
+                    "ก. เกษตรกรรายย่อยที่ปลูกพืชล้มลุกตามฤดูกาล",
+                    "ข. โครงการจัดซื้อจัดจ้างของหน่วยงานราชการส่วนท้องถิ่น (อบต./อบจ.)",
+                    "ค. กลุ่มสหกรณ์การเกษตรขนาดใหญ่, ฟาร์มปศุสัตว์ระบบปิด (Smart Farm) และผู้พัฒนาอสังหาริมทรัพย์ที่ทำระบบส่วนกลาง",
+                    "ง. ร้านค้าขายอุปกรณ์การเกษตรรายย่อยตามอำเภอต่างๆ"
+                ],
+                ans: 2
+            },
+            {
+                q: "3. คู่แข่งในตลาดใช้กลยุทธ์ \"รับประกันเปลี่ยนเครื่องใหม่ทันทีใน 1 ปี\" สำหรับปั๊มน้ำโซลาร์เซลล์ราคาถูก แต่บริษัทของคุณไม่สามารถทำได้เนื่องจากต้นทุนสินค้าสูงกว่า คุณจะเทรนทีมขายให้ใช้จุดเด่นใดในการปิดการขายแข่งกับข้อเสนอนี้?",
+                options: [
+                    "ก. ชูจุดขายเรื่องการบริการหลังการขาย (After-sales Service) ที่มีทีมวิศวกรเคลื่อนที่เร็วเข้าหน้างานภายใน 48 ชั่วโมง พร้อมผลวิเคราะห์ความคุ้มค่าของการทำงานต่อเนื่อง (System Uptime) ที่ปั๊มราคาถูกทำไม่ได้",
+                    "ข. การจัดโปรโมชั่นผ่อน 0% นาน 10 เดือน ร่วมกับบัตรเครดิตชั้นนำ",
+                    "ค. อ้างว่าปั๊มของคู่แข่งเป็นของปลอมและไม่ได้มาตรฐานสากล",
+                    "ง. เสนอแถมแผงโซลาร์เซลล์เพิ่มให้ลูกค้าอีก 1 แผงฟรีๆ เพื่อชดเชย"
+                ],
+                ans: 0
+            },
+            {
+                q: "4. ในการขยายตลาดปั๊มน้ำโซลาร์เซลล์เข้าสู่โครงการสัมปทานภาครัฐหรือโครงการบริหารจัดการน้ำชุมชน ปัจจัยใดที่ผู้จัดการฝ่ายขายต้องเตรียมความพร้อมให้กับทีมงานมากที่สุดเพื่อให้ชนะการประมูล (Bidding)?",
+                options: [
+                    "ก. ความพร้อมของวงเงินสินเชื่อธนาคารเพื่อขอกู้เงินมาสำรองจ่าย",
+                    "ข. การทดสอบและใบรับรองมาตรฐานผลิตภัณฑ์จากสถาบันที่น่าเชื่อถือ (เช่น มอก. หรือ ISO) ร่วมกับเล่มข้อกำหนดทางเทคนิค (TOR) ที่ตรงตามเกณฑ์ราคากลาง",
+                    "ค. ความสัมพันธ์ส่วนตัวกับหัวหน้าหน่วยงานราชการในพื้นที่",
+                    "ง. การเตรียมหน้าม้าเพื่อไปช่วยปั่นราคาในระบบ e-bidding"
+                ],
+                ans: 1
+            },
+            {
+                q: "5. หากโครงสร้างราคาน้ำมันดีเซลในประเทศปรับตัวลดลงอย่างรุนแรง ส่งผลให้เกษตรกรหันกลับไปใช้เครื่องสูบน้ำแบบใช้น้ำมันเพราะคุ้นเคยมากกว่า ทีมขายเริ่มสูญเสียความมั่นใจ คุณจะปรับยอดขาย (Sales Pitch) อย่างไร?",
+                options: [
+                    "ก. เปลี่ยนไปขายปั๊มน้ำมันแทนปั๊มโซลาร์เซลล์ชั่วคราว",
+                    "ข. ปรับแผนเป็นการนำเสนอ \"ระบบไฮบริด (Hybrid Solar Pump)\" ที่สลับใช้ได้ทั้งโซลาร์เซลล์และน้ำมัน/ไฟบ้าน พร้อมชี้ให้เห็นกราฟแนวโน้มราคาน้ำมันในระยะ 5 ปีที่ผันผวน",
+                    "ค. จัดกิจกรรมลดแลกแจกแถมจนกว่าราคาน้ำมันจะกลับมาแพงขึ้น",
+                    "ง. เน้นการทำตลาดเฉพาะในพื้นที่ที่ไม่มีสัญญาณโทรศัพท์และไฟฟ้าเข้าถึงเท่านั้น"
+                ],
+                ans: 1
+            },
+            {
+                q: "6. ลูกค้าต้องการปั๊มน้ำบาดาลโซลาร์เซลล์ไปใช้ในพื้นที่แห้งแล้ง โดยมีเงื่อนไขว่า บ่อบาดาลลึก 80 เมตร (Static Water Level อยู่ที่ 40 เมตร) และต้องการส่งน้ำขึ้นไปพักบนถังสูงที่ตั้งอยู่ห่างออกไปอีก 200 เมตรในแนวราบ (ความสูงถัง 10 เมตร) ทีมขายควรคำนวณหาค่า \"Total Dynamic Head (TDH)\" สรุปคร่าวๆ (ไม่รวม Friction Loss ในท่อ) อยู่ที่ประมาณเท่าใดเพื่อเลือกขนาดปั๊มได้ถูกต้อง?",
+                options: [
+                    "ก. 40 เมตร",
+                    "ข. 50 เมตร",
+                    "ค. 90 เมตร",
+                    "ง. 130 เมตร"
+                ],
+                ans: 2
+            },
+            {
+                q: "7. ในกรณีที่บ่อบาดาลของลูกค้ามีปัญหา \"ทรายปนในน้ำสูงมาก (Sandy Well)\" ซึ่งมักจะทำให้ใบพัดปั๊มน้ำ (Impeller) ล็อกหรือสึกหรออย่างรวดเร็ว ในฐานะผู้จัดการฝ่ายขาย คุณควรเลือกโปรดักต์ประเภทใดให้ทีมขายนำเสนอเพื่อป้องกันการเคลมสินค้าในอนาคต?",
+                options: [
+                    "ก. ปั๊มแบบ Helical Rotor (ปั๊มสกรู/ปั๊มแกนตรง)",
+                    "ข. ปั๊มแบบ Centrifugal (หอยโข่ง) หลายใบพัดที่มีโครงสร้างใบพัดแบบสลัดทราย (Floating Impeller) หรือทำจากเหล็กหล่อพิเศษ",
+                    "ค. ปั๊มชัก (Piston Pump) แบบดั้งเดิม",
+                    "ง. ปั๊มจุ่มประเภทพลาสติก (Plastic Submersible Pump)"
+                ],
+                ans: 1
+            },
+            {
+                q: "8. ลูกค้ารายหนึ่งบ่นว่า \"ช่วงเช้าตรู่และช่วงเย็น ปั๊มน้ำโซลาร์เซลล์ไม่ทำงานเลย ทั้งๆ ที่ยังมีแสงแดดรำไร\" ข้อใดคือการอธิบายทางเทคนิคตามหลักการทำงานของ Solar Pump Controller ที่ถูกต้องและดูเป็นมืออาชีพที่สุด?",
+                options: [
+                    "ก. เป็นเพราะแผงโซลาร์เซลล์เสื่อมสภาพเมื่อเจอความชื้นในตอนเช้า",
+                    "ข. ตัว Controller มีฟังก์ชันป้องกันแรงดันต่ำ (Under-voltage Protection) และกระแสต่ำ ซึ่งระบบจะสั่งทำงานเมื่อแผงผลิตไฟฟ้าได้วัตต์และโวลต์ถึงเกณฑ์สตาร์ทของมอเตอร์ (Minimum Startup Power) เท่านั้นเพื่อป้องกันมอเตอร์ไหม้",
+                    "ค. เป็นเพราะเซนเซอร์ตรวจจับระดับน้ำในบ่อสั่งตัดการทำงานเนื่องจากน้ำเต็ม",
+                    "ง. ระบบเกิดไฟฟ้าลัดวงจรชั่วคราวจากสภาพอากาศ"
+                ],
+                ans: 1
+            },
+            {
+                q: "9. หากทีมขายไปเจอหน้างานที่ลูกค้าต้องการติดตั้งปั๊มน้ำโซลาร์เซลล์ทดแทนปั๊มน้ำแบบเดิมที่เป็นมอเตอร์ AC 3 เฟส 380V ขนาด 5 แรงม้า (HP) ของเดิมอยู่แล้ว แต่อยากประหยัดงบโดยใช้อุปกรณ์เดิมให้มากที่สุด โซลูชันใดคุ้มค่าและตอบโจทย์ที่สุด?",
+                options: [
+                    "ก. แนะนำให้ถอนปั๊มเดิมทิ้ง แล้วซื้อปั๊ม DC 24V ขนาดเล็ก 5 ตัวมาติดแทน",
+                    "ข. เสนอขายแผงโซลาร์เซลล์ตามพิกัดกำลัง ร่วมกับอุปกรณ์ \"Solar Pump Inverter / Drive\" ที่สามารถแปลงไฟ DC จากแผงเป็น AC 3 เฟสไปขับมอเตอร์ตัวเดิมได้โดยตรง",
+                    "ค. แนะนำให้ต่อแผงโซลาร์เซลล์เข้ากับแบตเตอรี่รถยนต์ 32 ลูกเพื่ออนุกรมไฟให้ได้ 380V",
+                    "ง. เสนอให้เปลี่ยนมอเตอร์เป็นระบบ DC ทั้งหมดรวมถึงตัวปั๊มด้วย"
+                ],
+                ans: 1
+            },
+            {
+                q: "10. ปัญหา \"Dry-Running\" (ปั๊มทำงานในสภาวะไม่มีน้ำจนร้อนจัดและพัง) เป็นสาเหตุหลักที่ทำให้หมดประกัน ผู้จัดการฝ่ายขายควรติดตั้งหรือเซ็ตระบบมาตรฐานอย่างไรให้กับสินค้าที่จำหน่ายเพื่อลดปัญหานี้?",
+                options: [
+                    "ก. ติดตั้งสวิตช์ลูกลอย (Float Switch) หรือเซนเซอร์ตรวจจับระดับน้ำ (Water Level Sensor) ในบ่อ เชื่อมต่อเข้ากับ Controller เพื่อสั่งหยุดปั๊มอัตโนมัติเมื่อน้ำแห้ง",
+                    "ข. ใช้แผงโซลาร์เซลล์ขนาดเล็กลงเพื่อไม่ให้ปั๊มมีกำลังแรงเกินไป",
+                    "ค. แนะนำให้ลูกค้าเดินไปเปิด-ปิดสวิตช์ด้วยตัวเองทุกๆ 2 ชั่วโมง",
+                    "ง. ใส่ฟิวส์ขนาดใหญ่ขึ้นในตู้คอนโทรล"
+                ],
+                ans: 0
+            },
+            {
+                q: "11. ในการออกแบบระบบ Solar Pump สำหรับฟาร์มทุเรียนที่ต้องการน้ำวันละ 60,000 ลิตร (60 m³/day) โดยมีเวลาแดดจัดเฉลี่ย (Peak Sun Hours) 5 ชั่วโมงต่อวัน ทีมขายต้องเลือกปั๊มที่มีอัตราการไหล (Flow Rate) อย่างน้อยเท่าใด?",
+                options: [
+                    "ก. 5 m³/hour",
+                    "ข. 12 m³/hour",
+                    "ค. 20 m³/hour",
+                    "ง. 60 m³/hour"
+                ],
+                ans: 1
+            },
+            {
+                q: "12. ลูกค้าต้องการติดตั้งปั๊มหอยโข่งโซลาร์เซลล์ (Solar Surface Pump) สูบน้ำจากคลองสาธารณะขึ้นมารดน้ำแปลงผัก โดยตัวปั๊มตั้งอยู่บนตลิ่งสูงกว่าระดับน้ำในคลอง 8 เมตร ปัญหาร้ายแรงทางเทคนิคใดที่จะเกิดขึ้นหากทีมขายฝืนปิดดีลโดยไม่แก้ไขหน้างาน?",
+                options: [
+                    "ก. ปั๊มจะเกิดอาการ Cavitation และสูบน้ำไม่ขึ้น เนื่องจากระยะ Suction Head (แรงดูด) เกินขีดจำกัดของปั๊มหอยโข่งทั่วไป (มักไม่เกิน 6-7 เมตร)",
+                    "ข. กระแสไฟฟ้าจากแผงโซลาร์เซลล์จะไหลย้อนกลับลงแม่น้ำ",
+                    "ค. แผงโซลาร์เซลล์จะเกิดความร้อนสูงเกินไป (Overheating)",
+                    "ง. แรงดันน้ำฝั่งขาออกจะสูงเกินไปจนท่อแตก"
+                ],
+                ans: 0
+            },
+            {
+                q: "13. การเลือกประเภทของแผงโซลาร์เซลล์เพื่อใช้กับระบบปั๊มน้ำในภาคเกษตรกรรม ซึ่งมักจะมีฝุ่นละอองจากการไถพรวน และมูลนกชุกชุม เทคโนโลยีแผงแบบใดที่ตอบโจทย์และให้ Yield เสถียรที่สุดในสภาวะนี้?",
+                options: [
+                    "ก. แผง Thin-Film (ฟิล์มบาง)",
+                    "ข. แผง Monocrystalline ทั่วไป",
+                    "ค. แผงแบบ Half-Cut Cells (ที่มีการแยกวงจรแผงบน-ล่างออกจากกันชั่วคราว) เพื่อให้หากครึ่งล่างโดนฝุ่นบัง ครึ่งบนก็ยังผลิตไฟได้",
+                    "ง. แผงแบบ Bifacial (รับแสงสองด้าน) บนโครงสร้างเตี้ยติดดิน"
+                ],
+                ans: 2
+            },
+            {
+                q: "14. ทีมติดตั้งของดีลเลอร์ (Dealer) รายหนึ่ง นำแผงโซลาร์เซลล์ไปติดตั้งในลักษณะอนุกรม (Series) จนทำให้แรงดันไฟฟ้าเปิดวงจร (Voc) รวมของแผง สูงกว่าค่า Max Input Voltage ของ Solar Pump Controller ส่งผลให้ Controller ไหม้ทันทีเมื่อเปิดใช้งาน ดีลเลอร์โวยวายว่าเป็นความผิดของสินค้าคุณ ในฐานะผจก. คุณจะตัดสินใจอย่างไร?",
+                options: [
+                    "ก. ปฏิเสธการเคลมอย่างสิ้นเชิงและตัดสัมพันธ์กับดีลเลอร์รายนั้นทันที",
+                    "ข. ตรวจสอบข้อมูลจากดาต้าล็อกเกอร์หรือร่องรอยวงจร นำหลักข้อมูลทางเทคนิคเข้าชี้แจงอย่างสุภาพ เสนอขายคอนโทรลเลอร์ตัวใหม่ในราคาทุน พร้อมจัดคอร์สเทรนนิ่ง \"การออกแบบระบบอย่างปลอดภัย\" ให้ทีมช่างของดีลเลอร์ฟรีเพื่อรักษาความสัมพันธ์",
+                    "ค. ยอมรับเคลมให้ฟรีเพื่อตัดรำคาญและรักษาความพึงพอใจ",
+                    "ง. ส่งเรื่องให้ฝ่ายกฎหมายฟ้องร้องดีลเลอร์ฐานทำให้แบรนด์เสียชื่อเสียง"
+                ],
+                ans: 1
+            },
+            {
+                q: "15. ดัชนีชี้วัดผลงานหลัก (KPIs) ข้อใดที่สำคัญที่สุดสำหรับการประเมินประสิทธิภาพของ \"ทีมขายปั๊มโซลาร์เซลล์ (B2B/Dealer Channel)\" เพื่อดูความแข็งแกร่งของเครือข่ายร้านค้า?",
+                options: [
+                    "ก. จำนวนยอดไลก์ของเพจ Facebook ของบริษัท",
+                    "ข. อัตราการซื้อซ้ำของดีลเลอร์ (Dealer Retention Rate) และยอดสั่งซื้อเฉลี่ยต่อดีลเลอร์ (Average Order Value per Dealer)",
+                    "ค. จำนวนระยะทาง (กิโลเมตร) ที่ทีมขายขับรถไปพบลูกค้า",
+                    "ง. จำนวนสินค้าที่ค้างอยู่ในสต็อกของบริษัท"
+                ],
+                ans: 1
+            },
+            {
+                q: "16. ลูกค้าใช้ระบบปั๊มน้ำบาดาลโซลาร์เซลล์มาระยะหนึ่งแล้วแจ้งว่า \"ปั๊มน้ำค่อยๆ จ่ายน้ำน้อยลงเรื่อยๆ\" ทั้งๆ ที่แดดแรงจัดและไม่มีเงาบัง ข้อใดคือสาเหตุหน้างานที่เป็นไปได้มากที่สุดตามลำดับความสำคัญที่ทีม Service ต้องไปตรวจสอบ?",
+                options: [
+                    "ก. เกิดปรากฏการณ์ลืมเปิดสวิตช์ไฟ",
+                    "ข. แผงโซลาร์เซลล์ระเบิด",
+                    "ค. ระดับน้ำในบ่อบาดาลลดต่ำลง (Drawdown) จนเกินพิกัดปั๊ม หรือมีคราบตะกรัน/โคลนอุดตันที่ตัวกรอง (Strainer) ของปั๊ม",
+                    "ง. อินเวอร์เตอร์เปลี่ยนโหมดการทำงานเองเป็นระบบปั๊มลม"
+                ],
+                ans: 2
+            },
+            {
+                q: "17. ในสัญญาระหว่างบริษัทของคุณกับฟาร์มปศุสัตว์ขนาดใหญ่ มีข้อกำหนดเรื่องค่าปรับหากปั๊มน้ำเสียแล้วระบบจัดการน้ำล่มเกิน 48 ชม. วันนี้ปั๊มหลักพังและไม่มีอะไหล่รุ่นนั้นในสต็อกในประเทศ คาดว่าจะต้องอิมพอร์ต 2 สัปดาห์ คุณจะแก้ปัญหาวิกฤตนี้อย่างไร?",
+                options: [
+                    "ก. ยอมจ่ายค่าปรับตามสัญญาไปเรื่อยๆ จนกว่าของจะมา",
+                    "ข. ส่งทีมวิศวกรนำ \"ปั๊มสำรองชั่วคราว (Backup/Temporary Pump)\" หรือจัดระบบปั๊มน้ำมัน/ไฟบ้านเข้าไปติดตั้งทดแทนให้ลูกค้าใช้งานแก้ขัดทันทีภายใน 24 ชั่วโมง เพื่อรักษาผลประโยชน์ลูกค้าและเลี่ยงค่าปรับ",
+                    "ค. ขอร้องให้ลูกค้าหยุดเลี้ยงสัตว์ชั่วคราวเป็นเวลา 2 สัปดาห์",
+                    "ง. แจ้งลูกค้าว่าเอกสารสัญญาหายไปแล้ว ไม่สามารถดำเนินการใดๆ ได้"
+                ],
+                ans: 1
+            },
+            {
+                q: "18. เพื่อกระตุ้นยอดขายปั๊มโซลาร์เซลล์ในฤดูแล้ง (High Season) คุณต้องการจัดแคมเปญการตลาดร่วมกับดีลเลอร์ท้องถิ่น กิจกรรมใดต่อไปนี้ที่มีประสิทธิภาพในการดึงดูดกลุ่มเกษตรกรและผู้รับเหมาในพื้นที่ได้ดีที่สุด?",
+                options: [
+                    "ก. การจัดสัมมนาวิชาการในโรงแรม 5 ดาวกลางกรุงเทพฯ",
+                    "ข. การจัดกิจกรรม \"คาราวานตรวจเช็กระบบปั๊มเก่าฟรีทุกแบรนด์\" พร้อมสาธิตการสูบน้ำจริง (Live Demo Show) ณ ตลาดกลางเกษตรกรรมประจำจังหวัด",
+                    "ค. การแจกเสื้อยืดและหมวกตราบริษัทผ่านทางไปรษณีย์",
+                    "ง. การจ้างอินฟลูเอนเซอร์สายแฟชั่นมารีวิวสินค้า"
+                ],
+                ans: 1
+            },
+            {
+                q: "19. หากลูกค้าต้องการติดตั้งปั๊มน้ำโซลาร์เซลล์ในพื้นที่ห่างไกลที่ไม่มีสัญญาณโทรศัพท์ และต้องการให้ระบบเปิด-ปิดน้ำตามความชื้นในดินโดยอัตโนมัติ (Automation) เทคโนโลยีใดที่ทีมขายควรเสนอพ่วงเพื่อปิดดีลไฮเอนด์นี้?",
+                options: [
+                    "ก. ระบบควบคุมผ่านแอปพลิเคชัน 5G / Internet",
+                    "ข. ตัวควบคุมแบบ Standalone Logic Controller ร่วมกับเซนเซอร์ความชื้นในดิน (Soil Moisture Sensor) ที่ต่อสายตรงเข้าตู้ควบคุมโดยไม่ต้องใช้สัญญาณอินเทอร์เน็ต",
+                    "ค. การติดตั้งกล้องวงจรปิดเพื่อให้ลูกค้าคอยนั่งดูหน้าจอ",
+                    "ง. ระบบวิทยุสื่อสาร Walkie-Talkie ผูกติดกับตัวปั๊ม"
+                ],
+                ans: 1
+            },
+            {
+                q: "20. ข้อใดคือมาตรฐานความปลอดภัยทางไฟฟ้า (Electrical Safety) สำคัญที่สุดที่ผู้จัดการฝ่ายขายต้องควบคุมให้ทีมช่างหรือดีลเลอร์ติดตั้งทุกครั้งในระบบปั๊มน้ำโซลาร์เซลล์เพื่อความปลอดภัยของเกษตรกรผู้ใช้งาน?",
+                options: [
+                    "ก. การติดป้ายเตือนห้ามจับปั๊มขณะทำงาน",
+                    "ข. การติดตั้งระบบสายดิน (Grounding System) ทั้งฝั่งโครงสร้างแผง แผงโซลาร์ และตัวปั๊มน้ำ ร่วมกับอุปกรณ์ป้องกันไฟกระชาก (DC Surge Protection)",
+                    "ค. การใช้เทปพันสายไฟหนาๆ หลายชั้นตรงจุดต่อสายน้ำ",
+                    "ง. การใส่คัทเอาท์ไม้แบบโบราณเพื่อตัดไฟ"
+                ],
+                ans: 1
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Sales Manager (Solar Pump)';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = item.q;
+            const opts = item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        /* ============================================================
+           Logic
+        ============================================================ */
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
+            payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>

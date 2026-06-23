@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Finance Officer Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง เจ้าหน้าที่การเงิน</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง เจ้าหน้าที่การเงิน",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Finance Officer",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. ในฐานะเจ้าหน้าที่การเงิน เมื่อคุณทำการนับ \"เงินสดสดย่อย (Petty Cash)\" ประจำวัน แล้วพบว่ายอดเงินสดในมือ \"ขาด\" จากบัญชีคุมไป 500 บาท โดยที่ไม่สามารถหาสลิปหรือเอกสารจ่ายมารองรับได้ แอ็กชันแรกที่ถูกต้องและโปร่งใสที่สุดคือข้อใด?",
+                options: [
+                    "ก. นำเงินส่วนตัว 500 บาท ใส่ทดแทนลงไปเงียบๆ เพื่อไม่ให้บัญชีมีปัญหา",
+                    "ข. บันทึกผลต่างยอดเงินขาดบัญชี (Cash Shortage) จัดทำรายงานสรุปสถานการณ์ และแจ้งผู้บังคับบัญชาหรือผู้จัดการฝ่ายการเงินทราบทันทีเพื่อร่วมกันหาสาเหตุ",
+                    "ค. แกล้งทำเป็นลงบัญชีค่าใช้จ่ายเบ็ดเตล็ดปลอมขึ้นมา 1 รายการ มูลค่า 500 บาท",
+                    "ง. ปล่อยทิ้งไว้เฉยๆ และรอให้ผู้สอบบัญชี (Auditor) มาตรวจพบเองปลายปี"
+                ],
+                ans: 1
+            },
+            {
+                q: "2. มาตรฐานการควบคุมภายในที่ดีเกี่ยวกับการจัดการเงินสด (Cash Control) ข้อใดคือหลักการ \"การแบ่งแยกหน้าที่ (Segregation of Duties)\" ที่ช่วยป้องกันความเสี่ยงในการทุจริตได้อย่างมีประสิทธิภาพที่สุด?",
+                options: [
+                    "ก. ให้เจ้าหน้าที่การเงินคนเดียวกัน ทำหน้าที่ทั้งรับเงินสด ออกใบเสร็จ และนำเงินฝากธนาคารทั้งหมด",
+                    "ข. แยกหน้าที่ระหว่างบุคคลที่ทำหน้าที่ \"บันทึกบัญชี\" บุคคลที่ \"จัดเก็บ/ถือเงินสด\" และบุคคลที่ \"อนุมัติการจ่ายเงิน\" ออกจากกันเป็นคนละคน",
+                    "ค. ให้พนักงานฝ่ายขายเป็นผู้รับผิดชอบดูแลสมุดเช็คของบริษัทแทนฝ่ายการเงิน",
+                    "ง. ให้ผู้จัดการใหญ่เป็นผู้บันทึกรายงานการรับจ่ายเงินสดย่อยด้วยตนเองทุกวัน"
+                ],
+                ans: 1
+            },
+            {
+                q: "3. ทุกๆ สิ้นเดือน เจ้าหน้าที่การเงินมีหน้าที่ต้องจัดทำ \"งบกระทบยอดเงินฝากธนาคาร (Bank Reconciliation)\" วัตถุประสงค์หลักของเอกสารฉบับนี้คืออะไร?",
+                options: [
+                    "ก. เพื่อตรวจสอบหาความผิดพลาดหรือผลต่าง ระหว่างยอดเงินคงเหลือตามใบแจ้งยอดของธนาคาร (Bank Statement) กับยอดเงินคงเหลือในสมุดบัญชี (Book Value) ของบริษัท",
+                    "ข. เพื่อขออนุมัติกู้เงินเพิ่มจากธนาคาร",
+                    "ค. เพื่อคำนวณภาษีมูลค่าเพิ่ม (VAT) ประจำเดือน",
+                    "ง. เพื่อเช็คดูว่าธนาคารให้ดอกเบี้ยเงินฝากสูงกว่าธนาคารอื่นหรือไม่"
+                ],
+                ans: 0
+            },
+            {
+                q: "4. ในขณะที่คุณกำลังตรวจนับเงินสดรับจากการขายประจำวันจำนวน 500,000 บาท คุณสังเกตเห็นว่ามีธนบัตรใบละ 1,000 บาท อยู่ใบหนึ่งมีลักษณะเนื้อกระดาษและลายน้ำผิดปกติ (สงสัยว่าเป็นแบงก์ปลอม) คุณควรจัดการอย่างไร?",
+                options: [
+                    "ก. รีบนำแบงก์ใบนั้นใส่รวมกลับเข้าไปในถุงเงินเพื่อนำไปฝากธนาคารทันที",
+                    "ข. แยกธนบัตรใบนั้นออกมา บันทึกหมายเลขซีเรียล ตรวจสอบซ้ำด้วยเครื่องตรวจแบงก์ปลอม (ถ้ามี) และแจ้งผู้จัดการฝ่ายเพื่อดำเนินการตามขั้นตอนความปลอดภัยของบริษัท",
+                    "ค. นำแบงก์ใบนั้นไปแลกเป็นแบงก์ย่อยกับร้านค้าปลีกใกล้สำนักงาน",
+                    "ง. ฉีกธนบัตรใบนั้นทิ้งทันทีเพื่อลายหลักฐานไม่ให้ใครเห็น"
+                ],
+                ans: 1
+            },
+            {
+                q: "5. นโยบายการจ่ายเงินสดย่อย (Petty Cash Policy) ของบริษัทระบุว่า \"ห้ามจ่ายเงินสดย่อยเกิน 3,000 บาท ต่อหนึ่งใบเสร็จ\" แต่พนักงานฝ่ายจัดซื้อนำใบเบิกเงินสดจำนวน 4,500 บาท มาขอเบิกด่วนเพื่อจ่ายค่าซ่อมปั๊มน้ำ คุณจะตอบสนองอย่างไร?",
+                options: [
+                    "ก. ยอมจ่ายให้ทันทีเพราะเห็นว่าเป็นเรื่องด่วนและปั๊มน้ำเสียทำงานไม่ได้",
+                    "ข. ปฏิเสธการจ่ายเงินสดย่อย โดยชี้แจงระเบียบของบริษัทให้พนักงานทราบ และแนะนำให้ทำเรื่องขออนุมัติจ่ายผ่าน \"ระบบเงินทดรองจ่าย (Advance)\" หรือโอนจ่ายตามขั้นตอนปกติ",
+                    "ค. ให้พนักงานไปเขียนใบเบิกแยกเป็น 2 ใบ ใบละ 2,250 บาท เพื่อให้อยู่ในวงเงิน",
+                    "ง. บอกให้พนักงานไปยืมเงินจากผู้จัดการฝ่ายขายมาก่อน"
+                ],
+                ans: 1
+            },
+            {
+                q: "6. ก่อนที่คุณจะทำการโอนเงินจ่ายชำระหนี้ (Payment) ให้กับซัพพลายเออร์ (Supplier) มูลค่า 200,000 บาท \"ชุดเอกสาร\" ข้อใดต่อไปนี้ที่ต้องตรวจสอบให้ครบถ้วน (Three-Way Matching) จึงจะถือว่าปลอดภัยในการจ่ายเงิน?",
+                options: [
+                    "ก. ใบเสนอราคา และใบเสร็จรับเงินล่วงหน้า",
+                    "ข. ใบสั่งซื้อ (Purchase Order), ใบกำกับสินค้า/ใบแจ้งหนี้ (Invoice), และใบรับของ (Receiving Report) ที่ได้รับการเซ็นอนุมัติจากผู้มีอำนาจ",
+                    "ค. นามบัตรของเซลส์คู่ค้า และสลิปโอนเงินส่วนตัวของฝ่ายจัดซื้อ",
+                    "ง. แค็ตตาล็อกสินค้า และตารางเวลานัดหมายเข้าพบ"
+                ],
+                ans: 1
+            },
+            {
+                q: "7. บริษัทมีการว่าจ้างบริษัทภายนอกมาทำความสะอาดสำนักงาน เป็นมูลค่า 10,000 บาท (ไม่รวม VAT) ในฐานะเจ้าหน้าที่การเงิน เมื่อคุณจะทำการจ่ายเงิน คุณต้องหัก \"ภาษีเงินได้ ณ ที่จ่าย (Withholding Tax)\" ในอัตราร้อยละเท่าใดตามกฎหมายสรรพากรสำหรับค่าบริการ?",
+                options: [
+                    "ก. หัก 1%",
+                    "ข. หัก 3%",
+                    "ค. หัก 5%",
+                    "ง. ไม่ต้องหักเนื่องจากไม่ถึง 50,000 บาท"
+                ],
+                ans: 1
+            },
+            {
+                q: "8. ในการออก \"ใบกำกับภาษี/ใบเสร็จรับเงิน (Tax Invoice / Receipt)\" ให้กับลูกค้าที่มาซื้อสินค้า ข้อมูลส่วนใดบนหน้าเอกสารที่เจ้าหน้าที่การเงินต้องตรวจสอบความถูกต้องอย่างละเอียดที่สุดเพื่อไม่ให้โดนเบี้ยปรับจากสรรพากร?",
+                options: [
+                    "ก. โลโก้ของบริษัทคู่ค้าว่ามีความคมชัดหรือไม่",
+                    "ข. ชื่อ-ที่อยู่ ของบริษัทลูกค้า, เลขประจำตัวผู้เสียภาษีอากร 13 หลัก, รายการสินค้า, มูลค่าก่อนภาษี, จำนวน VAT 7% และยอดเงินรวมที่ถูกต้อง",
+                    "ค. รายชื่อผู้ถือหุ้นทั้งหมดของบริษัทลูกค้า",
+                    "ง. สีของกระดาษที่ใช้พิมพ์ใบเสร็จ"
+                ],
+                ans: 1
+            },
+            {
+                q: "9. พนักงานขายนำใบเสร็จค่าอาหารต้อนรับลูกค้ามาขอเบิกเงินชดเชย แต่ตัวใบเสร็จมีเพียงยอดเงินรวมเขียนด้วยลายมือ และไม่มีชื่อหรือที่อยู่ของร้านค้า (เป็นบิลเงินสดเปล่า) ในฐานะการเงินคุณควรทำอย่างไร?",
+                options: [
+                    "ก. ยอมให้เบิกเพราะเห็นใจพนักงานที่ออกเงินสำรองไปก่อน",
+                    "ข. ปฏิเสธการเบิกจ่ายชำระเงินเนื่องจากเอกสารไม่สมบูรณ์ (ไม่สามารถใช้เป็นค่าใช้จ่ายทางภาษีของบริษัทได้) และแนะนำให้พนักงานกลับไปขอเอกสารที่ระบุข้อมูลร้านค้าและใบเสร็จที่ถูกต้อง",
+                    "ค. ใช้ปากกาเขียนชื่อร้านค้าปลอมลงไปในบิลด้วยตัวเองเพื่อให้เอกสารครบ",
+                    "ง. นำบิลใบนั้นไปให้แผนกการตลาดเป็นคนจ่ายแทน"
+                ],
+                ans: 1
+            },
+            {
+                q: "10. คำว่า \"เช็คขีดคร่อม (Crossed Cheque)\" ที่มีการเขียนเส้นขนานสองเส้นตรงมุมบนด้านซ้ายและระบุคำว่า \"A/C Payee Only\" มีความหมายวิกฤตทางการเงินอย่างไรที่ผู้ถือเช็คต้องทราบ?",
+                options: [
+                    "ก. เป็นเช็คที่สามารถนำไปขึ้นเป็นเงินสดได้ทันทีที่เคาน์เตอร์ธนาคารทุกสาขา",
+                    "ข. เป็นเช็คที่ต้องนำเข้าบัญชีธนาคารของผู้มีชื่อระบุบนหน้าเช็คเท่านั้น ไม่สามารถโอนสลักหลังให้บุคคลอื่นและไม่สามารถเบิกเป็นเงินสดได้โดยตรง",
+                    "ค. เป็นเช็คที่หมดอายุการใช้งานแล้วไม่สามารถใช้ได้",
+                    "ง. เป็นเช็คที่ใช้สำหรับจ่ายค่าปรับจราจรเท่านั้น"
+                ],
+                ans: 1
+            },
+            {
+                q: "11. รายงาน \"ประมาณการกระแสเงินสด (Cash Flow Forecasting)\" ที่คุณต้องจัดทำเสนอผู้บริหารเป็นประจำทุกสัปดาห์ มีประโยชน์โดยตรงต่อองค์กรในแง่ใด?",
+                options: [
+                    "ก. ช่วยประเมินสภาพคล่อง (Liquidity) วางแผนการรับ-จ่ายเงินในอนาคต เพื่อให้มั่นใจว่าบริษัทจะมีเงินสดเพียงพอสำหรับจ่ายเงินเดือน ค่าน้ำไฟ และชำระหนี้ได้ตรงเวลา",
+                    "ข. ช่วยคำนวณหาอัตราการทำกำไรสุทธิของตัวสินค้า",
+                    "ค. ช่วยกำหนดราคาขายหน้าร้านของสินค้าล็อตใหม่",
+                    "ง. ช่วยตรวจสอบว่าพนักงานคนไหนลากิจบ่อยที่สุด"
+                ],
+                ans: 0
+            },
+            {
+                q: "12. หากบริษัทของคุณใช้ระบบอีเพย์เมนต์ (E-payment / Corporate Online Banking) ในการโอนเงินเดือนให้พนักงาน มาตรการความปลอดภัยเชิงระบบข้อใดที่เจ้าหน้าที่การเงินต้องยึดถือปฏิบัติอย่างเคร่งครัด?",
+                options: [
+                    "ก. การจดรหัสผ่าน (Password) และรหัส PIN ใส่กระดาษแปะไว้หน้าจอคอมพิวเตอร์ส่วนกลาง",
+                    "ข. การเปิดระบบ \"Two-Factor Authentication (2FA)\", การรักษาความลับของอุปกรณ์ Token และการตรวจสอบความถูกต้องของเลขบัญชีธนาคารปลายทางและยอดเงินรวมก่อนกดยืนยันรายการ",
+                    "ค. การแชร์รหัสผ่านเข้าสู่ระบบธนาคารให้เพื่อนร่วมงานรับทราบทุกคนเพื่อช่วยกันทำงาน",
+                    "ง. การล็อกอินระบบทิ้งไว้บนเครื่องคอมพิวเตอร์สาธารณะและเดินไปกินข้าว"
+                ],
+                ans: 1
+            },
+            {
+                q: "13. เมื่อเกิดกรณี \"ระบบธนาคารล่ม (Bank System Outage)\" ในวันสิ้นเดือนพอดี ทำให้ไม่สามารถโอนเงินจ่ายค่าสินค้าให้กับคู่ค้ารายสำคัญตามกำหนดเวลา (Due Date) ได้ การแก้ปัญหาเฉพาะหน้าทางธุรกิจที่ดีคือข้อใด?",
+                options: [
+                    "ก. ปิดโทรศัพท์และตัดการติดต่อกับคู่ค้าไปเลยเพื่อหลีกเลี่ยงการโดนทวงถาม",
+                    "ข. รีบประสานงานแจ้งปัญหาทางเทคนิคให้คู่ค้าทราบล่วงหน้าทันทีพร้อมแนบหลักฐานระบบล่ม ออกหนังสือยืนยันกำหนดเวลาโอนใหม่ทันทีที่ระบบใช้งานได้ เพื่อรักษาความน่าเชื่อถือ",
+                    "ค. บอกคู่ค้าว่าบริษัทไม่มีเงินจ่ายและให้ไปฟ้องร้องตามกฎหมายเอาเอง",
+                    "ง. เดินทางไปกดเงินสดจากตู้ ATM ส่วนตัวไปจ่ายให้คู่ค้าก่อนโดยไม่ลงบันทึก"
+                ],
+                ans: 1
+            },
+            {
+                q: "14. เงินฝากธนาคารประเภทใดต่อไปนี้ ที่ให้ความคล่องตัวสูงที่สุดในการบริหารเงินหมุนเวียนรายวัน (Working Capital) ของบริษัท เพื่อใช้สำหรับสั่งจ่ายเช็คและตัดยอดโอนเงินอัตโนมัติ?",
+                options: [
+                    "ก. บัญชีเงินฝากประจำ 12 เดือน (Fixed Deposit Account)",
+                    "ข. บัญชีเงินฝากกระแสรายวัน (Current Account)",
+                    "ค. บัญชีเงินฝากเงินตราต่างประเทศ (FCD)",
+                    "ง. บัญชีสลากออมทรัพย์"
+                ],
+                ans: 1
+            },
+            {
+                q: "15. ข้อใดเป็นวิธีการจัดการกับ \"อัตราแลกเปลี่ยนเงินตราต่างประเทศ (Foreign Exchange Risk)\" เบื้องต้น สำหรับบริษัทที่ต้องโอนเงินจ่ายค่าสินค้านำเข้าเป็นสกุลเงินดอลลาร์ (USD) อยู่เป็นประจำ?",
+                options: [
+                    "ก. สั่งซื้อสินค้าเฉพาะช่วงที่เงินดอลลาร์แพงที่สุดเท่านั้น",
+                    "ข. การประสานงานกับธนาคารเพื่อทำ \"สัญญาซื้อขายเงินตราต่างประเทศล่วงหน้า (Forward Contract)\" ล็อกเรทอัตราแลกเปลี่ยนไว้ เพื่อควบคุมต้นทุนไม่ให้ผันผวนตามสภาวะตลาด",
+                    "ค. การปฏิเสธการจ่ายเงินจนกว่าค่าเงินบาทจะแข็งตัวขึ้นเอง",
+                    "ง. การนำเงินสดสกุลบาทใส่ซองไปรษณีย์ส่งไปให้คู่ค้าต่างประเทศ"
+                ],
+                ans: 1
+            },
+            {
+                q: "16. ซัพพลายเออร์รายหนึ่งเสนอที่จะมอบ \"บัตรของขวัญมูลค่า 5,000 บาท\" ให้คุณเป็นการส่วนตัว เพื่อขอให้คุณช่วย \"ลัดคิวจ่ายเงิน (Expedite Payment)\" ให้เร็วกว่าเครดิตเทอมปกติของบริษัท คุณควรปฏิบัติอย่างไร?",
+                options: [
+                    "ก. รับบัตรของขวัญไว้และลัดคิวให้ทันทีเพราะถือเป็นสินน้ำใจเล็กๆ น้อยๆ",
+                    "ข. ปฏิเสธการรับบัตรของขวัญ แจ้งว่าบริษัทดำเนินการจ่ายเงินตามลำดับรอบบัญชีและเครดิตเทอมอย่างเท่าเทียม และรายงานกรณีดังกล่าวให้ผู้จัดการฝ่ายรับทราบตามนโยบายต่อต้านการคอร์รัปชัน",
+                    "ค. ขอเพิ่มมูลค่าบัตรของขวัญเป็น 10,000 บาท จึงจะยอมลัดคิวให้",
+                    "ง. รับบัตรของขวัญมาแล้วนำไปแบ่งให้พนักงานในแผนกบัญชีร่วมรับรู้"
+                ],
+                ans: 1
+            },
+            {
+                q: "17. เพื่อนสนิทของคุณที่เป็นหัวหน้าแผนกอื่น เดินมาขอยืม \"เงินสดย่อย\" ของบริษัทจำนวน 2,000 บาท โดยบอกว่าจะเอาไปจ่ายค่าอาหารเย็นวันขอบคุณทีมงาน และสัญญาว่าจะนำเงินสดมาคืนให้ในวันรุ่งขึ้นโดยไม่มีใบเสร็จ คุณจะทำอย่างไร?",
+                options: [
+                    "ก. ให้ยืมทันทีเพราะเป็นเพื่อนสนิทและเชื่อใจว่าเขาจะนำมาคืนจริง",
+                    "ข. ปฏิเสธอย่างสุภาพ โดยชี้แจงว่าเงินสดย่อยของบริษัทมีไว้สำหรับใช้จ่ายในกิจการของบริษัทที่มีเอกสารหลักฐานถูกต้องเท่านั้น ไม่สามารถนำมาใช้เป็นเงินกู้ยืมส่วนบุคคลได้ทุกกรณี",
+                    "ค. ให้ยืม 1,000 บาท เพื่อรักษาน้ำใจเพื่อน",
+                    "ง. เดินไปหยิบเงินในกระเป๋าตังค์ของผู้จัดการมาให้เพื่อนยืมแทน"
+                ],
+                ans: 1
+            },
+            {
+                q: "18. ในการจัดเก็บ \"สมุดเช็คที่ยังไม่ได้เขียน (Blank Cheques)\" และ \"ตราประทับบริษัท (Company Stamp)\" มาตรการความปลอดภัยทางกายภาพข้อใดที่เหมาะสมที่สุด?",
+                options: [
+                    "ก. วางตั้งไว้บนเคาน์เตอร์ต้อนรับลูกค้าเพื่อให้ทุกคนหยิบใช้ได้สะดวก",
+                    "ข. จัดเก็บไว้ในตู้นิรภัยทนไฟที่ล็อกรหัสแน่นหนา (Safe Box) โดยมีเพียงผู้รับผิดชอบที่ได้รับมอบหมายเท่านั้นที่ถือลูกกุญแจหรือรหัสผ่าน",
+                    "ค. ใส่ไว้ในลิ้นชักโต๊ะทำงานที่ไม่มีกุญแจล็อก",
+                    "ง. ฝากไว้กับพนักงานรักษาความปลอดภัยหน้าบริษัทตอนเลิกงาน"
+                ],
+                ans: 1
+            },
+            {
+                q: "19. หากคุณตรวจพบว่ามี \"รายการโอนเงินแปลกปลอม\" ยอดเงิน 50,000 บาท ออกจากบัญชีธนาคารของบริษัทไปยังบุคคลภายนอกที่ไม่ใช่คู่ค้าในเวลาเที่ยงคืน ขั้นตอนเร่งด่วนที่สุดที่คุณต้องทำคือข้อใด?",
+                options: [
+                    "ก. รอให้ถึงรอบกระทบยอดเงินฝากธนาคารสิ้นเดือนค่อยไปตรวจสอบ",
+                    "ข. แจ้งผู้จัดการฝ่ายการเงินและรายงานธนาคารเจ้าของบัญชีทันทีเพื่อขอตรวจสอบเส้นทางการเงินและอายัดรายการชั่วคราว พร้อมรวบรวมหลักฐาน Log file ส่งให้ฝ่ายไอทีตรวจสอบการเจาะระบบ",
+                    "ค. โพสต์เตือนภัยลงบนโซเชียลมีเดียส่วนตัวเพื่อถามความเห็นจากชาวเน็ต",
+                    "ง. ลบรายการนั้นออกจากสมุดบัญชีเพื่อไม่ให้ยอดเงินไม่ตรงกัน"
+                ],
+                ans: 1
+            },
+            {
+                q: "20. พนักงานระดับผู้บริหารระดับสูงสั่งให้คุณออกเช็คสั่งจ่ายเงินสด (Cheque Payable to Cash) มูลค่า 100,000 บาท โดยบอกว่าเป็นค่าใช้จ่ายลับทางการตลาด โดยไม่มีเอกสารขออนุมัติหรือใบแจ้งหนี้ประกอบเลย ในฐานะเจ้าหน้าที่การเงินคุณควรทำอย่างไร?",
+                options: [
+                    "ก. รีบออกเช็คให้ทันทีเพราะเป็นคำสั่งของผู้บริหารระดับสูง",
+                    "ข. ทบทวนนโยบายและอำนาจอนุมัติ (Delegation of Authority) ชี้แจงอย่างสุภาพว่าการออกเช็คจำเป็นต้องมีเอกสารรองรับและผ่านกระบวนการอนุมัติตามระบบ และประสานงานขอเอกสารหลักฐานประกอบการจ่ายให้ถูกต้องก่อนดำเนินการ",
+                    "ค. ทำตามคำสั่งแต่แอบจดชื่อผู้บริหารคนนั้นไปประจานในออฟฟิศ",
+                    "ง. ปฏิเสธเสียงแข็งและเดินหนีออกจากห้องทำงานทันที"
+                ],
+                ans: 1
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Finance Officer';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = item.q;
+            const opts = item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        /* ============================================================
+           Logic
+        ============================================================ */
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
+            payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>

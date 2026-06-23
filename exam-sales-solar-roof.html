@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sales Manager (Solar Roof) Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง ผู้จัดการฝ่ายขาย (Solar
+                Roof)</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง ผู้จัดการฝ่ายขาย (Solar Roof)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Sales Manager (Solar Roof)",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. ลูกค้าระดับโรงงานอุตสาหกรรมขนาดใหญ่มีพื้นที่หลังคาจำกัด แต่ต้องการลดค่า Demand Charge ในช่วง Peak (18.30 - 21.30 น.) เป็นหลัก ในฐานะผู้จัดการฝ่ายขาย คุณควรนำเสนอโซลูชันใดเพื่อปิดการขายและคุ้มค่าทุนที่สุด?",
+                options: [
+                    "ก. ระบบ Solar Rooftop แบบ On-Grid ขนาดเต็มพื้นที่หลังคา พร้อมติด Microinverter",
+                    "ข. ระบบ Solar Rooftop ร่วมกับ Battery Energy Storage System (BESS) และระบบ EMS",
+                    "ค. เปลี่ยนทิศทางการวางแผงจากทิศใต้เป็นทิศตะวันตกทั้งหมดเพื่อรับแสงช่วงเย็น",
+                    "ง. เสนอโมเดล PPA (Power Purchase Agreement) โดยลดราคาค่าไฟต่อหน่วยให้ต่ำกว่า กฟน./กฟภ. 30%"
+                ],
+                ans: 1
+            },
+            {
+                q: "2. หากบริษัทคู่แข่งเสนอขายระบบ Solar Roof ในโมเดล PPA (Private PPA) ด้วยส่วนลด (Discount) ที่สูงกว่าบริษัทของคุณ 5% แต่สัญญาผูกพันยาวนานกว่า 5 ปี คุณจะแก้เกมการขายนี้อย่างไรเพื่อดึงความเชื่อมั่นของลูกค้า Corporate กลับมา?",
+                options: [
+                    "ก. เสนอส่วนลดเพิ่มอีก 7% ทันทีเพื่อตัดราคาคู่แข่ง",
+                    "ข. นำเสนอ IRR และ NPV Comparison โดยพิสูจน์ให้เห็นว่าประสิทธิภาพแผง (Degradation Rate) ของเราต่ำกว่า ทำให้ผลตอบแทนสุทธิตลอดอายุสัญญาสูงกว่า",
+                    "ค. แนะนำให้ลูกค้าลดขนาดกิโลวัตต์ติดตั้ง (kWp) ลง เพื่อให้คืนทุนไวขึ้น",
+                    "ง. ชูจุดเด่นเรื่องการรับประกัน Inverter ที่นานกว่าคู่แข่ง 2 ปี"
+                ],
+                ans: 1
+            },
+            {
+                q: "3. ในการคำนวณความคุ้มค่า (Financial Feasibility) ของโครงการ Solar Rooftop ขนาด 1 MW สำหรับกลุ่มธุรกิจห้องเย็น (Cold Storage) ปัจจัยใดต่อไปนี้ที่มีผลกระทบต่อระยะเวลาคืนทุน (Payback Period) มากที่สุด และมักถูกมองข้ามในการนำเสนอขาย?",
+                options: [
+                    "ก. อัตราการเสื่อมสภาพของแผงโซลาร์เซลล์ (Panel Degradation) 0.5% ต่อปี",
+                    "ข. ค่าบริการรายเดือนของระบบ Monitoring System หลังจากปีที่ 5",
+                    "ค. โครงสร้างอัตราค่าไฟฟ้าประเภท TOU (Time of Use Rate) และสัดส่วนการใช้ไฟในวันหยุด (Off-Peak)",
+                    "ง. ค่าใช้จ่ายในการเปลี่ยน Inverter ในปีที่ 10-12"
+                ],
+                ans: 2
+            },
+            {
+                q: "4. ลูกค้าสนใจติด Solar Roof แบบ PPA แต่ติดเงื่อนไขว่าผู้บริหารระดับสูงกังวลเรื่องความเสี่ยงด้านงบดุล (Balance Sheet) ของบริษัท หากคุณต้องการปิดดีลนี้ คุณควรปรับเงื่อนไขในสัญญาอย่างไร?",
+                options: [
+                    "ก. เสนอขายขาดแบบ EPC พร้อมให้สินเชื่อบุคคลแทน",
+                    "ข. ออกแบบสัญญาให้เข้าเงื่อนไข \"Off-Balance Sheet\" ตามมาตรฐานบัญชี โดยเป็นสัญญาการซื้อบริการพลังงานที่ไม่เข้าข่ายสัญญาเช่า (Lease)",
+                    "ค. ให้ลูกค้าจ่ายเงินมัดจำล่วงหน้า 50% เพื่อลดมูลค่าสินทรัพย์ในระบบ",
+                    "ง. เสนอเงื่อนไขให้ลูกค้าสามารถซื้อระบบคืน (Buyout) ได้ตั้งแต่ปีแรก"
+                ],
+                ans: 1
+            },
+            {
+                q: "5. หากโครงสร้างค่าไฟของประเทศไทยมีการปรับเปลี่ยน Policy โดยลดค่า FT ลงอย่างต่อเนื่องจนติดลบ ทีมขายของคุณเริ่มท้อแท้เพราะลูกค้าชะลอการตัดสินใจ คุณจะปรับกลยุทธ์การขาย (Sales Pitch) อย่างไรเพื่อกระตุ้นยอดขาย?",
+                options: [
+                    "ก. แนะนำให้ทีมขายเน้นการขายเรื่องภาพลักษณ์ ESG และ Net Zero Carbon ขององค์กร แทนการพูดเรื่องการประหยัดเงิน",
+                    "ข. จัดโปรโมชั่นแถมฟรีบริการล้างแผงและตรวจเช็กระบบนาน 10 ปี",
+                    "ค. ร้องเรียนต่อหน่วยงานภาครัฐเพื่อให้ตรึงราคาค่าไฟ",
+                    "ง. ปรับการนำเสนอเป็นการป้องกันความเสี่ยง (Hedging) จากความผันผวนของราคาพลังงานในอนาคตระยะยาว 25 ปี"
+                ],
+                ans: 3
+            },
+            {
+                q: "6. โรงงานของลูกค้ามีปัญหาเรื่อง \"Harmonics\" ในระบบไฟฟ้าค่อนข้างสูง และมีโครงสร้างหลังคาเก่าที่เป็นแบบคานไม้ผสมเหล็ก ในฐานะผจก.ฝ่ายขาย คุณควรสั่งการทีมออกแบบ (Pre-Engineering) ให้ระวังและเลือกใช้อุปกรณ์ใดเพื่อป้องกันความเสี่ยงทางกฎหมายและเทคนิค?",
+                options: [
+                    "ก. เลือกใช้แผงประเภท Bifacial และ Inverter ขนาดใหญ่เครื่องเดียว",
+                    "ข. เลือกใช้ String Inverter ที่มีฟังก์ชัน AFCI และมีมาตรฐานการกรองสัญญาณรบกวน (THDi < 3%) พร้อมทำโครงสร้างเสริมน้ำหนัก light-weight",
+                    "ค. แนะนำให้ลูกค้าเปลี่ยนหลังคาทั้งหมดเป็น Metal Sheet ก่อนติดตั้ง",
+                    "ง. ใช้ Inverter ยี่ห้อใดก็ได้ แต่เพิ่มการติดตั้ง Active Harmonic Filter ที่ตู้ MDB หลัก"
+                ],
+                ans: 1
+            },
+            {
+                q: "7. ลูกค้าทักท้วงว่า \"ทำไมกำลังการผลิตจริง (Yield) ของระบบ Solar Roof ที่ส่งมอบ ถึงไม่เคยวิ่งไปแตะระดับ Max Capacity (kWp) ของแผงที่ติดตั้งเลย\" ข้อใดคือการอธิบายเชิงเทคนิคที่แสดงความเป็นมืออาชีพและสร้างความน่าเชื่อถือได้ดีที่สุด?",
+                options: [
+                    "ก. เกิดจากความผิดพลาดของทีมวิศวกรที่คำนวณมุมเอียง (Tilt Angle) ผิดพลาด",
+                    "ข. เป็นเพราะการสูญเสียในระบบ (System Losses) เช่น อุณหภูมิแผงที่สูงขึ้น (Temperature Coefficient), ความต้านทานในสาย DC/AC, และประสิทธิภาพของ Inverter",
+                    "ค. เกิดจากฝุ่นและคราบสกปรกบนหลังคาโรงงานที่สะสมตัวเร็วเกินไป",
+                    "ง. เป็นเรื่องปกติเพราะการไฟฟ้าฯ มีการจำกัดการจ่ายกระแสไฟเกินเข้าสู่ระบบ"
+                ],
+                ans: 1
+            },
+            {
+                q: "8. ในการประเมินหน้างานเพื่อติดตั้งระบบ Solar Roof ขนาด 500 kWp บนหลังคาห้างสรรพสินค้า พบว่ามีพื้นที่เงาบัง (Shading) จากตึกข้างเคียงในช่วงบ่าย 14.00 น. เป็นต้นไป ประมาณ 15% ของพื้นที่ติดตั้ง คุณจะแนะนำเทคโนโลยีใดเพื่อปิดดีลและได้ Yield สูงสุด?",
+                options: [
+                    "ก. ใช้แผงโซลาร์เซลล์ประเภท Monocrystalline ทั่วไปแต่เพิ่มจำนวนแผงอีก 15%",
+                    "ข. ติดตั้งระบบปรับมุมแผงอัตโนมัติ (Solar Tracker) บนหลังคา",
+                    "ค. เลือกใช้อุปกรณ์ Optimizers ในบริเวณที่โดนเงาบัง หรือใช้ระบบ Microinverter เพื่อแยกการทำงานอิสระแต่ละแผง",
+                    "ง. ย้ายแผงทั้งหมดไปติดในทิศเหนือเพื่อหลบเงาตึก"
+                ],
+                ans: 2
+            },
+            {
+                q: "9. ลูกค้าอุตสาหกรรมหนักรายหนึ่งมีพฤติกรรมการใช้ไฟแบบกระชาก (Sudden Load Changes) จากเครื่องจักรขนาดใหญ่ ข้อใดคือข้อควรระวังสูงสุดที่คุณต้องแจ้งทีม Engineering ก่อนทำการขนานไฟ (Sychronization)?",
+                options: [
+                    "ก. แรงดันไฟฟ้าฝั่ง AC จะตกอย่างรุนแรงจนทำให้แผงโซลาร์เซลล์เสียหาย",
+                    "ข. ระบบ Zero Export (กันย้อน) อาจทำงานไม่ทัน ทำให้มีไฟไหลย้อนกลับไปที่มิเตอร์การไฟฟ้าฯ จนถูกปรับหรือระบบตัดการทำงาน (Trip)",
+                    "ค. สายสัญญาณ RS485 จะเกิดสัญญาณรบกวนจนทำให้ไม่สามารถดูกราฟได้",
+                    "ง. อินเวอร์เตอร์จะทำงานเกินกำลัง (Overload) และเกิดเพลิงไหม้"
+                ],
+                ans: 1
+            },
+            {
+                q: "10. ในกรณีที่หลังคาโรงงานของลูกค้าเป็นแบบ \"RC Slab\" (ดาดฟ้าคอนกรีต) และลูกค้ามีเงื่อนไข \"ห้ามเจาะพื้นผิวเด็ดขาด\" เนื่องจากกลัวน้ำรั่วซึม คุณจะสั่งการให้ทีมขายนำเสนอระบบโครงสร้างรองรับ (Mounting Structure) รูปแบบใด?",
+                options: [
+                    "ก. โครงสร้างแบบใช้กาวเคมีแรงยึดเกาะสูง (Epoxy Bonding)",
+                    "ข. โครงสร้างระบบใช้ถังน้ำถ่วงน้ำหนัก (Water Tank Ballast)",
+                    "ค. โครงสร้างระบบ Ballast System (ใช้บล็อกคอนกรีตสำเร็จรูปถ่วงน้ำหนัก) ที่ผ่านการคำนวณ Wind Load แล้ว",
+                    "ง. โครงสร้างแบบขึงสลิงยึดจากขอบตึก (Tensile Cable System)"
+                ],
+                ans: 2
+            },
+            {
+                q: "11. การขออนุญาตติดตั้ง Solar Rooftop ขนาด 200 kWp ในประเทศไทย ข้อใดเรียงลำดับขั้นตอนทางกฎหมายและการประสานงานหน่วยงานราชการได้ถูกต้องที่สุด?",
+                options: [
+                    "ก. ขอนำส่ง พพ. (พค.2) -> ขออนุญาต อปท. (อ.1) -> ขอขนานไฟกับการไฟฟ้า (กฟน./กฟภ.) -> ขอใบอนุญาตประกอบกิจการพลังงาน (กกพ.)",
+                    "ข. ขออนุญาต อปท. (อ.1 หรือใบรับแจ้ง) -> ยื่นเอกสารขนานไฟกับการไฟฟ้า -> ขอนำส่ง/ขึ้นทะเบียนพลังงานควบคุม (พพ.) -> แจ้งยกเว้นหรือขอใบอนุญาตกับ กกพ.",
+                    "ค. ยื่นเอกสารกับการไฟฟ้า -> ขอใบอนุญาตจาก กกพ. -> ขออนุญาต อปท. -> แจ้ง พพ.",
+                    "ง. ขอใบอนุญาตจาก กกพ. -> แจ้ง พพ. -> ขออนุญาต อปท. -> ขอนำส่งเอกสารให้การไฟฟ้า"
+                ],
+                ans: 1
+            },
+            {
+                q: "12. หากลูกค้าต้องการติดตั้งระบบ Solar Roof ขนาด 1.2 MWp เพื่อใช้เองในโรงงาน แต่ไม่อยากยื่นขอ \"ใบอนุญาตประกอบกิจการผลิตไฟฟ้า\" จาก กกพ. (เนื่องจากขั้นตอนซับซ้อน) ในฐานะผู้จัดการฝ่ายขาย คุณมีข้อแนะนำตามกฎหมายปัจจุบันอย่างไร?",
+                options: [
+                    "ก. กฎหมายปัจจุบันยกเว้นให้ระบบที่ไม่เกิน 1 MWp เท่านั้น จึงต้องแนะนำให้ลดขนาดการติดตั้งลงมาไม่เกิน 1,000 kWp เพื่อรับการยกเว้นการขอใบอนุญาต (แต่ยังต้องแจ้งประกอบกิจการที่ได้รับการยกเว้น)",
+                    "ข. แนะนำให้แบ่งสัญญาซื้อขายออกเป็น 2 สัญญา สัญญาละ 600 kWp เพื่อเลี่ยงกฎหมาย",
+                    "ค. แนะนำให้จดทะเบียนในนามบุคคลธรรมดาแทนในนามนิติบุคคล",
+                    "ง. ยืนยันว่าสามารถสร้างได้เลยเพราะปัจจุบันไม่มีการจำกัดขนาดกำลังผลิตสำหรับใช้เองแล้ว"
+                ],
+                ans: 0
+            },
+            {
+                q: "13. ข้อใดคือเกณฑ์มาตรฐานการตรวจสอบโครงสร้างหลังคา (Structural Engineering Integrity) ที่วิศวกรโยธาต้องลงนามรับรอง ก่อนที่จะนำเอกสารไปยื่นขออนุญาตดัดแปลงอาคาร (อ.1) สำหรับติดตั้ง Solar Roof?",
+                options: [
+                    "ก. หลังคาต้องสามารถรับน้ำหนักรวม (Dead Load + Live Load) เพิ่มขึ้นได้อย่างน้อย 50 kg/m²",
+                    "ข. โครงสร้างเหล็กและหลังคาต้องมีอายุการใช้งานมาแล้วไม่เกิน 5 ปี",
+                    "ค. การคำนวณแรงลม (Wind Load) และน้ำหนักติดตั้งเพิ่มเติม (Superimposed Dead Load) ต้องเป็นไปตามมาตรฐาน มยผ. หรือกฎกระทรวงควบคุมอาคาร",
+                    "ง. ต้องมีการทดสอบดึงรั้ง (Pull-out Test) ของสกรูที่ใช้ยึดทุกตัวบนหลังคา"
+                ],
+                ans: 2
+            },
+            {
+                q: "14. ลูกค้าเซ็นสัญญา EPC ไปแล้ว แต่ทีมช่างเข้าหน้างานติดตั้งล่าช้ากว่าแผนงานในสัญญา 30 วัน เนื่องจากสินค้า (Inverter) ติดปัญหาขาดแคลนในซัพพลายเชนระดับโลก และลูกค้าขู่จะปรับและยกเลิกสัญญา คุณจะแก้ไขสถานการณ์นี้อย่างไรในฐานะ ผจก.ฝ่ายขาย?",
+                options: [
+                    "ก. ยอมรับความผิดพลาดและเสนอคืนเงินมัดจำทั้งหมดทันทีเพื่อรักษาชื่อเสียงบริษัท",
+                    "ข. เข้าพบลูกค้าพร้อมนำเสนอแผนเร่งรัด (Acceleration Plan) โดยเพิ่มทีมติดตั้ง และเสนอ Option เปลี่ยนเป็น Inverter แบรนด์เทียบเท่าที่มี Tier เดียวกันและผ่านเกณฑ์การไฟฟ้าทันที พร้อมมอบส่วนลดหรือบริการล้างแผงเพิ่มเพื่อชดเชย",
+                    "ค. อ้างเหตุผล Force Majeure (เหตุสุดวิสัย) ตามกฎหมายเพื่อปฏิเสธการจ่ายค่าปรับ",
+                    "ง. แจ้งให้ทีมขายหลีกเลี่ยงการรับสายลูกค้าจนกว่าสินค้าจะมาถึงท่าเรือ"
+                ],
+                ans: 1
+            },
+            {
+                q: "15. ทีมขายของคุณส่งสัญญาณว่า \"ปิดดีลลูกค้ายากมาก\" เพราะคู่แข่งรายย่อยใช้กลยุทธ์ลดต้นทุนด้วยการใช้แผงโซลาร์เซลล์ที่ไม่มีชื่อเสียง (Non-Tier 1) และใช้วิศวกรที่ไม่มีใบ กว. รับรอง ทำให้ราคาถูกกว่าบริษัทคุณ 30% คุณจะติวเข้ม (Coach) ทีมขายอย่างไร?",
+                options: [
+                    "ก. สั่งให้ทีมขายหาแผงราคาถูกแบบเดียวกันมาสู้ราคา",
+                    "ข. สอนให้ทีมขายทำ \"Risk Assessment Cost\" ให้ลูกค้าเห็นความเสี่ยงด้านอัคคีภัย, มูลค่าการสูญเสียหากระบบล่ม (Downtime), ความยากในการเคลมประกัน และผลกระทบต่อสิทธิ์การลดหย่อนภาษี BOI",
+                    "ค. บังคับให้ทีมขายทำยอดขายให้ได้ตามเป้าเดิม หากทำไม่ได้จะปรับลดค่าคอมมิชชั่น",
+                    "ง. ปรับเป้าหมายไปจับกลุ่มลูกค้าบ้านพักอาศัยขนาดเล็กแทนกลุ่มโรงงาน"
+                ],
+                ans: 1
+            },
+            {
+                q: "16. ในการประเมินผลงาน (KPIs) ของทีมขาย Solar Roof สำหรับตลาดนิติบุคคล (B2B Corporate) ดัชนีชี้วัดใดต่อไปนี้สะท้อนถึง \"ประสิทธิภาพและคุณภาพ\" ในการทำกำไรของบริษัทได้ดีที่สุด?",
+                options: [
+                    "ก. จำนวน Lead ใหม่ที่ทีมขายหาได้ในแต่ละเดือน",
+                    "ข. ยอดรวมเมกะวัตต์ (Total MWp Signed) ที่เซ็นสัญญาได้ โดยไม่สนใจมูลค่าโครงการ",
+                    "ค. อัตราส่วนกำไรขั้นต้นของโครงการ (Project Gross Profit Margin %) และระยะเวลาในการปิดดีล (Sales Cycle Time)",
+                    "ง. จำนวนครั้งที่ทีมขายเข้าไปพบลูกค้า (Client Visits)"
+                ],
+                ans: 2
+            },
+            {
+                q: "17. ลูกค้าโทรศัพท์มา complain รุนแรงว่า ระบบ Solar Roof ที่ติดตั้งไปเกิดปัญหาน้ำรั่วซึมจากหลังคาลงมาโดนเครื่องจักรในไลน์ผลิตเสียหาย ในช่วงหน้าฝนแรกหลังติดตั้งเสร็จ ขั้นตอนแรกที่คุณต้องบริหารจัดการคืออะไร?",
+                options: [
+                    "ก. ให้ฝ่ายกฎหมายตรวจสอบสัญญาว่ามีข้อความจำกัดความรับผิดชอบ (Limitation of Liability) หรือไม่",
+                    "ข. ส่งทีม Service/Engineering เข้าหน้างานทันทีภายใน 24 ชม. เพื่ออุดรอยรั่วชั่วคราว (Emergency Repair) และร่วมตรวจสอบหาสาเหตุที่แท้จริงร่วมกับลูกค้า พร้อมแสดงความรับผิดชอบอย่างจริงใจ",
+                    "ค. ปฏิเสธไว้ก่อนว่าอาจเกิดจากโครงสร้างหลังคาเดิมของลูกค้าที่เสื่อมสภาพ",
+                    "ง. บอกให้ลูกค้ารอให้ฝนหยุดตกก่อนแล้วค่อยส่งช่างเข้าไปดู week หน้า"
+                ],
+                ans: 1
+            },
+            {
+                q: "18. หากบริษัทของคุณต้องการรุกตลาดกลุ่มโรงพยาบาลและห้างสรรพสินค้า (Commercial Sector) ซึ่งเน้นเรื่องความปลอดภัยด้านอัคคีภัยสูงสุด คุณควรผลักดันให้ทีมขายชูฟังก์ชันหรือมาตรฐานทางเทคนิคใดเป็นจุดขายสำคัญ?",
+                options: [
+                    "ก. มาตรฐานแผงโซลาร์เซลล์ที่ผลิตในประเทศไทย (MiT)",
+                    "ข. ฟังก์ชัน Rapid Shutdown และระบบตรวจจับ Arc Fault (AFCI) ที่ได้มาตรฐานสากล เช่น UL1699B",
+                    "ค. การรับประกันตัวแผงยาวนาน 30 ปี",
+                    "ง. การติดตั้งระบบดับเพลิงอัตโนมัติ (Fire Suppressant) บนหลังคา"
+                ],
+                ans: 1
+            },
+            {
+                q: "19. นโยบายส่งเสริมการลงทุนของภาครัฐ (BOI) มาตรการยกระดับประสิทธิภาพการผลิต (Smart and Sustainable Industry) ให้สิทธิประโยชน์แก่ผู้ลงทุนติดตั้ง Solar Roof อย่างไร ซึ่งทีมขายต้องใช้เป็นเครื่องมือกระตุ้นการตัดสินใจของลูกค้า?",
+                options: [
+                    "ก. ได้รับการยกเว้นภาษีเงินได้นิติบุคคล 100% ของเงินลงทุน เป็นเวลา 5 ปี",
+                    "ข. ได้รับเงินอุดหนุนค่าติดตั้งโดยตรงจากรัฐบาล 30% ของมูลค่าโครงการ",
+                    "ค. ได้รับการยกเว้นภาษีเงินได้นิติบุคคล 50% ของเงินลงทุน เป็นระยะเวลา 3 ปี",
+                    "ง. สามารถนำค่าไฟฟ้าที่ประหยัดได้ ไปหักลดหย่อนภาษีได้ 2 เท่า"
+                ],
+                ans: 2
+            },
+            {
+                q: "20. ในขั้นตอนการโอนย้ายระบบ (Commissioning & Handover) ให้แก่ลูกค้า ข้อใดคือเอกสารทางเทคนิคที่สำคัญที่สุดที่ผู้จัดการฝ่ายขายต้องมั่นใจว่าทีมงานส่งมอบครบถ้วน เพื่อป้องกันข้อพิพาทและการเคลมประกันในอนาคต?",
+                options: [
+                    "ก. ภาพถ่ายโดรนของหลังคาตอนติดตั้งเสร็จสวยงาม",
+                    "ข. รายงานผลการทดสอบระบบ (Commissioning Report/IV Curve Test), As-Built Drawing, และคู่มือการใช้งานระบบ O&M พร้อมใบรับประกันจากโรงงานผู้ผลิตอุปกรณ์หลัก",
+                    "ค. นามบัตรของซัพพลายเออร์แผงโซลาร์เซลล์ทั้งหมด",
+                    "ง. สำเนาใบเสร็จค่าธรรมเนียมที่จ่ายให้กับการไฟฟ้าฯ"
+                ],
+                ans: 1
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Sales Manager (Solar Roof)';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = item.q;
+            const opts = item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        /* ============================================================
+           Logic
+        ============================================================ */
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
+            payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
