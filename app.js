@@ -3,7 +3,7 @@ const $ = (id) => document.getElementById(id);
 
 /** วาง URL /exec จาก Deploy ของ Apps Script */
 const SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+  "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
 
 /* ===== i18n / Language Toggle ===== */
 let currentLang = "th";
@@ -372,8 +372,8 @@ function pickAnswer(idx) {
 /* ---------- NEW: เลือกชุดข้อสอบเอง ---------- */
 const EXAM_CHOICES = [
   { label: "บัญชีทั่วไป", labelEn: "General Accounting", url: "exam-accounting.html" },
-  { label: "หัวหน้าบัญชี/ผู้จัดการ", labelEn: "Accounting Manager", url: "exam-accounting-manager.html" },
-  { label: "แอดมินสาขา", labelEn: "Branch Admin", url: "exam-branch-admin.html" },
+  { label: "บัญชีระดับหัวหน้า/ผู้จัดการ", labelEn: "Accounting Manager", url: "exam-accounting-manager.html" },
+  { label: "แอดมินสาขา/ธุรการ", labelEn: "Branch Admin", url: "exam-branch-admin.html" },
   { label: "ผู้จัดการสาขา", labelEn: "Branch Manager", url: "exam-branch-manager.html" },
   { label: "BD / Developer", labelEn: "BD / Developer", url: "exam-bd.html" },
   { label: "Telesales / โทรขาย", labelEn: "Telesales", url: "exam-telesales.html" },
@@ -381,14 +381,15 @@ const EXAM_CHOICES = [
   { label: "จัดซื้อ", labelEn: "Purchasing", url: "exam-purchasing.html" },
   { label: "ธุรการประสานงานโครงการ", labelEn: "Project Coordinator", url: "exam_coordinator.html" },
   { label: "วิศวกรไฟฟ้า", labelEn: "Electrical Engineer", url: "exam_electrical_engineer.html" },
-  { label: "วิศวกรเครื่องกล", labelEn: "Mechanical Engineer", url: "exam_Mechanical_engineer.html" }, // ✅ เพิ่มใหม่
+  { label: "วิศวกรเครื่องกล", labelEn: "Mechanical Engineer", url: "exam_Mechanical_engineer.html" },
   { label: "ช่างไฟฟ้า", labelEn: "Electrician", url: "exam-electrician.html" },
   { label: "วิศวกร", labelEn: "Engineer", url: "exam-engineer.html" },
   { label: "บริการ / Service", labelEn: "Service", url: "exam-service.html" },
   { label: "คลังสินค้า / Logistic", labelEn: "Warehouse / Logistics", url: "exam-warehouse-logistics.html" },
-  { label: "HR Manager", labelEn: "HR Manager", url: "exam_hr_manager.html" },
-  { label: "HR Officer / ธุรการบุคคล", labelEn: "HR Officer / Personnel Admin", url: "exam_hr_officer.html" },
-  { label: "พนักงานขับรถผู้บริหาร", labelEn: "Executive Driver", url: "exam_executive_driver.html" },
+  { label: "โฟร์แมน / หัวหน้างาน", labelEn: "Foreman / Site Supervisor", url: "exam_foreman.html" },
+  { label: "เจ้าหน้าที่การเงิน", labelEn: "Finance Officer", url: "exam-finance-officer.html" },
+  { label: "ผู้จัดการฝ่ายขาย (Solar Roof)", labelEn: "Sales Manager (Solar Roof)", url: "exam-sales-solar-roof.html" },
+  { label: "ผู้จัดการฝ่ายขาย (Solar Pump)", labelEn: "Sales Manager (Solar Pump)", url: "exam-sales-solar-pump.html" }
 ];
 
 
@@ -437,11 +438,7 @@ function renderExamPicker_(totalScore) {
       uuid: appData.uuid || "",
       preScore: String(totalScore || 0)
     });
-        setTimeout(() => {
-      const fullUrl = `${url}?${qs.toString()}`;
-      console.log("Redirecting to:", fullUrl);
-      window.location.href = fullUrl;
-    }, 400);
+    setTimeout(() => { window.location.href = `${url}?${qs.toString()}`; }, 400);
   });
 }
 
