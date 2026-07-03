@@ -392,7 +392,8 @@ const EXAM_CHOICES = [
   { label: "ผู้จัดการฝ่ายขาย (Solar Pump)", labelEn: "Sales Manager (Solar Pump)", url: "exam-sales-solar-pump.html" },
   { label: "พนักงานขับรถผู้บริหาร", labelEn: "Executive Driver", url: "exam_executive_driver.html" },
   { label: "ผู้จัดการฝ่ายบุคคล", labelEn: "HR Manager", url: "exam_hr_manager.html" },
-  { label: "เจ้าหน้าที่ HR", labelEn: "HR Officer", url: "exam_hr_officer.html" }
+  { label: "เจ้าหน้าที่ HR", labelEn: "HR Officer", url: "exam_hr_officer.html" },
+  { label: "ผู้จัดการฝ่ายการตลาด", labelEn: "Marketing Manager", url: "exam-marketing-manager.html" }
 ];
 
 function renderExamPicker_(totalScore) {

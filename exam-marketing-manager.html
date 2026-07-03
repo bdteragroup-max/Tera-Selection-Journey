@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Marketing Manager Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        /* Language toggle button */
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <!-- Language Toggle -->
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่งผู้จัดการฝ่ายการตลาด (Marketing Manager)</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        /* ============================================================
+           i18n
+        ============================================================ */
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่งผู้จัดการฝ่ายการตลาด (Marketing Manager)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Marketing Manager",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        /* ============================================================
+           Bilingual Questions
+        ============================================================ */
+        const questions = [
+            {
+                q: "1. หากบริษัทมีงบการตลาดลดลง 40% แต่เป้าหมายยอดขายยังคงเท่าเดิม สิ่งแรกที่ผู้จัดการฝ่ายการตลาดควรทำคือข้อใด",
+                qEn: "1. If the company's marketing budget is reduced by 40% but the sales target remains the same, what is the first thing the Marketing Manager should do?",
+                options: [
+                    "ก. ลดจำนวนพนักงานฝ่ายการตลาด",
+                    "ข. ตัดทุกกิจกรรม Branding แล้วเน้นโปรโมชั่นทั้งหมด",
+                    "ค. วิเคราะห์ ROI ของทุกช่องทางและจัดลำดับความสำคัญใหม่",
+                    "ง. เพิ่มจำนวนโพสต์ Social Media"
+                ],
+                optionsEn: [
+                    "A. Reduce marketing department headcount.",
+                    "B. Cut all branding activities and focus entirely on promotions.",
+                    "C. Analyze the ROI of all channels and reprioritize them.",
+                    "D. Increase the frequency of social media posts."
+                ],
+                ans: 2 // ค
+            },
+            {
+                q: "2. KPI ใดสะท้อนประสิทธิภาพของการตลาดได้ดีที่สุด",
+                qEn: "2. Which KPI best reflects the efficiency of marketing?",
+                options: [
+                    "ก. จำนวนผู้ติดตาม Facebook",
+                    "ข. จำนวน Like",
+                    "ค. Marketing ROI",
+                    "ง. จำนวนโพสต์ต่อเดือน"
+                ],
+                optionsEn: [
+                    "A. Number of Facebook followers.",
+                    "B. Number of likes.",
+                    "C. Marketing ROI.",
+                    "D. Number of posts per month."
+                ],
+                ans: 2 // ค
+            },
+            {
+                q: "3. Lead เพิ่มขึ้น 120% แต่ยอดขายไม่เพิ่ม ปัญหาที่มีโอกาสเกิดขึ้นมากที่สุดคือ",
+                qEn: "3. Leads increased by 120% but sales did not increase. What is the most likely problem?",
+                options: [
+                    "ก. Content ไม่สวย",
+                    "ข. Lead Quality ต่ำ",
+                    "ค. Logo ไม่โดดเด่น",
+                    "ง. Facebook Reach ต่ำ"
+                ],
+                optionsEn: [
+                    "A. Unattractive content.",
+                    "B. Low lead quality.",
+                    "C. Non-prominent logo.",
+                    "D. Low Facebook reach."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "4. Customer Lifetime Value (CLV) สูงกว่าต้นทุนหาลูกค้า (CAC) 8 เท่า หมายความว่า",
+                qEn: "4. What does it mean if Customer Lifetime Value (CLV) is 8 times higher than Customer Acquisition Cost (CAC)?",
+                options: [
+                    "ก. ธุรกิจขาดทุน",
+                    "ข. การลงทุนด้านการตลาดมีประสิทธิภาพ",
+                    "ค. ควรลดงบการตลาด",
+                    "ง. ควรหยุดทำโฆษณา"
+                ],
+                optionsEn: [
+                    "A. The business is losing money.",
+                    "B. Marketing investments are highly efficient.",
+                    "C. Marketing budget should be reduced.",
+                    "D. Advertising should be stopped."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "5. หาก Conversion Rate ลดลงทันทีหลังเปลี่ยน Landing Page สิ่งแรกที่ควรทำคือ",
+                qEn: "5. If the conversion rate drops immediately after changing the landing page, what is the first step that should be taken?",
+                options: [
+                    "ก. กลับไปใช้หน้าเดิมทันที",
+                    "ข. วิเคราะห์ Heatmap และ User Behavior",
+                    "ค. เพิ่มงบยิงโฆษณา",
+                    "ง. เปลี่ยนสีโลโก้"
+                ],
+                optionsEn: [
+                    "A. Revert to the original page immediately.",
+                    "B. Analyze the heatmap and user behavior.",
+                    "C. Increase the ad budget.",
+                    "D. Change the logo color."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "6. บริษัทต้องการเพิ่มกำไร ไม่ใช่ยอดขาย KPI ของฝ่ายการตลาดควรเปลี่ยนเป็นข้อใด",
+                qEn: "6. The company wants to increase profit, not sales revenue. What should the marketing department's KPI change to?",
+                options: [
+                    "ก. Reach",
+                    "ข. Engagement",
+                    "ค. Gross Profit Contribution",
+                    "ง. Followers"
+                ],
+                optionsEn: [
+                    "A. Reach.",
+                    "B. Engagement.",
+                    "C. Gross Profit Contribution.",
+                    "D. Followers."
+                ],
+                ans: 2 // ค
+            },
+            {
+                q: "7. Marketing Funnel ที่ถูกต้องคือข้อใด",
+                qEn: "7. Which of the following is the correct Marketing Funnel?",
+                options: [
+                    "ก. Awareness → Interest → Consideration → Purchase → Loyalty",
+                    "ข. Purchase → Awareness → Interest",
+                    "ค. Interest → Loyalty → Awareness",
+                    "ง. Awareness → Purchase"
+                ],
+                optionsEn: [
+                    "A. Awareness → Interest → Consideration → Purchase → Loyalty",
+                    "B. Purchase → Awareness → Interest",
+                    "C. Interest → Loyalty → Awareness",
+                    "D. Awareness → Purchase"
+                ],
+                ans: 0 // ก
+            },
+            {
+                q: "8. หากคู่แข่งลดราคาสินค้า 20% บริษัทควรทำอย่างไร",
+                qEn: "8. If a competitor cuts their product price by 20%, what should the company do?",
+                options: [
+                    "ก. ลดราคาตามทันที",
+                    "ข. วิเคราะห์ Positioning และคุณค่าที่แตกต่างก่อน",
+                    "ค. หยุดโฆษณา",
+                    "ง. เปลี่ยนโลโก้"
+                ],
+                optionsEn: [
+                    "A. Match the price cut immediately.",
+                    "B. Analyze product positioning and unique value propositions first.",
+                    "C. Stop advertising.",
+                    "D. Change the logo."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "9. การทำ A/B Testing ควรเปลี่ยนตัวแปรครั้งละกี่ตัว",
+                qEn: "9. How many variables should be changed at a time when conducting A/B testing?",
+                options: [
+                    "ก. 5 ตัว",
+                    "ข. 3 ตัว",
+                    "ค. 2 ตัว",
+                    "ง. 1 ตัว"
+                ],
+                optionsEn: [
+                    "A. 5 variables.",
+                    "B. 3 variables.",
+                    "C. 2 variables.",
+                    "D. 1 variable."
+                ],
+                ans: 3 // ง
+            },
+            {
+                q: "10. KPI ใดเหมาะกับการวัด Brand Awareness",
+                qEn: "10. Which KPI is suitable for measuring Brand Awareness?",
+                options: [
+                    "ก. ROAS",
+                    "ข. CPM และ Reach",
+                    "ค. CAC",
+                    "ง. Conversion"
+                ],
+                optionsEn: [
+                    "A. ROAS.",
+                    "B. CPM and Reach.",
+                    "C. CAC.",
+                    "D. Conversion."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "11. หาก ROAS = 7 หมายถึงอะไร",
+                qEn: "11. What does it mean if ROAS = 7?",
+                options: [
+                    "ก. ขาดทุน",
+                    "ข. ใช้เงิน 1 บาท ได้ยอดขาย 7 บาท",
+                    "ค. ได้กำไร 700%",
+                    "ง. Conversion 7%"
+                ],
+                optionsEn: [
+                    "A. Financial loss.",
+                    "B. Spending 1 Baht yields 7 Baht in sales revenue.",
+                    "C. Made a profit of 700%.",
+                    "D. 7% conversion rate."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "12. ข้อใดคือหน้าที่ของ Marketing Manager มากที่สุด",
+                qEn: "12. Which of the following is most representative of a Marketing Manager's primary role?",
+                options: [
+                    "ก. ทำ Artwork เอง",
+                    "ข. ยิง Ads เองทุกแคมเปญ",
+                    "ค. วางกลยุทธ์และบริหารทีม",
+                    "ง. ถ่ายรูปสินค้า"
+                ],
+                optionsEn: [
+                    "A. Creating artwork themselves.",
+                    "B. Running all ad campaigns themselves.",
+                    "C. Designing strategies and managing the team.",
+                    "D. Taking product photographs."
+                ],
+                ans: 2 // ค
+            },
+            {
+                q: "13. ลูกค้าซื้อสินค้าครั้งเดียวแล้วหาย KPI ที่ควรเร่งแก้คือ",
+                qEn: "13. Customers buy once and never return. Which KPI needs urgent improvement?",
+                options: [
+                    "ก. Repeat Purchase Rate",
+                    "ข. CPM",
+                    "ค. CTR",
+                    "ง. Impression"
+                ],
+                optionsEn: [
+                    "A. Repeat Purchase Rate.",
+                    "B. CPM.",
+                    "C. CTR.",
+                    "D. Impression."
+                ],
+                ans: 0 // ก
+            },
+            {
+                q: "14. Balanced Scorecard ของฝ่ายการตลาดควรประกอบด้วย",
+                qEn: "14. What should the Marketing Department's Balanced Scorecard consist of?",
+                options: [
+                    "ก. Financial, Customer, Internal Process, Learning & Growth",
+                    "ข. Sales, HR, Finance",
+                    "ค. Branding, Sales",
+                    "ง. Reach และ Followers"
+                ],
+                optionsEn: [
+                    "A. Financial, Customer, Internal Process, Learning & Growth.",
+                    "B. Sales, HR, Finance.",
+                    "C. Branding, Sales.",
+                    "D. Reach and Followers."
+                ],
+                ans: 0 // ก
+            },
+            {
+                q: "15. หากต้องเลือกเพียงหนึ่งตัวชี้วัดเพื่อวัดคุณภาพ Lead ควรใช้",
+                qEn: "15. If only one metric could be chosen to measure lead quality, what should it be?",
+                options: [
+                    "ก. CPL",
+                    "ข. SQL Rate",
+                    "ค. Reach",
+                    "ง. CPM"
+                ],
+                optionsEn: [
+                    "A. CPL.",
+                    "B. SQL Rate (Sales Qualified Lead Rate).",
+                    "C. Reach.",
+                    "D. CPM."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "16. เมื่อบริษัทเปิดตัวสินค้าใหม่ กลยุทธ์ที่เหมาะสมที่สุดคือ",
+                qEn: "16. When launching a new product, what is the most appropriate strategy?",
+                options: [
+                    "ก. Hard Sell ตั้งแต่วันแรก",
+                    "ข. สร้าง Awareness → Educate → Lead → Sales",
+                    "ค. ลดราคา 50%",
+                    "ง. แจกฟรีทั้งหมด"
+                ],
+                optionsEn: [
+                    "A. Hard selling from day one.",
+                    "B. Build Awareness → Educate → Generate Leads → Drive Sales.",
+                    "C. 50% price discount.",
+                    "D. Give everything away for free."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "17. Marketing Attribution Model ใช้เพื่ออะไร",
+                qEn: "17. What is a Marketing Attribution Model used for?",
+                options: [
+                    "ก. วัดกำไรบริษัท",
+                    "ข. วิเคราะห์ว่าช่องทางใดมีส่วนสร้างยอดขาย",
+                    "ค. วัดความพึงพอใจพนักงาน",
+                    "ง. วัดสต๊อกสินค้า"
+                ],
+                optionsEn: [
+                    "A. Measuring company profit.",
+                    "B. Analyzing which channels contributed to generating sales.",
+                    "C. Measuring employee satisfaction.",
+                    "D. Measuring inventory levels."
+                ],
+                ans: 1 // ข
+            },
+            {
+                q: "18. บริษัทมีสินค้า 5 กลุ่ม งบจำกัด ควรใช้หลักใดจัดสรรงบ",
+                qEn: "18. A company has 5 product lines with a limited budget. Which principle should be used to allocate the budget?",
+                options: [
+                    "ก. ลงเท่ากันทุกสินค้า",
+                    "ข. ลงเฉพาะสินค้าที่ขายดีที่สุด",
+                    "ค. วิเคราะห์ BCG Matrix และ ROI",
+                    "ง. ให้ฝ่ายขายตัดสินใจ"
+                ],
+                optionsEn: [
+                    "A. Allocating equally across all products.",
+                    "B. Allocating only to the best-selling product.",
+                    "C. Analyzing the BCG Matrix and ROI.",
+                    "D. Letting the sales department decide."
+                ],
+                ans: 2 // ค
+            },
+            {
+                q: "19. หากลูกค้าบ่นเรื่องบริการใน Social Media จำนวนมาก ผู้จัดการฝ่ายการตลาดควรทำอย่างไรเป็นอันดับแรก",
+                qEn: "19. If a large number of customers complain about service on social media, what should the Marketing Manager do first?",
+                options: [
+                    "ก. ลบคอมเมนต์",
+                    "ข. ไม่ตอบ",
+                    "ค. ประสานงานแก้ไขปัญหาและสื่อสารอย่างโปร่งใส",
+                    "ง. ปิดเพจ"
+                ],
+                optionsEn: [
+                    "A. Delete the comments.",
+                    "B. Ignore and do not respond.",
+                    "C. Coordinate to resolve the issues and communicate transparently.",
+                    "D. Close the social media page."
+                ],
+                ans: 2 // ค
+            },
+            {
+                q: "20. ผู้บริหารแจ้งว่าปีหน้าต้องเพิ่มยอดขายจาก 800 ล้านบาท เป็น 1,200 ล้านบาท โดยไม่เพิ่มจำนวนพนักงาน ผู้จัดการฝ่ายการตลาดควรเริ่มจากข้อใด",
+                qEn: "20. The executives announce that next year's sales target must increase from 800 million to 1,200 million Baht without adding headcount. Where should the Marketing Manager begin?",
+                options: [
+                    "ก. เพิ่มจำนวนโพสต์ Facebook",
+                    "ข. ซื้อ Followers",
+                    "ค. วิเคราะห์ Market Opportunity, Customer Segment, Product Mix และ Marketing Strategy ใหม่ทั้งหมด",
+                    "ง. ยิง Ads เพิ่มทันที"
+                ],
+                optionsEn: [
+                    "A. Increasing the number of Facebook posts.",
+                    "B. Buying followers.",
+                    "C. Completely analyzing the Market Opportunity, Customer Segments, Product Mix, and formulating a new Marketing Strategy.",
+                    "D. Immediately increasing ad spend."
+                ],
+                ans: 2 // ค
+            }
+        ];
+
+        /* ============================================================
+           App State
+        ============================================================ */
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Marketing Manager';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        /* ============================================================
+           Language helpers
+        ============================================================ */
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        /* ============================================================
+           Render
+        ============================================================ */
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        /* ============================================================
+           Logic
+        ============================================================ */
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],          // always store Thai for Sheet
+                isCorrect: choiceIndex === item.ans
+            });
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 14 ? "🟢 ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "🟡 พิจารณาพิเศษ" : "🔴 ไม่ผ่าน");
+            payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
+
+            // Update modal text to current language
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
