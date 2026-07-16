@@ -393,7 +393,8 @@ const EXAM_CHOICES = [
   { label: "พนักงานขับรถผู้บริหาร", labelEn: "Executive Driver", url: "exam_executive_driver.html" },
   { label: "ผู้จัดการฝ่ายบุคคล", labelEn: "HR Manager", url: "exam_hr_manager.html" },
   { label: "เจ้าหน้าที่ HR", labelEn: "HR Officer", url: "exam_hr_officer.html" },
-  { label: "ผู้จัดการฝ่ายการตลาด", labelEn: "Marketing Manager", url: "exam-marketing-manager.html" }
+  { label: "ผู้จัดการฝ่ายการตลาด", labelEn: "Marketing Manager", url: "exam-marketing-manager.html" },
+  { label: "เจ้าหน้าที่กฎหมาย (In-house Legal)", labelEn: "In-house Legal", url: "exam_inhouse_legal.html" }
 ];
 
 function renderExamPicker_(totalScore) {

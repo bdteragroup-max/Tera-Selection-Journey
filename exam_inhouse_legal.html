@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>In-house Legal Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .essay-area {
+            width: 100%;
+            min-height: 180px;
+            background: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            color: #2c3e50;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-next {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-next:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .manager-tag {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">Assessment: In-house Legal</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "Assessment: In-house Legal",
+                userInfo: (name, pos) => `ผู้สมัคร: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                tagChoice: "Legal Competency",
+                tagEssay: "Vision & Essay",
+                essayPlaceholder: "เขียนอธิบายคำตอบของคุณที่นี่ (ยิ่งละเอียด ยิ่งดีต่อการพิจารณา)...",
+                btnSaveNext: "บันทึกและถัดไป",
+                alertEssay: "กรุณาพิมพ์คำตอบให้ชัดเจนก่อนไปข้อถัดไปครับ",
+                saving: "กำลังบันทึกบททดสอบ...",
+                savingDesc: "กรุณารอสักครู่ ระบบกำลังนำส่งคำตอบและ Essay ของคุณเข้าสู่ระบบคัดเลือก",
+                modalIcon: "✅",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: In-house Legal",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                tagChoice: "Legal Competency",
+                tagEssay: "Vision & Essay",
+                essayPlaceholder: "Write your answer here. The more detail you provide, the better it reflects your thinking...",
+                btnSaveNext: "Save & Continue",
+                alertEssay: "Please provide a more detailed answer before continuing.",
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers and essays to our selection system.",
+                modalIcon: "✅",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            {
+                type: "choice",
+                q: "1. ในการทำหน้าที่ In-house Legal เมื่อต้องตรวจร่างสัญญาที่ฝ่ายขายเสนอมา ใครคือ 'ลูกความ (Client)' ที่แท้จริงที่คุณต้องรักษาผลประโยชน์สูงสุดให้?",
+                qEn: "1. As an In-house Legal counsel reviewing a contract draft from the sales team, who is your true 'Client' whose best interests you must protect?",
+                options: ["ก. ผู้จัดการฝ่ายขาย", "ข. คู่สัญญาของบริษัท", "ค. นิติบุคคลของบริษัท", "ง. พนักงานในแผนก"],
+                optionsEn: ["A. Sales Manager", "B. The company's counterparty", "C. The corporate entity (The company itself)", "D. Department employees"],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "2. หากบริษัทต้องการเลิกจ้างพนักงานเนื่องจากขาดงานบ่อย หน้าที่หลักของเจ้าหน้าที่กฎหมายในการประสานงานคดีความคืออะไร?",
+                qEn: "2. If the company wants to terminate an employee for frequent absenteeism, what is the primary role of the legal officer in coordinating the case?",
+                options: ["ก. การทำสำนวนส่งให้อัยการ", "ข. การตัดสินผลคดีเบื้องต้น", "ค. การจัดเตรียมพยานหลักฐาน", "ง. การขึ้นว่าความบนศาล"],
+                optionsEn: ["A. Preparing a brief for the prosecutor", "B. Making an initial ruling on the case", "C. Preparing evidence", "D. Representing the company in court"],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "3. ข้อใดคือความแตกต่างที่สำคัญที่สุดในการวิเคราะห์กฎหมายระหว่าง In-house Legal และทนายความจาก Law Firm?",
+                qEn: "3. What is the most significant difference in legal analysis between In-house Legal and a lawyer from a Law Firm?",
+                options: ["ก. การเข้าใจบริบทธุรกิจ", "ข. การทำงานกับคนจำนวนมาก", "ค. การจำตัวบทกฎหมายได้", "ง. การเขียนคำคู่ความเก่ง"],
+                optionsEn: ["A. Understanding the business context", "B. Working with a large number of people", "C. Memorizing legal statutes", "D. Writing excellent pleadings"],
+                ans: 0
+            },
+            {
+                type: "choice",
+                q: "4. ในการตรวจสอบสัญญาจ้าง (Service Agreement) ข้อสัญญาใดที่ In-house ควรให้ความสำคัญสูงสุดเพื่อจำกัดความรับผิดของบริษัท?",
+                qEn: "4. When reviewing a Service Agreement, which clause should In-house counsel prioritize to limit the company's liability?",
+                options: ["ก. Counterpart Clause", "ข. Limitation of Liability", "ค. Force Majeure Clause", "ง. Effective Date Clause"],
+                optionsEn: ["A. Counterpart Clause", "B. Limitation of Liability", "C. Force Majeure Clause", "D. Effective Date Clause"],
+                ans: 1
+            },
+            {
+                type: "choice",
+                q: "5. หากฝ่ายบริหารต้องการทำโครงการใหม่ที่มีความเสี่ยงทางกฎหมายสูง (Legal Risk) แต่มีโอกาสทำกำไรมหาศาล In-house Legal ควรทำอย่างไร?",
+                qEn: "5. If management wants to pursue a new project with high legal risk but massive profit potential, what should In-house Legal do?",
+                options: ["ก. ให้ฝ่ายบริหารตัดสินใจเอง", "ข. สั่งห้ามทำโครงการทันที", "ค. เพิกเฉยต่อความเสี่ยงนั้น", "ง. เสนอทางเลือกที่ลดเสี่ยง"],
+                optionsEn: ["A. Let management decide on their own", "B. Ban the project immediately", "C. Ignore the risks", "D. Propose risk-mitigating alternatives"],
+                ans: 3
+            },
+            {
+                type: "choice",
+                q: "6. ในการทำสัญญาเช่าพื้นที่สำนักงาน ระยะเวลาเช่าเท่าใดที่ต้องทำเป็นหนังสือและจดทะเบียนต่อพนักงานเจ้าหน้าที่จึงจะฟ้องร้องบังคับคดีได้เกิน 3 ปี?",
+                qEn: "6. When leasing office space, what lease duration requires a written agreement and registration with competent officials to be enforceable for more than 3 years?",
+                options: ["ก. เกินกว่า 1 ปีขึ้นไป", "ข. เกินกว่า 5 ปีขึ้นไป", "ค. ไม่เกิน 3 ปีพอดีบพอดี", "ง. เกินกว่า 3 ปีขึ้นไป"],
+                optionsEn: ["A. More than 1 year", "B. More than 5 years", "C. Exactly 3 years or less", "D. More than 3 years"],
+                ans: 3
+            },
+            {
+                type: "choice",
+                q: "7. งาน 'ติดต่อหน่วยงานราชการเพื่อขอใบอนุญาต' ของเจ้าหน้าที่กฎหมายบริษัท สะท้อนถึงความรับผิดชอบในมิติใดมากที่สุด?",
+                qEn: "7. The task of 'contacting government agencies for licenses' by a corporate legal officer primarily reflects responsibility in which dimension?",
+                options: ["ก. Arbitration", "ข. Litigation", "ค. Compliance", "ง. Legal Research"],
+                optionsEn: ["A. Arbitration", "B. Litigation", "C. Compliance", "D. Legal Research"],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "8. ข้อใดอธิบายลักษณะงานของ In-house Legal ในมิติ 'ขอบเขตงาน' ได้ถูกต้องที่สุดตามข้อมูลที่กำหนด?",
+                qEn: "8. Which of the following best describes the 'scope of work' of In-house Legal based on typical corporate requirements?",
+                options: ["ก. เน้นงานว่าความในศาลทุกวัน", "ข. รับทำคดีเฉพาะด้านเป็นหลัก", "ค. เน้นหาลูกค้าใหม่ให้บริษัท", "ง. ดูกฎหมายทุกมิติที่เกี่ยวข้อง"],
+                optionsEn: ["A. Focusing on daily court litigation", "B. Primarily handling specialized cases", "C. Focusing on finding new clients for the company", "D. Overseeing all relevant legal dimensions"],
+                ans: 3
+            },
+            {
+                type: "choice",
+                q: "9. ในกรณีที่บริษัทต้องทำสัญญาเช่า (Lease Agreement) ข้อใดคือหน้าที่ที่ In-house ต้องตรวจสอบเพื่อป้องกันการทำสัญญาที่ไม่มีผลผูกพัน?",
+                qEn: "9. In the case of a Lease Agreement, what must In-house counsel verify to prevent the contract from being non-binding?",
+                options: ["ก. ความสวยงามของรูปแบบเอกสาร", "ข. การสะกดชื่อพนักงานในแผนก", "ค. อำนาจลงนามของผู้มีอำนาจ", "ง. จำนวนสำเนาที่พิมพ์ออกมา"],
+                optionsEn: ["A. The aesthetic formatting of the document", "B. The spelling of department employees' names", "C. The signing authority of authorized signatories", "D. The number of printed copies"],
+                ans: 2
+            },
+            {
+                type: "choice",
+                q: "10. ทำไมตำแหน่งเจ้าหน้าที่กฎหมายในบริษัทส่วนใหญ่จึง 'ไม่จำเป็น' ต้องมีใบอนุญาตว่าความ (ตั๋วทนาย) ก็ทำงานได้?",
+                qEn: "10. Why is a lawyer's license (bar admission) often 'not required' for a corporate legal officer position?",
+                options: ["ก. เพราะไม่ได้ไปศาลเป็นอาชีพ", "ข. เพราะใช้วุฒิการศึกษาแทนได้", "ค. เพราะบริษัทไม่มีคดีความเลย", "ง. เพราะกฎหมายยกเว้นให้บริษัท"],
+                optionsEn: ["A. Because appearing in court is not their primary profession", "B. Because an educational degree can substitute for it", "C. Because the company never has lawsuits", "D. Because the law exempts companies"],
+                ans: 0
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'In-house Legal';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+            const card = document.createElement('div');
+            card.className = 'q-card';
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            let html = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <div class="manager-tag">${item.type === 'choice' ? t.tagChoice : t.tagEssay}</div>
+                <p class="q-text">${questionText}</p>`;
+
+            if (item.type === "choice") {
+                html += `<div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="processNext(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            } else {
+                html += `
+                    <textarea id="essayInput" class="essay-area" placeholder="${t.essayPlaceholder}"></textarea>
+                    <button class="btn-next" onclick="processNext(null)">${t.btnSaveNext}</button>`;
+            }
+
+            card.innerHTML = html;
+            container.appendChild(card);
+            if (item.type === "essay") document.getElementById('essayInput').focus();
+        }
+
+        async function processNext(choiceIndex) {
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            if (item.type === "choice") {
+                userAnswers.push({
+                    text: item.options[choiceIndex],
+                    score: choiceIndex === item.ans ? 1 : 0
+                });
+            } else {
+                const textVal = document.getElementById('essayInput').value.trim();
+                if (textVal.length < 5) {
+                    alert(t.alertEssay);
+                    return;
+                }
+                userAnswers.push({ text: textVal, score: 0 });
+            }
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.score === 1) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = String(ans.score);
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 8 ? "🟢 ผ่านเกณฑ์ (โดดเด่น)" : (score >= 6 ? "🟡 พิจารณาเพิ่มเติม" : "🔴 ไม่ผ่านเกณฑ์ทางเทคนิค");
+
+            document.getElementById('modalIcon').textContent = t.modalIcon;
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; 
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div id="modalIcon" style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
