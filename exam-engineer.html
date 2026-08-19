@@ -95,12 +95,35 @@
         #langToggle:hover {
             background: rgba(255, 255, 255, 0.28);
         }
+    
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
 
+        <button id="backBtn" onclick="goBack()">🔙 Back</button>
     <button id="langToggle">🇬🇧 EN</button>
 
     <div class="exam-container">
@@ -375,7 +398,29 @@
                     <h2 style="color:#f1c40f;">${t.saving}</h2>
                     <p style="opacity:0.8;">${t.savingDesc}</p>
                 </div>
-                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+    </style>`;
 
             let score = 0;
             const payload = {
@@ -411,6 +456,12 @@
                 console.error(err);
                 document.getElementById('customModal').style.display = 'block';
             }
+        }
+
+        
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}`;
         }
 
         function goHome() {

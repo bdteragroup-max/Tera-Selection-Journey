@@ -448,11 +448,11 @@ function renderExamPicker_(totalScore) {
 
 function escapeHtml_(s) {
   return String(s || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 /* ---------- Finish ---------- */
@@ -551,4 +551,14 @@ window.goHome = function () {
   window.location.href = "index.html";
 };
 
-showPage("landing");
+const params = new URLSearchParams(window.location.search);
+const uuidParam = params.get("uuid");
+if (uuidParam) {
+  appData.uuid = uuidParam;
+  appData.profile.name = params.get("name") || "";
+  const preScore = Number(params.get("preScore") || 0);
+  showPage("results");
+  renderExamPicker_(preScore);
+} else {
+  showPage("landing");
+}
