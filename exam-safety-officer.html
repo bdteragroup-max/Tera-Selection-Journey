@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Safety Officer Assessment - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 2.2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: left;
+            font-size: 1.05rem;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f1c40f;
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.6;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        #langToggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #langToggle:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+        }
+
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+        <button id="backBtn" onclick="goBack()">🔙 Back</button>
+    <button id="langToggle">🇬🇧 EN</button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง จป.วิชาชีพ — งานสำนักงานและงานโครงการ</h1>
+            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "🇬🇧 EN",
+                pageTitle: "แบบทดสอบตำแหน่ง จป.วิชาชีพ — งานสำนักงานและงานโครงการ",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "🇹🇭 TH",
+                pageTitle: "Assessment: Safety Officer (Professional Level) — Office and Project Work",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            {
+                q: "1. ก่อนเริ่มงานโครงการที่มีอันตรายหลายประเภท สิ่งใดเป็นหน้าที่สำคัญของ จป.วิชาชีพ เพื่อควบคุมความเสี่ยงก่อนเริ่มงาน",
+                qEn: "1. ก่อนเริ่มงานโครงการที่มีอันตรายหลายประเภท สิ่งใดเป็นหน้าที่สำคัญของ จป.วิชาชีพ เพื่อควบคุมความเสี่ยงก่อนเริ่มงาน",
+                options: ["A. ประเมินอันตรายและความเสี่ยงของงาน", "B. รอให้เกิดอุบัติเหตุก่อนจึงกำหนดมาตรการ", "C. ให้ผู้ปฏิบัติงานตัดสินใจเรื่องความปลอดภัยเองทั้งหมด", "D. ตรวจเฉพาะ PPE หลังเริ่มงานแล้ว"],
+                optionsEn: ["A. ประเมินอันตรายและความเสี่ยงของงาน", "B. รอให้เกิดอุบัติเหตุก่อนจึงกำหนดมาตรการ", "C. ให้ผู้ปฏิบัติงานตัดสินใจเรื่องความปลอดภัยเองทั้งหมด", "D. ตรวจเฉพาะ PPE หลังเริ่มงานแล้ว"],
+                ans: 0
+            },
+            {
+                q: "2. หากพบสายไฟพ่วงในสำนักงานมีฉนวนแตกและเห็นตัวนำไฟฟ้า การดำเนินการที่เหมาะสมที่สุดคือข้อใด",
+                qEn: "2. หากพบสายไฟพ่วงในสำนักงานมีฉนวนแตกและเห็นตัวนำไฟฟ้า การดำเนินการที่เหมาะสมที่สุดคือข้อใด",
+                options: ["A. พันเทปชั่วคราวแล้วใช้งานต่อ", "B. นำออกจากการใช้งานและให้ผู้มีความรู้ตรวจซ่อมหรือเปลี่ยน", "C. วางไว้ใต้โต๊ะเพื่อไม่ให้คนเห็น", "D. ใช้ต่อได้หากยังจ่ายไฟได้ตามปกติ"],
+                optionsEn: ["A. พันเทปชั่วคราวแล้วใช้งานต่อ", "B. นำออกจากการใช้งานและให้ผู้มีความรู้ตรวจซ่อมหรือเปลี่ยน", "C. วางไว้ใต้โต๊ะเพื่อไม่ให้คนเห็น", "D. ใช้ต่อได้หากยังจ่ายไฟได้ตามปกติ"],
+                ans: 1
+            },
+            {
+                q: "3. หลักการควบคุมอันตรายตามลำดับชั้น (Hierarchy of Controls) ควรให้ความสำคัญกับมาตรการใดก่อนการใช้ PPE เมื่อสามารถดำเนินการได้",
+                qEn: "3. หลักการควบคุมอันตรายตามลำดับชั้น (Hierarchy of Controls) ควรให้ความสำคัญกับมาตรการใดก่อนการใช้ PPE เมื่อสามารถดำเนินการได้",
+                options: ["A. กำจัดหรือแทนที่แหล่งอันตราย", "B. แจก PPE เพิ่มเป็นสองชุด", "C. ติดป้ายเตือนเพียงอย่างเดียว", "D. ให้พนักงานเพิ่มความระมัดระวัง"],
+                optionsEn: ["A. กำจัดหรือแทนที่แหล่งอันตราย", "B. แจก PPE เพิ่มเป็นสองชุด", "C. ติดป้ายเตือนเพียงอย่างเดียว", "D. ให้พนักงานเพิ่มความระมัดระวัง"],
+                ans: 0
+            },
+            {
+                q: "4. ก่อนให้พนักงานขึ้นทำงานบนที่สูงในพื้นที่โครงการ สิ่งใดควรได้รับการตรวจสอบเป็นสำคัญ",
+                qEn: "4. ก่อนให้พนักงานขึ้นทำงานบนที่สูงในพื้นที่โครงการ สิ่งใดควรได้รับการตรวจสอบเป็นสำคัญ",
+                options: ["A. เฉพาะเวลาที่คาดว่างานจะเสร็จ", "B. วิธีทำงาน จุดยึด อุปกรณ์ป้องกันการตก และสภาพพื้นที่", "C. เฉพาะจำนวนพนักงานในทีม", "D. เฉพาะประสบการณ์ของหัวหน้างาน"],
+                optionsEn: ["A. เฉพาะเวลาที่คาดว่างานจะเสร็จ", "B. วิธีทำงาน จุดยึด อุปกรณ์ป้องกันการตก และสภาพพื้นที่", "C. เฉพาะจำนวนพนักงานในทีม", "D. เฉพาะประสบการณ์ของหัวหน้างาน"],
+                ans: 1
+            },
+            {
+                q: "5. พบพนักงานยืนบนเก้าอี้สำนักงานที่มีล้อเพื่อหยิบแฟ้มบนชั้นสูง จป.วิชาชีพควรแนะนำอย่างไร",
+                qEn: "5. พบพนักงานยืนบนเก้าอี้สำนักงานที่มีล้อเพื่อหยิบแฟ้มบนชั้นสูง จป.วิชาชีพควรแนะนำอย่างไร",
+                options: ["A. ให้เพื่อนจับเก้าอี้ไว้", "B. ใช้บันไดหรืออุปกรณ์ขึ้นทำงานที่เหมาะสมและมั่นคง", "C. ถอดรองเท้าเพื่อเพิ่มการยึดเกาะ", "D. ทำได้หากใช้เวลาไม่เกินหนึ่งนาที"],
+                optionsEn: ["A. ให้เพื่อนจับเก้าอี้ไว้", "B. ใช้บันไดหรืออุปกรณ์ขึ้นทำงานที่เหมาะสมและมั่นคง", "C. ถอดรองเท้าเพื่อเพิ่มการยึดเกาะ", "D. ทำได้หากใช้เวลาไม่เกินหนึ่งนาที"],
+                ans: 1
+            },
+            {
+                q: "6. ก่อนเริ่มงานเชื่อมหรือตัดโลหะที่ทำให้เกิดประกายไฟในโครงการ การควบคุมใดเหมาะสมที่สุด",
+                qEn: "6. ก่อนเริ่มงานเชื่อมหรือตัดโลหะที่ทำให้เกิดประกายไฟในโครงการ การควบคุมใดเหมาะสมที่สุด",
+                options: ["A. ตรวจพื้นที่และดำเนินระบบอนุญาตทำงานร้อนตามที่กำหนด", "B. เริ่มงานทันทีหากช่างมีประสบการณ์", "C. เปิดเพลงเตือนพนักงานรอบพื้นที่", "D. ทำงานได้ทันทีหากอยู่กลางแจ้ง"],
+                optionsEn: ["A. ตรวจพื้นที่และดำเนินระบบอนุญาตทำงานร้อนตามที่กำหนด", "B. เริ่มงานทันทีหากช่างมีประสบการณ์", "C. เปิดเพลงเตือนพนักงานรอบพื้นที่", "D. ทำงานได้ทันทีหากอยู่กลางแจ้ง"],
+                ans: 0
+            },
+            {
+                q: "7. หากมีน้ำมันหกบนทางเดินในสำนักงาน การควบคุมเบื้องต้นที่เหมาะสมคือข้อใด",
+                qEn: "7. หากมีน้ำมันหกบนทางเดินในสำนักงาน การควบคุมเบื้องต้นที่เหมาะสมคือข้อใด",
+                options: ["A. ปล่อยไว้ให้แห้งเอง", "B. กั้นหรือเตือนพื้นที่และดำเนินการทำความสะอาดอย่างเหมาะสม", "C. ปิดไฟบริเวณดังกล่าว", "D. นำกระดาษมาวางทับแล้วเดินผ่านได้"],
+                optionsEn: ["A. ปล่อยไว้ให้แห้งเอง", "B. กั้นหรือเตือนพื้นที่และดำเนินการทำความสะอาดอย่างเหมาะสม", "C. ปิดไฟบริเวณดังกล่าว", "D. นำกระดาษมาวางทับแล้วเดินผ่านได้"],
+                ans: 1
+            },
+            {
+                q: "8. เมื่อผู้รับเหมาจะเข้าปฏิบัติงานในโครงการ สิ่งใดควรดำเนินการก่อนเริ่มงาน",
+                qEn: "8. เมื่อผู้รับเหมาจะเข้าปฏิบัติงานในโครงการ สิ่งใดควรดำเนินการก่อนเริ่มงาน",
+                options: ["A. ให้เริ่มงานก่อนแล้วอบรมภายหลัง", "B. ชี้แจงกฎความปลอดภัย อันตราย และมาตรการที่เกี่ยวข้องก่อนเริ่มงาน", "C. ตรวจเฉพาะบัตรประชาชน", "D. ให้หัวหน้าผู้รับเหมารับผิดชอบทั้งหมดโดยบริษัทไม่ต้องตรวจ"],
+                optionsEn: ["A. ให้เริ่มงานก่อนแล้วอบรมภายหลัง", "B. ชี้แจงกฎความปลอดภัย อันตราย และมาตรการที่เกี่ยวข้องก่อนเริ่มงาน", "C. ตรวจเฉพาะบัตรประชาชน", "D. ให้หัวหน้าผู้รับเหมารับผิดชอบทั้งหมดโดยบริษัทไม่ต้องตรวจ"],
+                ans: 1
+            },
+            {
+                q: "9. วัตถุประสงค์หลักของการทำ Toolbox Talk ก่อนเริ่มงานคือข้อใด",
+                qEn: "9. วัตถุประสงค์หลักของการทำ Toolbox Talk ก่อนเริ่มงานคือข้อใด",
+                options: ["A. ชี้แจงงาน อันตราย และมาตรการควบคุมที่เกี่ยวข้องกับงานนั้น", "B. ใช้แทนการประเมินความเสี่ยงทุกกรณี", "C. ใช้สำหรับบันทึกเวลาทำงานเท่านั้น", "D. ใช้แจ้งยอดขายของโครงการ"],
+                optionsEn: ["A. ชี้แจงงาน อันตราย และมาตรการควบคุมที่เกี่ยวข้องกับงานนั้น", "B. ใช้แทนการประเมินความเสี่ยงทุกกรณี", "C. ใช้สำหรับบันทึกเวลาทำงานเท่านั้น", "D. ใช้แจ้งยอดขายของโครงการ"],
+                ans: 0
+            },
+            {
+                q: "10. เมื่อเกิดอุบัติเหตุจากการทำงาน เป้าหมายสำคัญของการสอบสวนอุบัติเหตุคือข้อใด",
+                qEn: "10. เมื่อเกิดอุบัติเหตุจากการทำงาน เป้าหมายสำคัญของการสอบสวนอุบัติเหตุคือข้อใด",
+                options: ["A. ค้นหาสาเหตุและกำหนดมาตรการป้องกันการเกิดซ้ำ", "B. หาผู้กระทำผิดให้เร็วที่สุด", "C. คำนวณค่าเสียหายเพียงอย่างเดียว", "D. ปิดรายงานให้เร็วที่สุด"],
+                optionsEn: ["A. ค้นหาสาเหตุและกำหนดมาตรการป้องกันการเกิดซ้ำ", "B. หาผู้กระทำผิดให้เร็วที่สุด", "C. คำนวณค่าเสียหายเพียงอย่างเดียว", "D. ปิดรายงานให้เร็วที่สุด"],
+                ans: 0
+            },
+            {
+                q: "11. เหตุการณ์ที่เกือบทำให้เกิดการบาดเจ็บหรือความเสียหาย แต่ครั้งนั้นยังไม่มีความสูญเสีย เรียกว่าอะไร",
+                qEn: "11. เหตุการณ์ที่เกือบทำให้เกิดการบาดเจ็บหรือความเสียหาย แต่ครั้งนั้นยังไม่มีความสูญเสีย เรียกว่าอะไร",
+                options: ["A. Near Miss", "B. Annual Leave", "C. Job Rotation", "D. Performance Review"],
+                optionsEn: ["A. Near Miss", "B. Annual Leave", "C. Job Rotation", "D. Performance Review"],
+                ans: 0
+            },
+            {
+                q: "12. หากพบพนักงานโครงการไม่สวม PPE ที่กำหนดสำหรับพื้นที่เสี่ยง การดำเนินการใดเหมาะสมที่สุด",
+                qEn: "12. หากพบพนักงานโครงการไม่สวม PPE ที่กำหนดสำหรับพื้นที่เสี่ยง การดำเนินการใดเหมาะสมที่สุด",
+                options: ["A. ปล่อยให้ทำงานเพราะเป็นความรับผิดชอบส่วนบุคคล", "B. หยุดหรือระงับการสัมผัสอันตรายและให้แก้ไขให้เป็นไปตามมาตรการก่อนทำงานต่อ", "C. ถ่ายรูปไว้โดยไม่ต้องแจ้งผู้ปฏิบัติงาน", "D. รอประชุมประจำเดือนแล้วจึงแจ้ง"],
+                optionsEn: ["A. ปล่อยให้ทำงานเพราะเป็นความรับผิดชอบส่วนบุคคล", "B. หยุดหรือระงับการสัมผัสอันตรายและให้แก้ไขให้เป็นไปตามมาตรการก่อนทำงานต่อ", "C. ถ่ายรูปไว้โดยไม่ต้องแจ้งผู้ปฏิบัติงาน", "D. รอประชุมประจำเดือนแล้วจึงแจ้ง"],
+                ans: 1
+            },
+            {
+                q: "13. หากต้องยกวัสดุด้วยเครนในพื้นที่โครงการ สิ่งใดควรควบคุมเพื่อป้องกันบุคคลถูกวัสดุที่ยกตกหรือแกว่งกระแทก",
+                qEn: "13. หากต้องยกวัสดุด้วยเครนในพื้นที่โครงการ สิ่งใดควรควบคุมเพื่อป้องกันบุคคลถูกวัสดุที่ยกตกหรือแกว่งกระแทก",
+                options: ["A. กั้นเขตอันตรายและควบคุมไม่ให้บุคคลเข้าใต้ของที่กำลังยก", "B. ให้พนักงานเดินผ่านใต้ของยกได้หากสวมหมวกนิรภัย", "C. เพิ่มความเร็วในการยกเพื่อลดระยะเวลา", "D. ใช้เสียงตะโกนเตือนเพียงอย่างเดียว"],
+                optionsEn: ["A. กั้นเขตอันตรายและควบคุมไม่ให้บุคคลเข้าใต้ของที่กำลังยก", "B. ให้พนักงานเดินผ่านใต้ของยกได้หากสวมหมวกนิรภัย", "C. เพิ่มความเร็วในการยกเพื่อลดระยะเวลา", "D. ใช้เสียงตะโกนเตือนเพียงอย่างเดียว"],
+                ans: 0
+            },
+            {
+                q: "14. วัตถุประสงค์สำคัญของ Lockout/Tagout (LOTO) ก่อนซ่อมบำรุงเครื่องจักรหรือระบบพลังงานคือข้อใด",
+                qEn: "14. วัตถุประสงค์สำคัญของ Lockout/Tagout (LOTO) ก่อนซ่อมบำรุงเครื่องจักรหรือระบบพลังงานคือข้อใด",
+                options: ["A. ควบคุมและแยกแหล่งพลังงานอันตรายเพื่อป้องกันการจ่ายพลังงานโดยไม่คาดคิด", "B. ทำให้เครื่องจักรทำงานเร็วขึ้น", "C. ลดจำนวนช่างซ่อมบำรุง", "D. ใช้แทน PPE ทุกประเภท"],
+                optionsEn: ["A. ควบคุมและแยกแหล่งพลังงานอันตรายเพื่อป้องกันการจ่ายพลังงานโดยไม่คาดคิด", "B. ทำให้เครื่องจักรทำงานเร็วขึ้น", "C. ลดจำนวนช่างซ่อมบำรุง", "D. ใช้แทน PPE ทุกประเภท"],
+                ans: 0
+            },
+            {
+                q: "15. การจัดสายไฟหรือสายสัญญาณพาดขวางทางเดินในสำนักงานโดยไม่มีการป้องกัน มีความเสี่ยงเด่นที่สุดข้อใด",
+                qEn: "15. การจัดสายไฟหรือสายสัญญาณพาดขวางทางเดินในสำนักงานโดยไม่มีการป้องกัน มีความเสี่ยงเด่นที่สุดข้อใด",
+                options: ["A. การสะดุดและหกล้ม", "B. การสูญเสียการได้ยิน", "C. การสัมผัสสารเคมี", "D. การขาดออกซิเจน"],
+                optionsEn: ["A. การสะดุดและหกล้ม", "B. การสูญเสียการได้ยิน", "C. การสัมผัสสารเคมี", "D. การขาดออกซิเจน"],
+                ans: 0
+            },
+            {
+                q: "16. การซ้อมแผนฉุกเฉินในสถานประกอบการมีประโยชน์สำคัญที่สุดข้อใด",
+                qEn: "16. การซ้อมแผนฉุกเฉินในสถานประกอบการมีประโยชน์สำคัญที่สุดข้อใด",
+                options: ["A. ทำให้ผู้เกี่ยวข้องเข้าใจบทบาท ขั้นตอน และตรวจพบข้อบกพร่องของแผน", "B. ทำให้ไม่จำเป็นต้องมีอุปกรณ์ฉุกเฉิน", "C. รับประกันว่าจะไม่มีเหตุฉุกเฉินเกิดขึ้น", "D. ใช้แทนการประเมินความเสี่ยงทั้งหมด"],
+                optionsEn: ["A. ทำให้ผู้เกี่ยวข้องเข้าใจบทบาท ขั้นตอน และตรวจพบข้อบกพร่องของแผน", "B. ทำให้ไม่จำเป็นต้องมีอุปกรณ์ฉุกเฉิน", "C. รับประกันว่าจะไม่มีเหตุฉุกเฉินเกิดขึ้น", "D. ใช้แทนการประเมินความเสี่ยงทั้งหมด"],
+                ans: 0
+            },
+            {
+                q: "17. เมื่อตรวจพบทางหนีไฟในสำนักงานถูกวางกล่องสินค้ากีดขวาง ควรดำเนินการอย่างไร",
+                qEn: "17. เมื่อตรวจพบทางหนีไฟในสำนักงานถูกวางกล่องสินค้ากีดขวาง ควรดำเนินการอย่างไร",
+                options: ["A. ปล่อยไว้หากยังสามารถเดินเบี่ยงผ่านได้", "B. นำสิ่งกีดขวางออกและรักษาเส้นทางหนีไฟให้พร้อมใช้งาน", "C. ติดป้ายให้เดินระวังแล้ววางของต่อ", "D. รอให้มีการตรวจประจำปีจึงแก้ไข"],
+                optionsEn: ["A. ปล่อยไว้หากยังสามารถเดินเบี่ยงผ่านได้", "B. นำสิ่งกีดขวางออกและรักษาเส้นทางหนีไฟให้พร้อมใช้งาน", "C. ติดป้ายให้เดินระวังแล้ววางของต่อ", "D. รอให้มีการตรวจประจำปีจึงแก้ไข"],
+                ans: 1
+            },
+            {
+                q: "18. ก่อนเลือก PPE ให้เหมาะสมกับงาน จป.วิชาชีพควรพิจารณาข้อมูลใดเป็นหลัก",
+                qEn: "18. ก่อนเลือก PPE ให้เหมาะสมกับงาน จป.วิชาชีพควรพิจารณาข้อมูลใดเป็นหลัก",
+                options: ["A. อันตราย ลักษณะการสัมผัส และความเหมาะสมกับผู้ใช้งาน", "B. สีที่พนักงานส่วนใหญ่ชอบ", "C. เลือกชนิดที่ราคาต่ำที่สุดเสมอ", "D. เลือก PPE ชนิดเดียวใช้กับทุกงาน"],
+                optionsEn: ["A. อันตราย ลักษณะการสัมผัส และความเหมาะสมกับผู้ใช้งาน", "B. สีที่พนักงานส่วนใหญ่ชอบ", "C. เลือกชนิดที่ราคาต่ำที่สุดเสมอ", "D. เลือก PPE ชนิดเดียวใช้กับทุกงาน"],
+                ans: 0
+            },
+            {
+                q: "19. หากตรวจพบ Unsafe Condition ในโครงการที่มีโอกาสทำให้เกิดอันตรายร้ายแรงได้ทันที การดำเนินการใดเหมาะสมที่สุด",
+                qEn: "19. หากตรวจพบ Unsafe Condition ในโครงการที่มีโอกาสทำให้เกิดอันตรายร้ายแรงได้ทันที การดำเนินการใดเหมาะสมที่สุด",
+                options: ["A. ควบคุมพื้นที่หรือหยุดกิจกรรมที่เสี่ยงและดำเนินการแก้ไขก่อนทำงานต่อ", "B. บันทึกไว้แล้วรอสรุปรายงานปลายเดือน", "C. ถ่ายรูปเก็บไว้โดยไม่แจ้งใคร", "D. ให้ทำงานต่อจนจบกะแล้วค่อยแก้ไข"],
+                optionsEn: ["A. ควบคุมพื้นที่หรือหยุดกิจกรรมที่เสี่ยงและดำเนินการแก้ไขก่อนทำงานต่อ", "B. บันทึกไว้แล้วรอสรุปรายงานปลายเดือน", "C. ถ่ายรูปเก็บไว้โดยไม่แจ้งใคร", "D. ให้ทำงานต่อจนจบกะแล้วค่อยแก้ไข"],
+                ans: 0
+            },
+            {
+                q: "20. ตัวชี้วัดใดเป็น Leading Indicator ด้านความปลอดภัยมากที่สุด",
+                qEn: "20. ตัวชี้วัดใดเป็น Leading Indicator ด้านความปลอดภัยมากที่สุด",
+                options: ["A. จำนวนการตรวจความปลอดภัยและการปิดประเด็นแก้ไขตามกำหนด", "B. จำนวนอุบัติเหตุที่เกิดขึ้นแล้ว", "C. จำนวนวันหยุดงานจากการบาดเจ็บที่เกิดขึ้นแล้ว", "D. มูลค่าความเสียหายจากอุบัติเหตุที่เกิดขึ้นแล้ว"],
+                optionsEn: ["A. จำนวนการตรวจความปลอดภัยและการปิดประเด็นแก้ไขตามกำหนด", "B. จำนวนอุบัติเหตุที่เกิดขึ้นแล้ว", "C. จำนวนวันหยุดงานจากการบาดเจ็บที่เกิดขึ้นแล้ว", "D. มูลค่าความเสียหายจากอุบัติเหตุที่เกิดขึ้นแล้ว"],
+                ans: 0
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Safety Officer';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            document.getElementById('langToggle').textContent = t.langBtn;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            if (currentStep < questions.length - 1) {
+                currentStep++;
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: userPos,
+                uuid: uuid,
+                name: userName,
+                position: userPos,
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "ดีมาก" : (score >= 13 ? "ดี" : (score >= 10 ? "พอใช้" : "ต่ำกว่าเกณฑ์"));
+            payload.decisionNote = score >= 16 ? "ดีมาก — มีพื้นฐานความรู้ด้านความปลอดภัยที่เหมาะสม" : (score >= 13 ? "ดี — มีความรู้พื้นฐานค่อนข้างดี ควรสัมภาษณ์เชิงสถานการณ์เพิ่มเติม" : (score >= 10 ? "พอใช้ — ควรประเมินประสบการณ์ภาคสนามและความเข้าใจข้อกำหนดเพิ่มเติม" : "ต่ำกว่าเกณฑ์ — ควรพิจารณาความรู้และประสบการณ์ด้านความปลอดภัยเพิ่มเติม"));
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}`;
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="font-size: 4.5rem; margin-bottom: 1.5rem;">✅</div>
+            <h2 id="modalTitle"
+                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>

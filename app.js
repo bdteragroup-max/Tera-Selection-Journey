@@ -394,7 +394,8 @@ const EXAM_CHOICES = [
   { label: "ผู้จัดการฝ่ายบุคคล", labelEn: "HR Manager", url: "exam_hr_manager.html" },
   { label: "เจ้าหน้าที่ HR", labelEn: "HR Officer", url: "exam_hr_officer.html" },
   { label: "ผู้จัดการฝ่ายการตลาด", labelEn: "Marketing Manager", url: "exam-marketing-manager.html" },
-  { label: "เจ้าหน้าที่กฎหมาย (In-house Legal)", labelEn: "In-house Legal", url: "exam_inhouse_legal.html" }
+  { label: "เจ้าหน้าที่กฎหมาย (In-house Legal)", labelEn: "In-house Legal", url: "exam_inhouse_legal.html" },
+  { label: "จป.วิชาชีพ — งานสำนักงานและงานโครงการ", labelEn: "Safety Officer", url: "exam-safety-officer.html" }
 ];
 
 function renderExamPicker_(totalScore) {
