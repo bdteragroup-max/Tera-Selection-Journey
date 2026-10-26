@@ -363,6 +363,10 @@ body {
   top: 16px;
   right: 16px;
   z-index: 10000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -386,3 +390,173 @@ body {
   position: relative;
   z-index: 2;
 }
+
+/* ===== Journey Tracker & Step Badges ===== */
+.assess-top.between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-gold {
+  background: rgba(241, 196, 15, 0.18);
+  border: 1px solid rgba(241, 196, 15, 0.45);
+  color: #f1c40f;
+  font-weight: 700;
+}
+
+.pill-step {
+  background: rgba(225, 6, 0, 0.2);
+  border: 1px solid rgba(225, 6, 0, 0.4);
+  color: #ff9999;
+  font-weight: 700;
+}
+
+.journey-tracker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.journey-step {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.65);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: all 0.2s ease;
+}
+
+.journey-step.active {
+  background: rgba(225, 6, 0, 0.28);
+  border-color: rgba(225, 6, 0, 0.85);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(225, 6, 0, 0.35);
+}
+
+.journey-step.done {
+  background: rgba(39, 174, 96, 0.22);
+  border-color: rgba(39, 174, 96, 0.65);
+  color: #2ecc71;
+}
+
+.opt-prefix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #f1c40f;
+  font-weight: 900;
+  font-size: 0.95rem;
+  margin-right: 12px;
+  flex-shrink: 0;
+  border: 1px solid rgba(241, 196, 15, 0.35);
+}
+
+/* ===== Vector Icon Badges (replaces emojis) ===== */
+.icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.2s ease;
+}
+
+.icon-circle:hover {
+  transform: scale(1.05);
+}
+
+.icon-circle.gold {
+  background: rgba(241, 196, 15, 0.15);
+  border-color: rgba(241, 196, 15, 0.4);
+  color: #f1c40f;
+  box-shadow: 0 0 20px rgba(241, 196, 15, 0.2);
+}
+
+.icon-circle.blue {
+  background: rgba(52, 152, 219, 0.15);
+  border-color: rgba(52, 152, 219, 0.4);
+  color: #5dade2;
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
+}
+
+.icon-circle.green {
+  background: rgba(39, 174, 96, 0.18);
+  border-color: rgba(39, 174, 96, 0.45);
+  color: #2ecc71;
+  box-shadow: 0 0 20px rgba(39, 174, 96, 0.25);
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.status-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-icon.green {
+  background: rgba(39, 174, 96, 0.25);
+  color: #2ecc71;
+  border: 1px solid rgba(39, 174, 96, 0.5);
+}
+
+.status-icon.gold {
+  background: rgba(241, 196, 15, 0.25);
+  color: #f1c40f;
+  border: 1px solid rgba(241, 196, 15, 0.5);
+}
+
+.status-icon.blue {
+  background: rgba(52, 152, 219, 0.25);
+  color: #5dade2;
+  border: 1px solid rgba(52, 152, 219, 0.5);
+}
+
