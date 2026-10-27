@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assessment: Asst. Sales Manager (Automation & Inverter) - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 860px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.18);
+            border: 1px solid rgba(241, 196, 15, 0.45);
+            color: #f1c40f;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 2.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.15rem 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            text-align: left;
+            font-size: 1.02rem;
+            line-height: 1.55;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: #f1c40f;
+            transform: translateX(4px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        #langToggle,
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #langToggle {
+            right: 16px;
+        }
+
+        #backBtn {
+            left: 16px;
+        }
+
+        #langToggle:hover,
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="backBtn" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back</span>
+    </button>
+    <button id="langToggle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="langBtnText">EN</span>
+    </button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.75rem; letter-spacing: -0.3px;">แบบทดสอบตำแหน่ง ผู้ช่วยผู้จัดการฝ่ายขาย (Automation & Inverter)</h1>
+            <p id="userInfo" style="opacity: 0.85; font-size: 1.05rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "EN",
+                pageTitle: "แบบทดสอบตำแหน่ง ผู้ช่วยผู้จัดการฝ่ายขาย (Automation & Inverter)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "TH",
+                pageTitle: "Assessment: Asst. Sales Manager (Automation & Inverter)",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            // หมวดที่ 1: กลยุทธ์การขายและการบริหารช่องทาง (Sales Strategy & Channel Management)
+            {
+                category: "หมวดที่ 1: กลยุทธ์การขายและการบริหารช่องทาง",
+                categoryEn: "Category 1: Sales Strategy & Channel Management",
+                q: "1. บริษัทผู้รวมระบบ (System Integrator - SI) ซึ่งเป็นพันธมิตรหลักของคุณ แอบนำสินค้า Inverter แบรนด์คู่แข่งที่ราคาถูกกว่าไปเสนอจัดชุดร่วมกับ PLC ของคุณในโครงการของลูกค้ารายใหญ่ เพื่อลดต้นทุนรวม ในฐานะ Asst. Sales Manager คุณควรจัดการอย่างไร?",
+                qEn: "1. A key System Integrator (SI) partner secretly quotes a competitor's cheaper Inverter bundled with your PLC to lower total project cost for a key account. As Asst. Sales Manager, how should you address this?",
+                options: [
+                    "ก. ยกเลิกสถานะการเป็นพันธมิตร (Partner) กับ SI รายนั้นทันที",
+                    "ข. เข้าพบ SI เพื่อรับฟังปัญหาด้านต้นทุน และนำเสนอสิทธิประโยชน์หรือส่วนลดพิเศษเพิ่มเติมสำหรับ Inverter (Bundle Package) พร้อมชี้ให้เห็นข้อดีในแง่ของ Total Integration (การเชื่อมต่อที่ไร้รอยต่อผ่านโปรโตคอลเดียวกัน) ที่จะช่วยลดเวลาและต้นทุนการเขียนโปรแกรม (Engineering Hours) ของเขาได้",
+                    "ค. แจ้งไปยังฝ่ายจัดซื้อของโรงงานลูกค้าโดยตรงว่าระบบที่ SI เสนอจะไม่มีประสิทธิภาพ",
+                    "ง. นิ่งเฉยไว้ก่อนตราบใดที่เขายังยอมซื้อ PLC จากเราอยู่"
+                ],
+                optionsEn: [
+                    "A. Immediately terminate the partnership status with this SI.",
+                    "B. Meet with the SI to understand cost constraints, offer a competitive bundle discount package, and demonstrate the engineering-hour savings from seamless single-protocol integration.",
+                    "C. Directly contact the end customer's procurement department to state that the SI's proposed setup is inefficient.",
+                    "D. Stay silent as long as they still purchase PLCs from us."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: กลยุทธ์การขายและการบริหารช่องทาง",
+                categoryEn: "Category 1: Sales Strategy & Channel Management",
+                q: "2. ในตลาดกลุ่มผู้ผลิตเครื่องจักร (OEMs) ที่มีการผลิตเครื่องจักรซ้ำๆ เป็นจำนวนมาก (Mass Production) ปัจจัยใดต่อไปนี้ที่ลูกค้ากลุ่มนี้ให้ความสำคัญสูงสุดในการเลือกซื้อชุด Automation & Inverter ซึ่งทีมขายของคุณต้องใช้เป็นแกนหลักในการเจาะตลาด?",
+                qEn: "2. In the machine builder (OEM) market with mass production, which factor do clients prioritize highest when selecting Automation & Inverter packages?",
+                options: [
+                    "ก. หน้าตาความสวยงามของตัวอุปกรณ์",
+                    "ข. ราคาต่อหน่วยที่ต่ำที่สุดภายใต้ฟังก์ชันที่กำหนด (Cost-performance Ratio) ความเสถียรของซัพพลายเชน (Lead Time) และความง่ายในการคัดลอกโปรแกรม/พารามิเตอร์ (Mass commissioning)",
+                    "ค. การบริการหลังการขายแบบ On-site ตลอด 24 ชั่วโมง",
+                    "ง. ความหลากหลายของฟังก์ชันการใช้งานที่เครื่องจักรของเขาอาจจะไม่ได้ใช้"
+                ],
+                optionsEn: [
+                    "A. Aesthetic appearance of the hardware units.",
+                    "B. Lowest unit cost for specified functions (Cost-performance Ratio), supply chain stability (lead time), and ease of mass parameter/program duplication (commissioning).",
+                    "C. 24/7 on-site field maintenance service.",
+                    "D. A wide variety of advanced features that their machines may never need."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: กลยุทธ์การขายและการบริหารช่องทาง",
+                categoryEn: "Category 1: Sales Strategy & Channel Management",
+                q: "3. หากแบรนด์คู่แข่งจัดแคมเปญ \"Trade-in\" ยอมให้โรงงานลูกค้านำ Inverter หรือ PLC เก่ารุ่นใดก็ได้มาแลกรับส่วนลดตัวใหม่ 40% จนทีมขายของคุณเริ่มสูญเสียส่วนแบ่งการตลาด (Market Share) คุณจะเสนอแผนแก้เกมอย่างไรให้ผู้จัดการฝ่ายขาย?",
+                qEn: "3. If a competitor launches a 40% trade-in campaign for old inverters/PLCs, eroding your market share, what counter-strategy should you propose to the Sales Manager?",
+                options: [
+                    "ก. แนะนำให้บริษัทลดราคาลง 50% ทันทีเพื่อตัดราคาแข่งกัน",
+                    "ข. นำเสนอกลยุทธ์ \"Retrofit & Migration Strategy\" โดยส่งทีม Technical Sales เข้าไปประเมินความเสี่ยงของระบบเก่า (Obsolescence Assessment) ชูจุดขายเรื่องการทำ \"Smooth Migration\" ที่ช่วยลด Downtime ในการเปลี่ยนผ่านระบบ และรับประกันประสิทธิภาพการประหยัดพลังงาน (Energy Audit) ที่วัดผลได้จริง",
+                    "ค. ประกาศตัดความสัมพันธ์กับลูกค้าทุกรายที่เปลี่ยนไปใช้ของคู่แข่ง",
+                    "ง. จัดงานสัมมนาแนะนำสินค้าใหม่โดยไม่มีโปรโมชั่นสู้"
+                ],
+                optionsEn: [
+                    "A. Slash prices across the board by 50% immediately to trigger a price war.",
+                    "B. Propose a \"Retrofit & Migration Strategy\" with technical obsolescence assessments, emphasizing zero-downtime smooth migration and certified energy audit savings.",
+                    "C. Cut commercial ties with any client who switches to the competitor.",
+                    "D. Host product introduction seminars without any counter-promotions."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: กลยุทธ์การขายและการบริหารช่องทาง",
+                categoryEn: "Category 1: Sales Strategy & Channel Management",
+                q: "4. กลุ่มลูกค้าโรงงานอุตสาหกรรมหนัก (เช่น โรงปูน, โรงเหล็ก) มักมีขั้นตอนการขึ้นทะเบียนผู้ค้า (Vendor List) ที่ยากมาก หากทีมขายรายงานว่าติดปัญหานี้จนเข้าไม่ถึงฝ่ายจัดซื้อ คุณควรแนะนำขั้นตอนแรกอย่างไร?",
+                qEn: "4. Heavy industry clients (e.g. cement, steel) often have rigorous Vendor List requirements that block procurement access. What first step should you guide your sales team to take?",
+                options: [
+                    "ก. แนะนำให้ทีมขายไปติดต่อฝ่ายบุคคลเพื่อขอเข้าไปฝึกงาน",
+                    "ข. เน้นการเข้าหาฝ่ายวิศวกรรม (Engineering) หรือฝ่ายบำรุงรักษา (Maintenance) เพื่อนำเสนอโซลูชันการแก้ปัญหาหน้างานจริง (เช่น การลด Breakdown) เพื่อให้ฝ่ายเทคนิคเป็นผู้ผลักดัน (Pull) แบรนด์ของเราเข้าสู่ Vendor List",
+                    "ค. รอจนกว่าทางโรงงานจะประกาศประมูลแบบสาธารณะ",
+                    "ง. เปลี่ยนไปขายโรงงานขนาดเล็กที่ไม่มีระบบ Vendor List แทน"
+                ],
+                optionsEn: [
+                    "A. Have the sales team apply for internships through the client's HR department.",
+                    "B. Engage plant Engineering or Maintenance teams with concrete on-site solutions (e.g. breakdown reduction), creating technical 'pull' to register onto the Vendor List.",
+                    "C. Wait passively until the plant releases an open public tender.",
+                    "D. Divert all efforts solely toward smaller factories that lack vendor qualification systems."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: กลยุทธ์การขายและการบริหารช่องทาง",
+                categoryEn: "Category 1: Sales Strategy & Channel Management",
+                q: "5. ดัชนีชี้วัด (KPIs) ข้อใดที่สะท้อนถึงความสำเร็จในการทำงานของตัวคุณเองในฐานะ \"ผู้ช่วยผู้จัดการฝ่ายขาย\" ฝ่าย Automation ได้ดีที่สุด?",
+                qEn: "5. Which Key Performance Indicator (KPI) best reflects your success as Asst. Sales Manager in Automation & Inverters?",
+                options: [
+                    "ก. จำนวนรอบที่ส่งทีมช่างเข้าไปซ่อมสินค้าเคลม",
+                    "ข. อัตราการเติบโตของยอดขายในกลุ่มผลิตภัณฑ์กลยุทธ์ (Strategic Product Growth) และเปอร์เซ็นต์การชนะโครงการ (Project Win Rate) ของทีมงาน",
+                    "ค. จำนวนอีเมลที่ตอบกลับลูกค้าในแต่ละวัน",
+                    "ง. ยอดขายรวมของบริษัทคู่แข่งในตลาด"
+                ],
+                optionsEn: [
+                    "A. Number of warranty repair visits dispatched per month.",
+                    "B. Sales growth in strategic product lines (Strategic Product Growth) and project win rate of the sales team.",
+                    "C. Total count of customer emails replied to each day.",
+                    "D. Aggregate revenue numbers of competitor firms in the market."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 2: เทคนิควิศวกรรมอุตสาหกรรมและการนำเสนอขาย (Technical Sales & Industrial Application)
+            {
+                category: "หมวดที่ 2: เทคนิควิศวกรรมอุตสาหกรรมและการนำเสนอขาย",
+                categoryEn: "Category 2: Technical Sales & Industrial Application",
+                q: "6. โรงงานอาหารและยา (Food & Pharmaceutical) ต้องการปรับปรุงสายการบรรจุภัณฑ์ โดยต้องการความแม่นยำสูงในการหยุดตำแหน่ง (Positioning) และต้องการความเร็วสูงมาก ในฐานะผู้เชี่ยวชาญ คุณควรสั่งการให้ทีมขายนำเสนอโซลูชันใด?",
+                qEn: "6. A food & pharma client seeks to upgrade a packaging line needing ultra-high speed and high positioning accuracy. Which solution should your team pitch?",
+                options: [
+                    "ก. มอเตอร์เหนี่ยวนำ AC ทั่วไป ควบคุมด้วย Inverter ระบบ V/f Control",
+                    "ข. ระบบ AC Servo Motor & Drive ควบคุมผ่านเครือข่ายสื่อสารความเร็วสูง เช่น EtherCAT หรือ CC-Link IE",
+                    "ค. ปั๊มไฮดรอลิก (Hydraulic System) พร้อมวาล์วควบคุม",
+                    "ง. สเต็ปปิ้งมอเตอร์ (Stepping Motor) แบบเปิดวงจร (Open Loop)"
+                ],
+                optionsEn: [
+                    "A. Standard AC induction motor driven by a V/f control inverter.",
+                    "B. AC Servo Motor & Drive system controlled via high-speed deterministic bus such as EtherCAT or CC-Link IE.",
+                    "C. Hydraulic pump system fitted with proportional valves.",
+                    "D. Open-loop stepping motor assembly."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: เทคนิควิศวกรรมอุตสาหกรรมและการนำเสนอขาย",
+                categoryEn: "Category 2: Technical Sales & Industrial Application",
+                q: "7. ลูกค้ามีปัญหา Inverter ในระบบบำบัดน้ำเสียเกิดอาการเลิฟเวอร์โหลดและทริป (Fault: Overvoltage) บ่อยครั้ง ในช่วงที่มอเตอร์พัดลมขนาดใหญ่กำลังลดความเร็วลง (Deceleration) ข้อใดคือการแนะนำอุปกรณ์เสริมเพื่อแก้ปัญหาและปิดการขายเพิ่มได้ตรงจุดที่สุด?",
+                qEn: "7. A wastewater plant faces frequent Inverter overvoltage trips during large fan motor deceleration. What add-on should you recommend to solve the issue and upsell?",
+                options: [
+                    "ก. เสนอขายแผงโซลาร์เซลล์มาต่อพ่วง",
+                    "ข. เสนอขายชุด Braking Resistor (ความต้านทานเบรก) หรือ Braking Unit เพื่อช่วยระบายพลังงานไฟฟ้าที่มอเตอร์ปั่นย้อนกลับมาในระบบ หรือเสนอระบบ Regenerative Drive",
+                    "ค. แนะนำให้ลูกค้าเปลี่ยนสายไฟให้มีขนาดใหญ่ขึ้น",
+                    "ง. เสนอขาย PLC ตัวใหม่ไปควบคุมการเปิด-ปิดแทน"
+                ],
+                optionsEn: [
+                    "A. Recommend coupling with supplementary rooftop solar panels.",
+                    "B. Supply a Braking Resistor / Braking Unit to dissipate regenerated kinetic energy, or propose an active Regenerative Unit.",
+                    "C. Advise upsizing the main supply power cables.",
+                    "D. Propose a new PLC to handle on/off sequencing."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: เทคนิควิศวกรรมอุตสาหกรรมและการนำเสนอขาย",
+                categoryEn: "Category 2: Technical Sales & Industrial Application",
+                q: "8. ในงานประเภท \"Constant Torque Load\" เช่น เครื่องอัด (Extruder) หรือสายพานลำเลียงสินค้าหนัก (Heavy Conveyor) การเลือกขนาด (Sizing) ของ Inverter ควรแนะนำทีมขายให้พิจารณาเกณฑ์ใดเป็นสำคัญ?",
+                qEn: "8. For constant torque loads like extruders or heavy conveyors, which sizing criterion should your sales team prioritize?",
+                options: [
+                    "ก. พิจารณาเลือกขนาดตามพิกัดประเภท Heavy Duty (HD) และดูที่กระแสเอาต์พุต (Rated Current) ของ Inverters มากกว่าดูแค่กำลังแรงม้า (HP/kW) ของมอเตอร์",
+                    "ข. เลือกขนาดตามพิกัด Normal Duty (ND) เพื่อประหยัดงบของลูกค้า",
+                    "ค. เลือก Inverter ที่มีขนาดเล็กกว่ามอเตอร์ 1 ระดับเสมอเพื่อความปลอดภัย",
+                    "ง. ดูเฉพาะรอบความเร็ว (RPM) ของมอเตอร์อย่างเดียว"
+                ],
+                optionsEn: [
+                    "A. Select Heavy Duty (HD) ratings based on Inverter rated continuous output current rather than motor kW/HP rating alone.",
+                    "B. Select Normal Duty (ND) ratings to minimize client expenditure.",
+                    "C. Always undersize the inverter by one frame size for safety.",
+                    "D. Consider motor nominal RPM exclusively."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 2: เทคนิควิศวกรรมอุตสาหกรรมและการนำเสนอขาย",
+                categoryEn: "Category 2: Technical Sales & Industrial Application",
+                q: "9. ลูกค้าต้องการทำโปรเจกต์ \"Energy Saving\" ในระบบปั๊มน้ำขนาดใหญ่ของโรงงาน โดยต้องการติด VFD (Inverter) แทนการควบคุมด้วยวาล์ว (Throttling Valve) แบบเดิม ปัจจัยทางคณิตศาสตร์/วิศวกรรมข้อใด (Affinity Laws) ที่ทีมขายต้องนำไปเขียนในรายงานสรุปความคุ้มค่า (ROI) เพื่อดึงดูดใจผู้บริหารโรงงาน?",
+                qEn: "9. A factory wants to install VFDs on large water pumps instead of throttling valves. Which Affinity Law formula should sales feature in ROI proposals?",
+                options: [
+                    "ก. กำลังไฟฟ้าที่ใช้จะแปรผันตรงกับความเร็วรอบมอเตอร์",
+                    "ข. กำลังไฟฟ้าที่ใช้ (Power) จะแปรผันตรงกับกำลังสามของความเร็วรอบ (Cube of Speed) ซึ่งหมายความว่าลดความเร็วรอบลงนิดเดียว จะประหยัดพลังงานได้มหาศาล",
+                    "ค. อัตราการไหลของน้ำจะแปรผันตามกำลังสองของความเร็วรอบ",
+                    "ง. แรงดันของปั๊มจะไม่มีการเปลี่ยนแปลงเมื่อลดความเร็วรอบ"
+                ],
+                optionsEn: [
+                    "A. Power consumed varies strictly linearly with impeller rotational speed.",
+                    "B. Power varies with the cube of speed (P ∝ N³), meaning slight speed reductions yield dramatic energy savings.",
+                    "C. Fluid volumetric flow varies with the square of motor speed.",
+                    "D. Discharge head pressure remains invariant when speed is decreased."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: เทคนิควิศวกรรมอุตสาหกรรมและการนำเสนอขาย",
+                categoryEn: "Category 2: Technical Sales & Industrial Application",
+                q: "10. เมื่อต้องเผชิญหน้ากับโรงงานที่ใช้ระบบ \"Industry 4.0\" และต้องการเชื่อมต่อข้อมูลจากเครื่องจักรขึ้นระบบคลาวด์ (Cloud/ERP) ฟังก์ชันหรือโปรโตคอลการสื่อสารใดในตัว PLC / Gateway ที่ทีมขายของคุณควรชูเป็นจุดขายสำคัญ?",
+                qEn: "10. For Industry 4.0 plants integrating machine telemetry into Cloud/ERP systems, which communication protocol should sales highlight as a core selling point?",
+                options: [
+                    "ก. Modbus RTU (RS485)",
+                    "ข. OPC UA หรือ MQTT ที่รองรับการเชื่อมต่อข้อมูลในระดับ IT/OT Integration อย่างปลอดภัย",
+                    "ค. การส่งสัญญาณแบบ Analog 4-20mA",
+                    "ง. โปรโตคอลการรับส่งสัญญาณวิทยุ AM/FM"
+                ],
+                optionsEn: [
+                    "A. Modbus RTU over serial RS485.",
+                    "B. OPC UA or MQTT supporting secure IT/OT convergence and contextualized data tags.",
+                    "C. Hardwired 4-20mA analog current loops.",
+                    "D. AM/FM commercial radio frequency broadcast."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 3: การประเมินคู่แข่งและการบริหารข้อกำหนด (Competitive Analysis & Specifications)
+            {
+                category: "หมวดที่ 3: การประเมินคู่แข่งและการบริหารข้อกำหนด",
+                categoryEn: "Category 3: Competitive Analysis & Specifications",
+                q: "11. ในตารางเปรียบเทียบคุณสมบัติ (Specification Comparison) เพื่อเข้าประมูลงานราชการ คู่แข่งระบุว่า PLC ของเขามีระบบ \"Hot-Standby CPU Redundancy\" หาก PLC แบรนด์ของคุณไม่มีฟังก์ชันนี้ในรุ่นเดียวกัน คุณจะแนะนำให้ทีมขายแก้สถานการณ์เชิงเทคนิคอย่างไรในตัวเล่มข้อเสนอ?",
+                qEn: "11. In a government tender, a competitor specifies 'Hot-Standby CPU Redundancy'. If your model lacks hardware CPU redundancy, how should sales counter in the technical bid?",
+                options: [
+                    "ก. ยอมรับว่าเราแพ้และขอถอนตัวจากการประมูล",
+                    "ข. นำเสนอโครงสร้างสถาปัตยกรรมแบบ \"Distributed Control\" หรือการใช้ PLC แยกโมดูลควบคุมอิสระพร้อมระบบ Ethernet Ring Topology ซึ่งมีระบบความเสถียรทดแทนกันได้ในราคาที่ประหยัดกว่า",
+                    "ค. แอบไปแก้ไขเอกสารคุณสมบัติของคู่แข่งให้ต่ำลง",
+                    "ง. ยืนยันว่าระบบ Redundancy ไม่มีประโยชน์ในการใช้งานจริง"
+                ],
+                optionsEn: [
+                    "A. Concede defeat and withdraw from the bidding process.",
+                    "B. Propose a Distributed Control architecture with independent controllers on an Ethernet Ring Topology, offering resilient fault isolation at lower total cost.",
+                    "C. Falsify the competitor's technical comparison data in the submittal.",
+                    "D. Assert that redundant architecture delivers zero practical value."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การประเมินคู่แข่งและการบริหารข้อกำหนด",
+                categoryEn: "Category 3: Competitive Analysis & Specifications",
+                q: "12. สินค้า Inverter แบรนด์ยุโรปมักถูกมองว่า \"ราคาสูงเกินไป\" เมื่อเทียบกับแบรนด์เอเชีย ในฐานะ Asst. Sales Manager ของแบรนด์พรีเมียม คุณจะสร้าง \"Value Proposition\" อย่างไรเพื่อไม่ให้ทีมขายติดหล่มการตัดราคา?",
+                qEn: "12. European Inverters are often perceived as higher priced than Asian counterparts. How should an Asst. Sales Manager build a Value Proposition to avoid price wars?",
+                options: [
+                    "ก. การเน้นย้ำเรื่อง Total Cost of Ownership (TCO), มาตรฐานความปลอดภัยระดับสูง (Built-in Functional Safety - SIL3/PLe), อายุการใช้งานของคาปาซิเตอร์ที่ยาวนานกว่า และโปรแกรมสำเร็จรูปเฉพาะทาง (Application Libraries)",
+                    "ข. การบอกลูกค้าว่าสินค้าเอเชียไม่มีคุณภาพและพังง่าย",
+                    "ค. การแถมแชมพูหรือของสมนาคุณอื่นๆ ให้กับฝ่ายจัดซื้อ",
+                    "ง. การรับประกันสินค้าแบบไม่มีเงื่อนไขยาวนาน 50 ปี"
+                ],
+                optionsEn: [
+                    "A. Emphasize Total Cost of Ownership (TCO), integrated functional safety (SIL3/PLe), superior capacitor lifespan, and dedicated application macro libraries.",
+                    "B. Criticize Asian products as inferior and prone to breakdown.",
+                    "C. Offer non-industrial giveaways and consumer goods to purchasing officers.",
+                    "D. Guarantee 50 years unconditional equipment replacement."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 3: การประเมินคู่แข่งและการบริหารข้อกำหนด",
+                categoryEn: "Category 3: Competitive Analysis & Specifications",
+                q: "13. ข้อใดคือมาตรฐานระดับการป้องกัน (IP Rating) ที่ผู้จัดการหรือทีมขายต้องเลือกให้ถูกต้องและระบุในใบเสนอราคา หากลูกค้าต้องการนำตู้คอนโทรลที่มี Inverter ไปติดตั้งในไลน์ผลิตที่มีการฉีดน้ำล้างทำความสะอาดตลอดยี่สิบสี่ชั่วโมง (Washdown Environment) ในโรงงานแปรรูปอาหาร?",
+                qEn: "13. Which ingress protection rating (IP Rating) must be specified for inverter control panels in continuous washdown zones within food processing facilities?",
+                options: [
+                    "ก. IP20",
+                    "ข. IP54",
+                    "ค. IP65 หรือ IP67 (หรือใช้ตู้สเตนเลสโครงสร้างพิเศษร่วมด้วย)",
+                    "ง. IP22"
+                ],
+                optionsEn: [
+                    "A. IP20",
+                    "B. IP54",
+                    "C. IP65 or IP67 (in conjunction with hygienic stainless steel enclosure designs).",
+                    "D. IP22"
+                ],
+                ans: 2
+            },
+
+            // หมวดที่ 4: การบริหารทีมงาน การปิดดีล และการจัดการวิกฤตหน้างาน (Team Management & Crisis Resolution)
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน การปิดดีล และการจัดการวิกฤตหน้างาน",
+                categoryEn: "Category 4: Team Management & Crisis Resolution",
+                q: "14. ทีมวิศวกรซัพพอร์ต (Application Engineers) และทีมขาย (Sales) ในทีมของคุณเกิดความขัดแย้งกันอย่างรุนแรง โดยทีมขายมองว่าทีมวิศวกรทำงานช้าทำให้ส่งหน้างานไม่ทัน ส่วนทีมวิศวกรก็บ่นว่าทีมขายรับปากลูกค้าในสิ่งที่เป็นไปไม่ได้ทางเทคนิค คุณจะแก้ปัญหาความขัดแย้งนี้อย่างไร?",
+                qEn: "14. Tension escalates between sales and application engineers: sales cites slow support turnaround, while engineers complain about unvetted promises. How do you resolve this?",
+                options: [
+                    "ก. ไล่ทีมวิศวกรออกแล้วจ้างทีมขายเพิ่ม",
+                    "ข. จัดทำกระบวนการทำงานร่วมกันใหม่ (Cross-functional Workflow) โดยกำหนดขั้นตอน \"Pre-Sales Technical Qualification\" ให้ช่างและเซลส์ร่วมตรวจสอบสเปก (Feasibility Check) ก่อนออกใบเสนอราคา พร้อมทำข้อตกลง SLA (Service Level Agreement) ที่ชัดเจนในเรื่องระยะเวลาการทำงาน",
+                    "ค. ปล่อยให้ทั้งสองฝ่ายเคลียร์ปัญหากันเองโดยไม่แทรกแซง",
+                    "ง. แยกออฟฟิศของทั้งสองทีมให้อยู่คนละจังหวัด"
+                ],
+                optionsEn: [
+                    "A. Dismiss the engineering team and recruit more salespeople.",
+                    "B. Establish a cross-functional workflow requiring Pre-Sales Technical Qualification / feasibility sign-off before quotation, backed by formal internal SLAs.",
+                    "C. Remain completely uninvolved and let interpersonal friction resolve itself.",
+                    "D. Relocate the two departments to separate provincial branches."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน การปิดดีล และการจัดการวิกฤตหน้างาน",
+                categoryEn: "Category 4: Team Management & Crisis Resolution",
+                q: "15. โครงการอัปเกรดระบบ SCADA มูลค่า 5 ล้านบาทที่ทีมขายของคุณดูแลอยู่ เกิดปัญหาบกพร่องทางซอฟต์แวร์ (Software Bug) ในวันเปิดระบบจริง (Go-Live) ทำให้ไลน์ผลิตของลูกค้าหยุดชะงักไป 3 ชั่วโมง ลูกค้าโกรธมากและขู่ฟ้องร้องเรียกค่าเสียหาย คุณควรทำอย่างไรเป็นอันดับแรก?",
+                qEn: "15. A 5M THB SCADA upgrade suffers a go-live software crash halting production for 3 hours. The furious client threatens litigation. What is your immediate priority action?",
+                options: [
+                    "ก. แจ้งว่าความผิดทั้งหมดเกิดจากบริษัทผู้พัฒนาซอฟต์แวร์ภายนอก (Outsource)",
+                    "ข. ร่วมมือกับผู้จัดการฝ่ายวิศวกรรมเพื่อส่งทีมผู้เชี่ยวชาญระดับสูงเข้าหน้างานทันที ทำการ Rollback ระบบกลับไปใช้เวอร์ชันเสถียรก่อนหน้าเพื่อเดินไลน์ผลิตให้ได้ก่อน (Workaround) พร้อมเข้าพบผู้บริหารลูกค้าเพื่อแสดงความรับผิดชอบและชี้แจงแผนการแก้ไขถาวรอย่างเป็นระบบ",
+                    "ค. ส่งอีเมลปฏิเสธความรับผิดชอบตามข้อตกลงในใบเสนอราคา",
+                    "ง. ปิดโทรศัพท์มือถือของทีมงานทุกคนเพื่อสืบหาสาเหตุกันภายในก่อน"
+                ],
+                optionsEn: [
+                    "A. Shift blame entirely onto the outsourced software vendor.",
+                    "B. Deploy senior technical leads on-site immediately with Engineering, execute a verified rollback to restore production, and meet executive sponsors with a remediation roadmap.",
+                    "C. Transmit a legal disclaimer email repudiating liability per quotation terms.",
+                    "D. Have the team switch off mobile phones until internal investigations conclude."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน การปิดดีล และการจัดการวิกฤตหน้างาน",
+                categoryEn: "Category 4: Team Management & Crisis Resolution",
+                q: "16. หากพนักงานขายในทีมของคุณสูญเสียลูกค้ารายใหญ่ (Key Account) ที่มียอดซื้อประจำไปให้กับคู่แข่งเนื่องจากปัญหา \"สินค้าขาดสต็อก (Stock Out Outage)\" ในช่วงปีที่ผ่านมา คุณควรโค้ชชิ่งและวางระบบป้องกันปัญหานี้ร่วมกับพนักงานขายอย่างไร?",
+                qEn: "16. A salesperson loses a recurring Key Account to competitors due to stock-outs. How should you coach the salesperson and build systemic prevention?",
+                options: [
+                    "ก. บังคับให้พนักงานขายกราบขอโทษลูกค้าจนกว่าจะยอมกลับมาซื้อ",
+                    "ข. สอนให้พนักงานทำ \"Rolling Forecast\" (การคาดการณ์ยอดขายล่วงหน้า 3-6 เดือน) ร่วมกับลูกค้ากลุ่ม Key Account เพื่อทำข้อตกลง \"Safety Stock / Buffer Stock\" ล็อคสินค้าในคลังสินค้าไว้เฉพาะสำหรับลูกค้าคนสำคัญ",
+                    "ค. แนะนำให้พนักงานขายเปลี่ยนไปหาลูกค้าใหม่รายย่อยแทน",
+                    "ง. เสนอให้ลดเงินเดือนพนักงานขายคนนั้นเพื่อชดเชยมูลค่าที่สูญเสียไป"
+                ],
+                optionsEn: [
+                    "A. Demand that the salesperson apologize repeatedly until the customer returns.",
+                    "B. Coach on building 3-6 month joint rolling demand forecasts with key accounts to structure reserved buffer/safety stock agreements.",
+                    "C. Advise the salesperson to abandon large enterprises in favor of small transactional shops.",
+                    "D. Penalize the representative through mandatory salary cuts to cover lost profit."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน การปิดดีล และการจัดการวิกฤตหน้างาน",
+                categoryEn: "Category 4: Team Management & Crisis Resolution",
+                q: "17. ในการปิดดีลโครงการติดตั้งระบบประหยัดพลังงานด้วย Inverter ในโรงงานขนาดใหญ่ ข้อเสนอประเภทใดต่อไปนี้ที่คุณควรนำมาพิจารณาร่วมกับลูกค้า หากลูกค้าไม่มีงบประมาณลงทุน (CAPEX) ในปีนี้?",
+                qEn: "17. When closing a major industrial Inverter energy retrofit whose CAPEX budget is frozen for the year, which proposal model should you introduce?",
+                options: [
+                    "ก. การให้ยืมสินค้าไปใช้ฟรีๆ โดยไม่มีกำหนด",
+                    "ข. รูปแบบสัญญา ESCO (Energy Service Company) หรือโมเดลแบ่งปันผลลัพธ์การประหยัดพลังงาน (Energy Performance Contracting - EPC) โดยให้ลูกค้าจ่ายค่าสินค้าจากเงินค่าไฟที่ประหยัดได้ในแต่ละเดือน",
+                    "ค. การแนะนำให้ลูกค้าทำเรื่องกู้เงินนอกระบบ",
+                    "ง. การรอจนกว่าปีหน้าโรงงานจะมีงบประมาณเข้ามาใหม่"
+                ],
+                optionsEn: [
+                    "A. Loan capital equipment indefinitely at zero charge.",
+                    "B. An ESCO model or Energy Performance Contracting (EPC) where amortized payments are funded directly through verified monthly electricity savings.",
+                    "C. Direct the factory towards uncollateralized shadow lending channels.",
+                    "D. Put the opportunity on hold until the next fiscal cycle."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน การปิดดีล และการจัดการวิกฤตหน้างาน",
+                categoryEn: "Category 4: Team Management & Crisis Resolution",
+                q: "18. ปัญหาเรื่องสัญญาณรบกวนทางแม่เหล็กไฟฟ้า (EMI/RFI Noise) จากตัว Inverter ไปรบกวนสัญญาณเซนเซอร์และระบบคอนโทรลอื่นๆ ในโรงงาน เป็นปัญหาที่พบบ่อยมาก ข้อใดคือแนวทางเชิงเทคนิคที่คุณต้องแน่ใจว่าทีมขายแนะนำให้ลูกค้าติดตั้งเพื่อป้องกันปัญหานี้?",
+                qEn: "18. EMI/RFI noise from inverters commonly disturbs factory analog sensors and controls. Which technical preventive practice must your sales team enforce?",
+                options: [
+                    "ก. แนะนำให้ถอดสายดิน (Ground) ออกจากระบบทั้งหมด",
+                    "ข. แนะนำให้ใช้สายไฟแบบมีชีลด์กันสัญญาณรบกวน (Shielded Cable) สำหรับสายเอาต์พุตของมอเตอร์, ติดตั้งตัวกรองสัญญาณ (Noise Filter / EMC Filter) และแยกรางเดินสายไฟกำลัง (Power Cable) ออกจากสายสัญญาณ (Signal Cable)",
+                    "ค. แนะนำให้ปิดอินเวอร์เตอร์แล้วกลับไปใช้ระบบสตาร์ทตรง (DOL)",
+                    "ง. แนะนำให้ตั้งตู้คอนโทรลไว้ห่างจากโรงงาน 1 กิโลเมตร"
+                ],
+                optionsEn: [
+                    "A. Disconnect earth ground connections across the enclosure.",
+                    "B. Mandate shielded motor output cabling with 360-degree bonding, install line/load EMC noise filters, and physically segregate power conduits from sensitive instrumentation trunks.",
+                    "C. Decommission the drive and revert to direct-on-line (DOL) contactors.",
+                    "D. Position the control enclosure 1 kilometer away from production halls."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน การปิดดีล และการจัดการวิกฤตหน้างาน",
+                categoryEn: "Category 4: Team Management & Crisis Resolution",
+                q: "19. เมื่อทีมขายต้องไปนำเสนอขายระบบ Automation ให้กับโรงงานอุตสาหกรรมในเครือญี่ปุ่น (Japanese Accounts) สิ่งใดต่อไปนี้เป็นวัฒนธรรมองค์กรและเกณฑ์การตัดสินใจที่ฝั่งผู้ช่วยผู้จัดการขายต้องเตรียมตัวเป็นพิเศษ?",
+                qEn: "19. When pitching automation projects to Japanese multinational industrial accounts, which cultural and decision-making dynamic demands thorough preparation?",
+                options: [
+                    "ก. การตัดสินใจที่รวดเร็วของประธานบริษัทเพียงคนเดียวโดยไม่ต้องผ่านคณะกรรมการ",
+                    "ข. การเตรียมเอกสารทางเทคนิคที่ละเอียดและครบถ้วนสูง (Ringi System), การเน้นความสัมพันธ์ระยะยาว (Trust), มาตรฐานคุณภาพสากลและการทดลองใช้เพื่อพิสูจน์ผล (PoC)",
+                    "ค. การเน้นสินค้าที่มีราคาถูกที่สุดโดยไม่สนใจแบรนด์หรือสัญชาติสินค้า",
+                    "ง. การชอบเอกสารนำเสนอที่มีเฉพาะรูปภาพและไม่มีเนื้อหาเชิงตัวเลข"
+                ],
+                optionsEn: [
+                    "A. Instant unilateral purchasing authorizations granted solely by top executives.",
+                    "B. Meticulously detailed technical documentation supporting consensus decision-making (Ringi system), proven long-term trust, and rigorous proof-of-concept (PoC) trials.",
+                    "C. Exclusive focus on the cheapest price tag without regard for supplier pedigree.",
+                    "D. Strong preference for picture-only slides stripped of quantified technical metrics."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน การปิดดีล และการจัดการวิกฤตหน้างาน",
+                categoryEn: "Category 4: Team Management & Crisis Resolution",
+                q: "20. เอกสารทางเทคนิคประเภทใดต่อไปนี้ ที่ทีมขายของคุณต้องส่งให้โรงงานของลูกค้าตรวจสอบและอนุมัติก่อนเริ่มการสั่งซื้ออุปกรณ์เพื่อประกอบตู้คอนโทรล (Control Panel Assembly) เพื่อป้องกันข้อผิดพลาดในการติดตั้งจริง?",
+                qEn: "20. Which technical deliverables must your sales engineering team submit for customer sign-off prior to purchasing and control panel assembly to avoid site discrepancies?",
+                options: [
+                    "ก. คู่มือการใช้งานหน้าจอ HMI ภาษาอังกฤษ",
+                    "ข. แบบวงจรไฟฟ้า (Electrical Schematic Diagram / Control Circuit Diagram) และตารางรายการอุปกรณ์ (Bill of Materials - BOM)",
+                    "ค. ใบรับรองการผ่านการอบรมของพนักงานขาย",
+                    "ง. เอกสารงบการเงินย้อนหลัง 3 ปีของบริษัทเรา"
+                ],
+                optionsEn: [
+                    "A. English-language user manual for the HMI terminal.",
+                    "B. Detailed Electrical Schematic / Control Circuit Diagrams and comprehensive Bill of Materials (BOM) with part specifications.",
+                    "C. Salesmanship training attendance certificate.",
+                    "D. 3-year historical financial audited statements of our firm."
+                ],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Asst_Sales_Manager_Automation';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            const _lBtn = document.getElementById('langToggle');
+            if (_lBtn) {
+                _lBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>${t.langBtn}</span>
+                `;
+            }
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, "ผู้ช่วยผู้จัดการฝ่ายขาย (Automation & Inverter)");
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, "ผู้ช่วยผู้จัดการฝ่ายขาย (Automation & Inverter)");
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const catText = (currentLang === 'en' && item.categoryEn) ? item.categoryEn : item.category;
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span class="category-badge">${catText}</span>
+                    <span class="progress-text" style="margin-bottom:0;">${t.progress(currentStep + 1, questions.length)}</span>
+                </div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: "Asst_Sales_Manager_Automation",
+                uuid: uuid,
+                name: userName,
+                position: "ผู้ช่วยผู้จัดการฝ่ายขาย (Automation & Inverter)",
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_category`] = questions[i].category;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "ผ่านเกณฑ์โดดเด่น (เรียกสัมภาษณ์)" : (score >= 12 ? "ผ่านเกณฑ์มาตรฐาน (พิจารณาเพิ่มเติม)" : "ไม่ผ่านเกณฑ์");
+            payload.decisionNote = score >= 16 ? "แนะนำเรียกสัมภาษณ์ มีความเชี่ยวชาญทั้งเชิงกลยุทธ์และเทคนิค" : (score >= 12 ? "สัมภาษณ์เจาะลึกด้านเทคนิคและเคสหน้างานเพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>

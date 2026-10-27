@@ -1240,6 +1240,7 @@ const EXAM_CHOICES = [
   { label: "เจ้าหน้าที่การเงิน", labelEn: "Finance Officer", url: "exam-finance-officer.html" },
   { label: "ผู้จัดการฝ่ายขาย (Solar Roof)", labelEn: "Sales Manager (Solar Roof)", url: "exam-sales-solar-roof.html" },
   { label: "ผู้จัดการฝ่ายขาย (Solar Pump)", labelEn: "Sales Manager (Solar Pump)", url: "exam-sales-solar-pump.html" },
+  { label: "ผู้ช่วยผู้จัดการฝ่ายขาย (Automation & Inverter)", labelEn: "Asst. Sales Manager (Automation & Inverter)", url: "exam-asst-sales-manager-automation.html" },
   { label: "พนักงานขับรถผู้บริหาร", labelEn: "Executive Driver", url: "exam_executive_driver.html" },
   { label: "ผู้จัดการฝ่ายบุคคล", labelEn: "HR Manager", url: "exam_hr_manager.html" },
   { label: "เจ้าหน้าที่ HR", labelEn: "HR Officer", url: "exam_hr_officer.html" },
