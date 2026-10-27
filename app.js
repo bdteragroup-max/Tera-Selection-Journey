@@ -1236,6 +1236,7 @@ const EXAM_CHOICES = [
   { label: "วิศวกรไฟฟ้า", labelEn: "Electrical Engineer", url: "exam_electrical_engineer.html" },
   { label: "วิศวกรเครื่องกล", labelEn: "Mechanical Engineer", url: "exam_Mechanical_engineer.html" },
   { label: "ช่างไฟฟ้า", labelEn: "Electrician", url: "exam-electrician.html" },
+  { label: "ผู้ช่วยช่างไฟฟ้า", labelEn: "Assistant Electrician", url: "exam-assistant-electrician.html" },
   { label: "วิศวกร", labelEn: "Engineer", url: "exam-engineer.html" },
   { label: "บริการ / Service", labelEn: "Service", url: "exam-service.html" },
   { label: "คลังสินค้า / Logistic", labelEn: "Warehouse / Logistics", url: "exam-warehouse-logistics.html" },

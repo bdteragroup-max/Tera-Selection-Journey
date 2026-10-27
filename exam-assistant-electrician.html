@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assessment: Assistant Electrician - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 860px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.18);
+            border: 1px solid rgba(241, 196, 15, 0.45);
+            color: #f1c40f;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 2.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.15rem 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            text-align: left;
+            font-size: 1.02rem;
+            line-height: 1.55;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: #f1c40f;
+            transform: translateX(4px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        #langToggle,
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #langToggle {
+            right: 16px;
+        }
+
+        #backBtn {
+            left: 16px;
+        }
+
+        #langToggle:hover,
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="backBtn" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back</span>
+    </button>
+    <button id="langToggle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="langBtnText">EN</span>
+    </button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.75rem; letter-spacing: -0.3px;">แบบทดสอบตำแหน่ง ผู้ช่วยช่างไฟฟ้า (Assistant Electrician)</h1>
+            <p id="userInfo" style="opacity: 0.85; font-size: 1.05rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "EN",
+                pageTitle: "แบบทดสอบตำแหน่ง ผู้ช่วยช่างไฟฟ้า (Assistant Electrician)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "TH",
+                pageTitle: "Assessment: Assistant Electrician",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            // หมวดที่ 1: ความรู้พื้นฐานเกี่ยวกับไฟฟ้าและเครื่องมือวัด (Electrical Fundamentals & Tools)
+            {
+                category: "หมวดที่ 1: ความรู้พื้นฐานเกี่ยวกับไฟฟ้าและเครื่องมือวัด",
+                categoryEn: "Category 1: Electrical Fundamentals & Tools",
+                q: "1. ในฐานะผู้ช่วยช่างไฟฟ้า เมื่อช่างอาวุโสสั่งให้คุณหยิบเครื่องมือเพื่อตรวจสอบว่า \"สายไฟเส้นใดมีกระแสไฟฟ้าไหลผ่านอยู่ (Line/Live wire)\" เครื่องมือในข้อใดปลอดภัยและเหมาะสมที่สุดในการใช้งานเบื้องต้น?",
+                qEn: "1. As an assistant electrician, when asked by a senior technician to check which conductor is live (Line/Live wire), which tool is the safest and most appropriate for initial testing?",
+                options: [
+                    "ก. ไขควงวัดไฟ (Test Pen) ที่ได้มาตรฐานและมีฉนวนหุ้มมิดชิด",
+                    "ข. คีมปากจระเข้ไม่มีฉนวนหุ้ม",
+                    "ค. มีดคัตเตอร์ปอกสายไฟ",
+                    "ง. ไขควงตอกด้ามเหล็กเปลือย"
+                ],
+                optionsEn: [
+                    "A. A certified test pen with comprehensive electrical insulation.",
+                    "B. Combination pliers without electrical insulation sleeves.",
+                    "C. A utility box cutter.",
+                    "D. A bare metal heavy-duty striking screwdriver."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 1: ความรู้พื้นฐานเกี่ยวกับไฟฟ้าและเครื่องมือวัด",
+                categoryEn: "Category 1: Electrical Fundamentals & Tools",
+                q: "2. หากคุณต้องการวัดค่า \"แรงดันไฟฟ้า (Voltage)\" ของระบบไฟฟ้ากระแสสลับภายในอาคารทั่วไป (Single Phase) คุณต้องปรับย่านวัดของมัลติมิเตอร์ (Multimeter) ไปที่สัญลักษณ์ใดและค่าที่ได้ควรอยู่ประมาณเท่าใด?",
+                qEn: "2. To measure standard single-phase residential AC voltage, which multimeter setting should you select and what approximate reading is expected?",
+                options: [
+                    "ก. ปรับไปที่ DCA วัดได้ 10 แอมแปร์",
+                    "ข. ปรับไปที่ ACV (หรือ V~) วัดได้ประมาณ 220 โวลต์",
+                    "ค. ปรับไปที่ Ω (Ohm) วัดได้ 0 โอห์ม",
+                    "ง. ปรับไปที่ DCV วัดได้ 12 โวลต์"
+                ],
+                optionsEn: [
+                    "A. Set to DCA, measuring 10 Amperes.",
+                    "B. Set to ACV (or V~), measuring approximately 220 Volts.",
+                    "C. Set to Ω (Ohm), measuring 0 Ohms.",
+                    "D. Set to DCV, measuring 12 Volts."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: ความรู้พื้นฐานเกี่ยวกับไฟฟ้าและเครื่องมือวัด",
+                categoryEn: "Category 1: Electrical Fundamentals & Tools",
+                q: "3. เครื่องมือในข้อใดต่อไปนี้ ออกแบบมาเพื่อใช้สำหรับ \"ปอกและตัด\" สายไฟฟ้าโดยเฉพาะ เพื่อป้องกันไม่ให้ลวดทองแดงภายในได้รับความเสียหายหรือขาดรั้ง?",
+                qEn: "3. Which of the following tools is specifically engineered to strip and cut electrical wire insulation without nicking or severing copper strands?",
+                options: [
+                    "ก. คีมปอกสายไฟอัตโนมัติ (Wire Stripper)",
+                    "ข. เลื่อยตัดเหล็ก",
+                    "ค. คีมล็อกปากแหลม",
+                    "ง. กรรไกรตัดกระดาษขนาดใหญ่"
+                ],
+                optionsEn: [
+                    "A. Automatic Wire Stripper.",
+                    "B. Hacksaw.",
+                    "C. Long-nose locking pliers.",
+                    "D. Large paper cutting shears."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 1: ความรู้พื้นฐานเกี่ยวกับไฟฟ้าและเครื่องมือวัด",
+                categoryEn: "Category 1: Electrical Fundamentals & Tools",
+                q: "4. สายไฟขนาดสแควร์มิลลิเมตร (เช่น 1.5 sq.mm., 2.5 sq.mm., 4 sq.mm.) ตัวเลขเหล่านี้มีความสำคัญอย่างไรที่ผู้ช่วยช่างไฟฟ้าต้องเลือกใช้ให้ถูกต้องตามแบบแปลน?",
+                qEn: "4. What is the fundamental significance of wire gauge cross-sectional sizes (e.g., 1.5, 2.5, 4 sq.mm.) that an assistant electrician must match strictly to blueprints?",
+                options: [
+                    "ก. บ่งบอกความยาวของสายไฟในม้วน",
+                    "ข. บ่งบอกขนาดพื้นที่หน้าตัดของลวดตัวนำ ซึ่งสัมพันธ์กับความสามารถในการทนกระแสไฟฟ้า (Current Carrying Capacity)",
+                    "ค. บ่งบอกระดับความเข้มของสีฉนวนภายนอก",
+                    "ง. บ่งบอกน้ำหนักของสายไฟต่อกิโลกรัม"
+                ],
+                optionsEn: [
+                    "A. Total linear length of wire on the spool.",
+                    "B. Cross-sectional conductor area, determining the wire's safe current-carrying capacity (ampacity).",
+                    "C. Darkness shade tier of the outer plastic sheath.",
+                    "D. Net weight of the cable per kilogram."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: ความรู้พื้นฐานเกี่ยวกับไฟฟ้าและเครื่องมือวัด",
+                categoryEn: "Category 1: Electrical Fundamentals & Tools",
+                q: "5. เมื่อช่างไฟฟ้าสั่งให้คุณเตรียม \"เทปพันสายไฟ\" เพื่อใช้ในงานระบบไฟฟ้านอกอาคารที่ต้องตากแดดตากฝน คุณควรเลือกใช้เทปที่มีคุณสมบัติข้อใดสำคัญที่สุด?",
+                qEn: "5. When instructed to prepare electrical insulating tape for outdoor installations exposed to sunlight and rain, which critical properties must it possess?",
+                options: [
+                    "ก. เทปพันสายไฟชนิดเนื้อกาวธรรมดาที่มีสีสันสวยงามหลายๆ สี",
+                    "ข. เทปพันสายไฟคุณภาพสูงชนิดทนแรงดันไฟฟ้า ทนความร้อน และต้านทานรังสี UV รวมถึงความชื้นได้ดี (เช่น เทปยางละลาย หรือเทป PVC เกรดใช้งานภายนอก)",
+                    "ค. เทปแลคซีนผ้าที่ใช้ติดสันหนังสือ",
+                    "ง. เทพกาวสองหน้าแบบหนาเนื้อโฟม"
+                ],
+                optionsEn: [
+                    "A. Standard colorful decorative adhesive stationery tape.",
+                    "B. Premium electrical insulating tape rated for high dielectric strength, thermal endurance, UV resistance, and weatherproofing (such as self-amalgamating rubber or outdoor-grade PVC tape).",
+                    "C. Cloth book-binding duct tape.",
+                    "D. Thick double-sided foam mounting tape."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 2: อุปกรณ์ในระบบไฟฟ้าและการเดินสาย (Electrical Components & Wiring)
+            {
+                category: "หมวดที่ 2: อุปกรณ์ในระบบไฟฟ้าและการเดินสาย",
+                categoryEn: "Category 2: Electrical Components & Wiring",
+                q: "6. อุปกรณ์ใดต่อไปนี้ทำหน้าที่ \"ตัดกระแสไฟฟ้าอัตโนมัติ\" เมื่อเกิดกระแสไฟเกิน (Overload) หรือเกิดการลัดวงจร (Short Circuit) เพื่อป้องกันไม่ให้สายไฟร้อนจนเกิดเพลิงไหม้?",
+                qEn: "6. Which component automatically interrupts current during overloads or short circuits to prevent cable overheating and fire hazards?",
+                options: [
+                    "ก. สวิตช์ไฟทางเดียว (Single-pole Switch)",
+                    "ข. เซอร์กิตเบรกเกอร์ (Circuit Breaker)",
+                    "ค. เต้ารับไฟฟ้า (Socket Outlet)",
+                    "ง. กล่องพักสายไฟ (Junction Box)"
+                ],
+                optionsEn: [
+                    "A. Single-pole light switch.",
+                    "B. Circuit Breaker.",
+                    "C. Wall socket outlet.",
+                    "D. Junction Box."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: อุปกรณ์ในระบบไฟฟ้าและการเดินสาย",
+                categoryEn: "Category 2: Electrical Components & Wiring",
+                q: "7. ตามมาตรฐานรหัสสีสายไฟใหม่ของประเทศไทย (มอก. 11-2553) สำหรับระบบไฟฟ้า 1 เฟส สายเส้นที่เป็น \"นิวทรัล (Neutral หรือ N)\" และสาย \"ดิน (Ground หรือ G)\" ต้องใช้ฉนวนสีใดตามลำดับ?",
+                qEn: "7. According to Thai Industrial Standard (TIS 11-2553) for single-phase wiring, what are the mandatory insulation colors for Neutral (N) and Ground (G) respectively?",
+                options: [
+                    "ก. นิวทรัลสีน้ำตาล / สายดินสีฟ้า",
+                    "ข. นิวทรัลสีฟ้า / สายดินสีเขียวแถบเหลือง",
+                    "ค. นิวทรัลสีดำ / สายดินสีแดง",
+                    "ง. นิวทรัลสีเทา / สายดินสีขาว"
+                ],
+                optionsEn: [
+                    "A. Neutral: Brown / Ground: Blue.",
+                    "B. Neutral: Blue / Ground: Green with Yellow stripe.",
+                    "C. Neutral: Black / Ground: Red.",
+                    "D. Neutral: Grey / Ground: White."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: อุปกรณ์ในระบบไฟฟ้าและการเดินสาย",
+                categoryEn: "Category 2: Electrical Components & Wiring",
+                q: "8. ในการเดินท่อร้อยสายไฟ (Conduit Installation) การใช้ท่อ PVC สีเหลือง และท่อ PVC สีขาว มีความแตกต่างกันในแง่การใช้งานอย่างไร?",
+                qEn: "8. In electrical conduit installation, what is the practical application difference between yellow PVC and white PVC conduits?",
+                options: [
+                    "ก. ท่อสีเหลืองใช้สำหรับฝังในผนังหรือเพดานทั่วไป ส่วนท่อสีขาวนิยมใช้สำหรับการเดินลอยโชว์แนวเนื่องจากดัดง่ายและมีความสวยงามกลมกลืนกับผนัง",
+                    "ข. ท่อสีเหลืองใช้เดินสายสัญญานอินเทอร์เน็ตเท่านั้น",
+                    "ค. ท่อสีขาวใช้เฉพาะสายไฟแรงสูง 3 เฟส",
+                    "ง. ทั้งสองสีไม่มีความแตกต่างกัน สามารถใช้สลับแทนกันได้ทุกกรณี"
+                ],
+                optionsEn: [
+                    "A. Yellow conduit is standard for concealed wall/ceiling embeds; white conduit is preferred for exposed surface runs due to neat appearance and easy bending.",
+                    "B. Yellow conduit is restricted to internet Ethernet cabling only.",
+                    "C. White conduit is used exclusively for 3-phase high-voltage cables.",
+                    "D. There is zero difference; both can be substituted interchangeably in all scenarios."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 2: อุปกรณ์ในระบบไฟฟ้าและการเดินสาย",
+                categoryEn: "Category 2: Electrical Components & Wiring",
+                q: "9. เหตุใดการต่อสายไฟภายในกล่องพักสาย (Junction Box) จึงต้องใช้อุปกรณ์เชื่อมต่อสาย เช่น \"วายนัท (Wire Nut)\" หรือ \"เต๋าต่อสาย (Terminal Block)\" แทนการใช้นิ้วมือบิดเกลียวแล้วพันเทปธรรมดาในงานมาตรฐาน?",
+                qEn: "9. Why does standard electrical work require connector accessories like Wire Nuts or Terminal Blocks inside junction boxes instead of hand-twisting and simple taping?",
+                options: [
+                    "ก. เพื่อความสวยงามเพียงอย่างเดียว",
+                    "ข. เพื่อให้การเชื่อมต่อแน่นหนา ไม่หลวม หลีกเลี่ยงการเกิดความร้อนสะสม (Arcing) และเพิ่มความปลอดภัยในการเป็นฉนวน",
+                    "ค. เพื่อให้สามารถดึงสายไฟให้ตึงได้มากขึ้น",
+                    "ง. เพื่อช่วยเพิ่มแรงดันไฟฟ้าให้สูงขึ้น"
+                ],
+                optionsEn: [
+                    "A. Purely for cosmetic neatness.",
+                    "B. To ensure mechanically solid, vibration-resistant connections that prevent loose contact arcing and maintain certified electrical insulation safety.",
+                    "C. To allow cables to be stretched tighter.",
+                    "D. To elevate system voltage."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: อุปกรณ์ในระบบไฟฟ้าและการเดินสาย",
+                categoryEn: "Category 2: Electrical Components & Wiring",
+                q: "10. ในการติดตั้งเต้ารับไฟฟ้า (ปลั๊กตัวเมีย) แบบมีกราวด์ ข้อใดคือวิธีการต่อสายเข้าหลักดินที่ถูกต้องและปลอดภัยที่สุด?",
+                qEn: "10. When installing a grounded convenience receptacle, which grounding method is correct and safe according to code?",
+                options: [
+                    "ก. ต่อสายดินจากเต้ารับไปผูกไว้กับขาโต๊ะเหล็กใกล้ๆ",
+                    "ข. ต่อสายดิน (G) เข้ากับระบบกราวด์ของอาคาร ซึ่งเชื่อมต่อไปยังแท่งกราวด์ (Ground Rod) ที่ตอกลงดินลึกตามมาตรฐานกำหนด",
+                    "ค. นำสายดินไปพันรวมกับสายนิวทรัล (N) ที่เต้ารับโดยไม่ต้องเดินสายลงดินจริง",
+                    "ง. ปล่อยช่องสายดินว่างไว้ไม่ต้องต่อสายใดๆ เพราะเครื่องใช้ไฟฟ้าทำงานได้ปกติอยู่แล้ว"
+                ],
+                optionsEn: [
+                    "A. Fastening the ground wire to a nearby metal table leg.",
+                    "B. Connecting Ground (G) to the building's grounding system bonded to a certified ground rod driven into deep earth.",
+                    "C. Jumpering the ground terminal directly to the neutral wire at the receptacle without a true earth path.",
+                    "D. Leaving the ground terminal unbonded since loads run fine on two wires."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 3: มาตรฐานความปลอดภัยและการปฏิบัติงาน (Occupational Safety & Procedures)
+            {
+                category: "หมวดที่ 3: มาตรฐานความปลอดภัยและการปฏิบัติงาน",
+                categoryEn: "Category 3: Occupational Safety & Procedures",
+                q: "11. ก่อนที่ช่างไฟฟ้าและคุณจะเริ่มลงมือซ่อมแซมหรือเปลี่ยนตู้ควบคุมไฟ (Consumer Unit) ขั้นตอนด้านความปลอดภัยข้อใดที่ต้องปฏิบัติเป็นอันดับแรกสุดโดยไม่มีข้อยกเว้น?",
+                qEn: "11. Before commencing maintenance or replacement of a main distribution consumer unit, what is the mandatory first safety step without exception?",
+                options: [
+                    "ก. การสวมถุงเท้าผ้าหนาๆ",
+                    "ข. การทำการสับสะพานไฟหลักลง (Disconnect/Turn off Main Breaker) เพื่อตัดกระแสไฟ พร้อมแขวนป้ายเตือนและล็อกกุญแจ (Lockout/Tagout) และใช้ไขควงวัดไฟตรวจสอบซ้ำว่าไม่มีไฟจริง",
+                    "ค. การฉีดน้ำล้างตู้ไฟให้สะอาดก่อนทำงาน",
+                    "ง. การสวมแว่นตากันแดดเพื่อป้องกันแสงแยงตา"
+                ],
+                optionsEn: [
+                    "A. Putting on extra thick cotton socks.",
+                    "B. De-energizing the main circuit breaker, applying Lockout/Tagout (LOTO) warning locks, and verifying zero voltage with a calibrated tester.",
+                    "C. Hosing down the electrical panel with water for cleaning.",
+                    "D. Wearing sunglasses to reduce glare."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: มาตรฐานความปลอดภัยและการปฏิบัติงาน",
+                categoryEn: "Category 3: Occupational Safety & Procedures",
+                q: "12. หากคุณพบพนักงานคนหนึ่งกำลังโดนไฟฟ้าดูดและหมดสติ โดยที่ตัวเขายังคงสัมผัสอยู่กับสายไฟเปลือยที่มีกระแสไฟรั่ว ในฐานะผู้ช่วยช่างไฟฟ้า แอ็กชันแรกที่คุณต้องทำคืออะไร?",
+                qEn: "12. If a coworker is actively suffering electric shock, unconscious and still in physical contact with an energized conductor, what is your immediate first action?",
+                options: [
+                    "ก. รีบวิ่งเข้าไปใช้มือเปล่าดึงตัวผู้เคราะห์ร้ายออกมาทันที",
+                    "ข. รีบหาทางตัดกระแสไฟหลัก (เปิดเบรกเกอร์) หรือหากทำไม่ได้ ให้ใช้วัตถุที่เป็นฉนวนแห้ง เช่น ไม้ หรือผ้าหนาๆ ผลักดันสายไฟหรือตัวผู้เสียหายให้ออกจากแหล่งไฟก่อนเข้าช่วยเหลือ",
+                    "ค. โทรศัพท์หาญาติของผู้เสียหายเพื่อแจ้งเรื่อง",
+                    "ง. ยืนตะโกนเรียกชื่อผู้เสียหายเสียงดังๆ จนกว่าเขาจะตื่น"
+                ],
+                optionsEn: [
+                    "A. Rush in and grab the victim with bare hands to pull them away.",
+                    "B. Immediately disconnect the upstream breaker, or if inaccessible, use dry non-conductive materials (dry timber, thick dry cloth) to dislodge the live conductor or victim before physical contact.",
+                    "C. Telephone the victim's family to inform them.",
+                    "D. Stand and shout the victim's name loudly until they awaken."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: มาตรฐานความปลอดภัยและการปฏิบัติงาน",
+                categoryEn: "Category 3: Occupational Safety & Procedures",
+                q: "13. การสวมใส่ \"ถุงมือสำหรับช่างไฟฟ้า\" ในการทำงานปฏิบัติงาน ข้อใดระบุประเภทและวิธีใช้งานได้ถูกต้องและปลอดภัยที่สุด?",
+                qEn: "13. Regarding electricians' personal protective gloves, which option specifies the correct and safe standard practice?",
+                options: [
+                    "ก. ใช้ถุงมือผ้าถักธรรมดาที่ซื้อจากร้านก่อสร้างทั่วไปเพราะระบายอากาศดี",
+                    "ข. ใช้ถุงมือยางฉนวนไฟฟ้า (Electrical Rubber Insulating Gloves) ที่ผ่านการทดสอบแรงดันไฟฟ้าตามระดับงาน และสวมทับด้วยถุงมือหนังเพื่อป้องกันการฉีกขาดหรือโดนบาด",
+                    "ค. ใช้ถุงมือพลาสติกใสแบบที่ใช้ทำอาหารเพื่อป้องกันคราบสกปรก",
+                    "ง. ใช้ถุงมือไหมพรมในหน้าหนาวเท่านั้น"
+                ],
+                optionsEn: [
+                    "A. Wearing standard knit cotton work gloves for breathability.",
+                    "B. Wearing certified electrical rubber insulating gloves rated for the voltage class, protected by leather outer protector gloves against punctures and cuts.",
+                    "C. Using clear disposable food preparation gloves to avoid dust.",
+                    "D. Wearing knitted woolen gloves during winter conditions only."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: มาตรฐานความปลอดภัยและการปฏิบัติงาน",
+                categoryEn: "Category 3: Occupational Safety & Procedures",
+                q: "14. ในขณะที่กำลังเจาะผนังคอนกรีตเพื่อเดินสายไฟใหม่ สว่านไฟฟ้าที่คุณใช้อยู่เกิดมีกลิ่นไหม้และมีควันพวยพุ่งออกมาเล็กน้อย คุณควรจัดการอย่างไรในฐานะผู้ช่วย?",
+                qEn: "14. While hammer-drilling a masonry wall for conduit, the drill emits a burning smell and wisps of smoke. How should an assistant handle this?",
+                options: [
+                    "ก. ฝืนเจาะต่อไปเรื่อยๆ จนกว่ารูจะเสร็จ",
+                    "ข. หยุดใช้งานทันที ถอดปลั๊กไฟออก แจ้งช่างอาวุโสเพื่อทำการตรวจสอบและส่งซ่อม ห้ามนำมาใช้งานต่อจนกว่าจะปลอดภัย",
+                    "ค. นำน้ำเปล่ามาสาดใส่ตัวสว่านเพื่อระบายความร้อน",
+                    "ง. ใช้เทปพันสายไฟพันรอบตัวสว่านหนาๆ เพื่อไม่ให้ควันพุ่งออกมา"
+                ],
+                optionsEn: [
+                    "A. Push through and keep drilling until the hole depth is completed.",
+                    "B. Cease operation immediately, disconnect the power cord, notify the senior electrician, and red-tag the tool for maintenance until certified safe.",
+                    "C. Splash tap water into the motor casing to cool it down.",
+                    "D. Wrap thick electrical tape around motor vents to stifle the smoke."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: มาตรฐานความปลอดภัยและการปฏิบัติงาน",
+                categoryEn: "Category 3: Occupational Safety & Procedures",
+                q: "15. ข้อใดเป็นข้อห้ามที่สำคัญที่สุดในการปฏิบัติตามกฎความปลอดภัยขณะทำงานใกล้ตู้ควบคุมไฟฟ้าแรงสูง?",
+                qEn: "15. What is the most critical safety prohibition when working near energized high-voltage switchgear cabinets?",
+                options: [
+                    "ก. ห้ามพกพาหรือสวมใส่เครื่องประดับที่เป็นโลหะ เช่น แหวน สร้อยคอ นาฬิกาข้อมือสายเหล็ก",
+                    "ข. ห้ามดื่มน้ำเปล่าขณะยืนคุยงาน",
+                    "ค. ห้ามพกสมุดโน้ตกระดาษเข้าไปจดงาน",
+                    "ง. ห้ามสวมหมวกนิรภัยเข้าไปในพื้นที่"
+                ],
+                optionsEn: [
+                    "A. Do not carry or wear conductive metal jewelry, such as rings, chains, or metal wristwatches.",
+                    "B. Do not sip bottled water while discussing work.",
+                    "C. Do not carry paper note pads into the enclosure.",
+                    "D. Do not wear protective hard hats in the zone."
+                ],
+                ans: 0
+            },
+
+            // หมวดที่ 4: การทำงานร่วมกับช่างอาวุโสและการแก้ไขปัญหา (Teamwork & Site Troubleshooting)
+            {
+                category: "หมวดที่ 4: การทำงานร่วมกับช่างอาวุโสและการแก้ไขปัญหา",
+                categoryEn: "Category 4: Teamwork & Site Troubleshooting",
+                q: "16. ช่างไฟฟ้าอาวุโสสั่งให้คุณทำความสะอาดและจัดเก็บ \"บันไดอลูมิเนียมทรง A\" หลังจากใช้งานเสร็จ ข้อควรระวังในการตรวจสอบสภาพบันไดข้อใดที่เป็นหน้าที่ของคุณก่อนนำไปเก็บ?",
+                qEn: "16. After job completion, when inspecting and stowing an aluminum A-frame ladder, what critical safety check is your responsibility?",
+                options: [
+                    "ก. ดูว่าสีของบันไดซีดลงหรือไม่จากแสงแดด",
+                    "ข. ตรวจสอบความแข็งแรงของข้อต่อ ยางรองขาบันไดทั้ง 4 ข้างว่ายังอยู่ครบและไม่สึกหรอ เพื่อป้องกันบันไดลื่นไถลขณะช่างปีนทำงานในครั้งต่อไป",
+                    "ค. การขัดเงาบันไดให้วาววับเหมือนใหม่อยู่ตลอดเวลา",
+                    "ง. การชั่งน้ำหนักบันไดเพื่อดูว่าเบาลงหรือไม่"
+                ],
+                optionsEn: [
+                    "A. Inspecting if sunlight exposure caused cosmetic color fading.",
+                    "B. Checking locking hinge integrity and verifying all 4 anti-slip rubber foot pads are intact and unworn to prevent tipping during future climbing.",
+                    "C. Buffing and polishing the ladder rungs to a mirror sheen.",
+                    "D. Weighing the ladder to see if it lost metal mass."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การทำงานร่วมกับช่างอาวุโสและการแก้ไขปัญหา",
+                categoryEn: "Category 4: Teamwork & Site Troubleshooting",
+                q: "17. ในระหว่างเดินสายไฟบนฝ้าเพดาน ช่างอาวุโสส่งสายไฟมาให้คุณและสั่งให้ทำการเชื่อมต่อกับเต้ารับ แต่คุณพบว่าปลายสายไฟมีรอยหนูกัดจนฉนวนแหว่งเห็นเนื้อทองแดง คุณควรทำอย่างไร?",
+                qEn: "17. While pulling ceiling cables, a senior tech hands you a line to terminate at an outlet, but you spot gnawed rodent damage exposing bare copper. What should you do?",
+                options: [
+                    "ก. แกล้งทำเป็นมองไม่เห็นและต่อสายเข้าเต้ารับตามคำสั่งทันทีเพื่อไม่ให้เสียเวลา",
+                    "ข. แจ้งช่างอาวุโสให้ทราบทันที เพื่อทำการตัดสายส่วนที่เสียหายออกแล้วปอกใหม่ หรือเปลี่ยนสายเส้นใหม่หากความยาวไม่พอ เพื่อความปลอดภัยระยะยาว",
+                    "ค. นำกระดาษกาวสองหน้ามาพันทับรอยแหว่งนั้นไว้หลวมๆ",
+                    "ง. ใช้มีดคัตเตอร์ขูดเนื้อทองแดงให้เงาขึ้นแล้วใช้งานต่อได้เลย"
+                ],
+                optionsEn: [
+                    "A. Pretend not to notice and terminate it anyway to save installation time.",
+                    "B. Promptly inform the senior technician to cut back past the damaged section and re-strip, or pull a fresh run if length is compromised, ensuring long-term fire safety.",
+                    "C. Cover the exposed copper loosely with double-sided paper tape.",
+                    "D. Scrape the bare copper clean with a box cutter and terminate as-is."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การทำงานร่วมกับช่างอาวุโสและการแก้ไขปัญหา",
+                categoryEn: "Category 4: Teamwork & Site Troubleshooting",
+                q: "18. เมื่อได้รับมอบหมายให้เดินสายไฟร้อยท่อ PVC คุณพบว่าหน้างานมีมุมหักเลี้ยวซิกแซกหลายจุด และช่างสั่งให้คุณเตรียม \"สปริงดัดท่อ (Bending Spring)\" คุณจะใช้งานอุปกรณ์นี้อย่างไร?",
+                qEn: "18. During PVC conduit rough-in requiring tight offsets and bends, how should a bending spring be correctly utilized?",
+                options: [
+                    "ก. นำสปริงมาพันไว้ภายนอกท่อ PVC แล้วใช้ไฟลน",
+                    "ข. สอดสปริงดัดท่อเข้าไปภายในท่อ PVC ตรงจุดที่ต้องการดัด เพื่อพยุงโครงสร้างไม่ให้ท่อบี้แบนหรือหักงอขณะออกแรงดัดด้วยความร้อนหรือแรงมือ",
+                    "ค. ใช้สปริงแทนลวดสำหรับดึงสายไฟ (Fish Tape)",
+                    "ง. นำสปริงไปโยนทิ้งเพราะท่อ PVC สามารถดัดได้ด้วยมือเปล่าอยู่แล้ว"
+                ],
+                optionsEn: [
+                    "A. Coil the spring around the conduit exterior and torch with fire.",
+                    "B. Insert the bending spring inside the PVC conduit centered at the bend zone to support internal walls from flattening or kinking during manual cold or heat bending.",
+                    "C. Use the spring as a wire pulling fish tape.",
+                    "D. Discard the spring because rigid PVC easily bends with bare hands alone."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การทำงานร่วมกับช่างอาวุโสและการแก้ไขปัญหา",
+                categoryEn: "Category 4: Teamwork & Site Troubleshooting",
+                q: "19. หากหน้างานเกลื่อนกลาดไปด้วยเศษสายไฟ เศษท่อ PVC และฝุ่นจากการเจาะผนัง หลังจากเสร็จสิ้นงานในแต่ละวัน หน้าที่ที่ดีของผู้ช่วยช่างไฟฟ้าคือข้อใด?",
+                qEn: "19. At day's end with the work area cluttered with wire cutoffs, PVC trimmings, and masonry dust, what is the professional duty of an assistant electrician?",
+                options: [
+                    "ก. เดินออกจากหน้างานทันทีเพราะเป็นหน้าที่ของแม่บ้านประจำอาคาร",
+                    "ข. ทำความสะอาด จัดเก็บเศษขยะไฟฟ้าแยกประเภท ม้วนเก็บสายไฟและเครื่องมือเข้ากล่องให้เป็นระเบียบเรียบร้อย เพื่อความปลอดภัยและพร้อมใช้งานในวันรุ่งขึ้น",
+                    "ค. นำเศษสายไฟทั้งหมดไปกองรวมกันไว้หลังตู้ควบคุมไฟหลัก",
+                    "ง. รอให้ช่างอาวุโสมาสั่งเตือนก่อนจึงค่อยเริ่มกวาดพื้น"
+                ],
+                optionsEn: [
+                    "A. Depart immediately assuming building janitorial crews will handle it.",
+                    "B. Clean the site, sort and dispose of electrical debris, coil cables neatly, and organize tools into kits for safety and readiness next morning.",
+                    "C. Pile all copper clippings and debris behind the main live distribution panel.",
+                    "D. Wait idle until the senior electrician gives a direct reprimand to sweep."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การทำงานร่วมกับช่างอาวุโสและการแก้ไขปัญหา",
+                categoryEn: "Category 4: Teamwork & Site Troubleshooting",
+                q: "20. คำว่า \"L\" และ \"N\" ที่สลักอยู่ด้านหลังของสวิตช์ไฟหรือเต้ารับไฟฟ้า มีความสำคัญอย่างไรที่ผู้ช่วยช่างไฟฟ้าต้องจำให้ขึ้นใจขณะเข้าสาย?",
+                qEn: "20. What is the vital meaning of the 'L' and 'N' markings stamped on the rear terminals of switches and receptacles?",
+                options: [
+                    "ก. L หมายถึง Low (ไฟต่ำ) และ N หมายถึง Normal (ไฟปกติ)",
+                    "ข. L หมายถึง Line (สายที่มีไฟ) ส่วน N หมายถึง Neutral (สายที่ไม่มีไฟ) ต้องเข้าสายให้ถูกต้องตรงตามตำแหน่งห้ามสลับกันเด็ดขาดเพื่อความปลอดภัยของระบบและการทำงานของเครื่องใช้ไฟฟ้า",
+                    "ค. L หมายถึง Left (ซ้าย) และ N หมายถึง Next (ถัดไป)",
+                    "ง. เป็นเพียงสัญลักษณ์โรงงานผู้ผลิต ไม่จำเป็นต้องสนใจตอนต่อสายจริง"
+                ],
+                optionsEn: [
+                    "A. L stands for Low and N stands for Normal.",
+                    "B. L denotes Line (energized conductor) and N denotes Neutral (grounded return); they must be terminated strictly to designated terminals without polarity reversal for user safety and appliance protection.",
+                    "C. L stands for Left and N stands for Next.",
+                    "D. Arbitrary manufacturer mold marks with no practical termination relevance."
+                ],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Assistant_Electrician';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            const _lBtn = document.getElementById('langToggle');
+            if (_lBtn) {
+                _lBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>${t.langBtn}</span>
+                `;
+            }
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, "ผู้ช่วยช่างไฟฟ้า");
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, "ผู้ช่วยช่างไฟฟ้า");
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const catText = (currentLang === 'en' && item.categoryEn) ? item.categoryEn : item.category;
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span class="category-badge">${catText}</span>
+                    <span class="progress-text" style="margin-bottom:0;">${t.progress(currentStep + 1, questions.length)}</span>
+                </div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: "Assistant_Electrician",
+                uuid: uuid,
+                name: userName,
+                position: "ผู้ช่วยช่างไฟฟ้า",
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_category`] = questions[i].category;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "ผ่านเกณฑ์โดดเด่น (เรียกสัมภาษณ์)" : (score >= 12 ? "ผ่านเกณฑ์มาตรฐาน (พิจารณาเพิ่มเติม)" : "ไม่ผ่านเกณฑ์");
+            payload.decisionNote = score >= 16 ? "เรียกสัมภาษณ์ มีความรู้พื้นฐานงานช่างไฟฟ้า ความปลอดภัย และทักษะเครื่องมือดีเยี่ยม" : (score >= 12 ? "พิจารณาการฝึกงานและสัมภาษณ์เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
