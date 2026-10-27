@@ -1228,6 +1228,7 @@ const EXAM_CHOICES = [
   { label: "ผู้จัดการสาขา", labelEn: "Branch Manager", url: "exam-branch-manager.html" },
   { label: "BD / Developer", labelEn: "BD / Developer", url: "exam-bd.html" },
   { label: "Telesales / โทรขาย", labelEn: "Telesales", url: "exam-telesales.html" },
+  { label: "หัวหน้าทีม Telesales", labelEn: "Telesales Team Leader", url: "exam-telesales-team-leader.html" },
   { label: "Sales / AE / ฝ่ายขาย", labelEn: "Sales / AE", url: "exam-sales.html" },
   { label: "จัดซื้อ", labelEn: "Purchasing", url: "exam-purchasing.html" },
   { label: "ธุรการประสานงานโครงการ", labelEn: "Project Coordinator", url: "exam_coordinator.html" },
@@ -1246,6 +1247,7 @@ const EXAM_CHOICES = [
   { label: "ผู้จัดการฝ่ายบุคคล", labelEn: "HR Manager", url: "exam_hr_manager.html" },
   { label: "เจ้าหน้าที่ HR", labelEn: "HR Officer", url: "exam_hr_officer.html" },
   { label: "ผู้จัดการฝ่ายการตลาด", labelEn: "Marketing Manager", url: "exam-marketing-manager.html" },
+  { label: "เจ้าหน้าที่การตลาด", labelEn: "Marketing Officer", url: "exam-marketing-officer.html" },
   { label: "เจ้าหน้าที่กฎหมาย (In-house Legal)", labelEn: "In-house Legal", url: "exam_inhouse_legal.html" },
   { label: "จป.วิชาชีพ — งานสำนักงานและงานโครงการ", labelEn: "Safety Officer", url: "exam-safety-officer.html" },
 ];

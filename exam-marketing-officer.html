@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assessment: Marketing Officer - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 860px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.18);
+            border: 1px solid rgba(241, 196, 15, 0.45);
+            color: #f1c40f;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 2.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.15rem 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            text-align: left;
+            font-size: 1.02rem;
+            line-height: 1.55;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: #f1c40f;
+            transform: translateX(4px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        #langToggle,
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #langToggle {
+            right: 16px;
+        }
+
+        #backBtn {
+            left: 16px;
+        }
+
+        #langToggle:hover,
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="backBtn" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back</span>
+    </button>
+    <button id="langToggle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="langBtnText">EN</span>
+    </button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.75rem; letter-spacing: -0.3px;">แบบทดสอบตำแหน่ง เจ้าหน้าที่การตลาด (Marketing Officer)</h1>
+            <p id="userInfo" style="opacity: 0.85; font-size: 1.05rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "EN",
+                pageTitle: "แบบทดสอบตำแหน่ง เจ้าหน้าที่การตลาด (Marketing Officer)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "TH",
+                pageTitle: "Assessment: Marketing Officer",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            // หมวดที่ 1: การตลาดดิจิทัลและการยิงโฆษณา (Digital Marketing & Paid Media)
+            {
+                category: "หมวดที่ 1: การตลาดดิจิทัลและการยิงโฆษณา",
+                categoryEn: "Category 1: Digital Marketing & Paid Media",
+                q: "1. แคมเปญโฆษณาบน Facebook Ads ของคุณมียอดคลิก (Click-Through Rate: CTR) สูงมากถึง 5% แต่เมื่อตรวจสอบข้อมูลหลังบ้านพบว่ายอดขายจริง (Conversion Rate) กลับต่ำกว่า 0.5% ซึ่งทำให้ต้นทุนต่อการได้ลูกค้า 1 คน (CPA) สูงจนขาดทุน คุณควรวิเคราะห์และปรับปรุงจุดใดเป็นอันดับแรก?",
+                qEn: "1. Your Facebook Ads campaign achieves a high CTR of 5%, but post-click conversion rate is under 0.5%, driving CPA into unprofitability. What should you analyze and optimize first?",
+                options: [
+                    "ก. เปลี่ยนภาพโฆษณาให้มีสีสันฉูดฉาดกว่าเดิมเพื่อเพิ่มยอดคลิกให้สูงขึ้นไปอีก",
+                    "ข. ตรวจสอบประสบการณ์ใช้งานบนหน้าเว็บไซต์/Landing Page และความสอดคล้องของเนื้อหาโฆษณากับราคาหน้าเว็บ รวมถึงความง่ายในขั้นตอนการกดสั่งซื้อและชำระเงิน",
+                    "ค. ปิดแคมเปญทันทีแล้วย้ายงบประมาณทั้งหมดไปลงโฆษณาผ่านวิทยุท้องถิ่นแทน",
+                    "ง. สั่งเพิ่มงบโฆษณาขึ้น 3 เท่าเพื่อให้ระบบ AI ของแพลตฟอร์มหาลูกค้าให้เอง"
+                ],
+                optionsEn: [
+                    "A. Change ad creative to more flamboyant colors to drive CTR even higher.",
+                    "B. Audit landing page user experience, content/pricing alignment between ad and page, and eliminate friction in the checkout and payment funnel.",
+                    "C. Terminate digital campaigns immediately and divert budget to local radio ads.",
+                    "D. Triple the ad spend hoping the algorithmic AI fixes customer acquisition on its own."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การตลาดดิจิทัลและการยิงโฆษณา",
+                categoryEn: "Category 1: Digital Marketing & Paid Media",
+                q: "2. ในการทำตลาดคอนเทนต์ (Content Marketing) ยุคปัจจุบัน หากแบรนด์ต้องการสร้างยอดการเข้าถึงแบบออร์แกนิก (Organic Reach) และสร้างการมีส่วนร่วม (Engagement) สูงสุดในกลุ่มผู้บริโภครุ่นใหม่ (Gen Z) รูปแบบคอนเทนต์ข้อใดตอบโจทย์เชิงกลยุทธ์ได้ดีที่สุด?",
+                qEn: "2. In modern content marketing, which content format strategically yields the highest organic reach and viral engagement among Gen Z consumers?",
+                options: [
+                    "ก. บทความวิชาการความยาว 5 หน้ากระดาษ A4 ลงในบล็อกของเว็บไซต์บริษัท",
+                    "ข. วิดีโอสั้น (Short-form Video) ความยาว 15-30 วินาที เน้นความสมจริง (Authenticity) เกาะกระแสสถานการณ์ และสื่อสารใจความสำคัญภายใน 3 วินาทีแรก",
+                    "ค. การส่งจดหมายข่าว (Newsletter) พิมพ์สี่สีเย็บเล่มส่งตรงไปยังตู้ไปรษณีย์ที่บ้าน",
+                    "ง. แบนเนอร์ภาพนิ่งกราฟิกทางการที่มีแต่ข้อความเงื่อนไขทางกฎหมายตัวแน่นๆ"
+                ],
+                optionsEn: [
+                    "A. A 5-page academic article published on the corporate website blog.",
+                    "B. 15-30 second short-form video emphasizing authenticity, trending topics, and hooking audience attention within the first 3 seconds.",
+                    "C. A 4-color printed newsletter mailed directly to residential mailboxes.",
+                    "D. A formal static banner graphic filled with dense legal disclaimers."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การตลาดดิจิทัลและการยิงโฆษณา",
+                categoryEn: "Category 1: Digital Marketing & Paid Media",
+                q: "3. แบรนด์ของคุณกำลังจะเปิดตัวสินค้าใหม่ และต้องการทำ SEO (Search Engine Optimization) เพื่อให้เว็บไซต์ติดหน้าแรกของ Google ในระยะยาวอย่างยั่งยืน กลยุทธ์การเลือกคีย์เวิร์ด (Keyword Strategy) ข้อใดถูกต้องที่สุด?",
+                qEn: "3. When launching a new product and building long-term sustainable Google page 1 SEO visibility, which keyword strategy is most effective?",
+                options: [
+                    "ก. เลือกเฉพาะคำกว้างๆ ที่มีปริมาณการค้นหาสูงสุด (Short-tail Keyword) แม้คู่แข่งจะสูงมากและไม่ตรงกลุ่มเป้าหมายโดยตรง",
+                    "ข. มุ่งเน้นการใช้คีย์เวิร์ดที่มีคำค้นหาจำเพาะเจาะาะลึกและสะท้อนความต้องการซื้อที่ชัดเจน (Long-tail Keywords) ควบคู่กับการสร้างคอนเทนต์คุณภาพที่มีประโยชน์และตอบคำถามของผู้ใช้งานได้ตรงจุด",
+                    "ค. คัดลอกคีย์เวิร์ดจากเว็บไซต์คู่แข่งทั้งหมดมาใส่ในหน้าเว็บซ้ำๆ แสนครั้งโดยไม่มีเนื้อหา",
+                    "ง. ซื้อโฆษณา Google Ads เพียงอย่างเดียวโดยไม่จำเป็นต้องปรับโครงสร้างภายในเว็บไซต์"
+                ],
+                optionsEn: [
+                    "A. Target only broad short-tail keywords with massive search volume regardless of fierce competition and loose intent.",
+                    "B. Focus on high-intent, targeted long-tail keywords paired with high-quality content that directly answers user search queries.",
+                    "C. Scrape competitors' keywords and spam them across web pages without readable copy.",
+                    "D. Rely exclusively on Google Ads paid search without improving on-page web architecture."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การตลาดดิจิทัลและการยิงโฆษณา",
+                categoryEn: "Category 1: Digital Marketing & Paid Media",
+                q: "4. ค่าสถิติระบุว่า อัตราการเปิดอ่านอีเมล (Email Open Rate) ของแคมเปญการตลาดที่คุณส่งให้ฐานลูกค้าเก่าลดลงเหลือเพียง 8% จากค่าเฉลี่ยปกติที่ 25% ในฐานะนักการตลาด คุณจะเลือกทำการทดสอบส่วนใด (A/B Testing) ด่วนที่สุดเพื่อแก้ไขปัญหานี้?",
+                qEn: "4. Your email marketing open rate drops to 8% against a 25% benchmark. What element should you prioritize for rapid A/B testing to fix open rates?",
+                options: [
+                    "ก. ปรับเปลี่ยนสีปุ่มสั่งซื้อ (CTA Button) ด้านในเนื้อหาอีเมล",
+                    "ข. ปรับเปลี่ยนและทดสอบหัวข้ออีเมล (Subject Line) ให้น่าสนใจ สั้นกระชับ หรือสร้างความรู้สึกเฉพาะบุคคล (Personalization)",
+                    "ค. เปลี่ยนฟอนต์เนื้อความด้านในอีเมลจากแบบมีหัวเป็นแบบไม่มีหัว",
+                    "ง. ลบรายชื่อลูกค้าเก่าทิ้งทั้งหมดแล้วส่งอีเมลหาคนเดิมซ้ำๆ วันละ 10 รอบ"
+                ],
+                optionsEn: [
+                    "A. Change the color of the CTA button deep inside the email body.",
+                    "B. Test alternative subject lines for conciseness, curiosity hooks, and personalization tags.",
+                    "C. Alter inner body typography from serif to sans-serif fonts.",
+                    "D. Delete the subscriber list and re-blast the same message 10 times daily."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การตลาดดิจิทัลและการยิงโฆษณา",
+                categoryEn: "Category 1: Digital Marketing & Paid Media",
+                q: "5. แบรนด์แฟชั่นของคุณต้องการทำแคมเปญการตลาดผ่านเลนส์ Influencer Marketing โดยมีงบประมาณจำกัด หากเป้าหมายคือต้องการสร้างความน่าเชื่อถือและการบอกต่ออย่างจริงใจ (Word-of-Mouth) คุณควรจัดสรรงบประมาณเลือกจ้างอินฟลูเอนเซอร์กลุ่มใด?",
+                qEn: "5. A fashion brand with a modest budget seeks authentic credibility and organic word-of-mouth. Which influencer tier should be selected?",
+                options: [
+                    "ก. จ้าง Mega Influencer ที่มีผู้ติดตาม 5 ล้านคนเพียงคนเดียวจนหมดงบประมาณ",
+                    "ข. กระจายงบประมาณจ้างกลุ่ม Micro หรือ Nano Influencers หลายๆ คนที่มีผู้ติดตามเฉพาะกลุ่ม (Niche) ยอดการมีส่วนร่วมสูง และมีไลฟ์สไตล์ตรงกับคุณค่าของแบรนด์",
+                    "ค. จ้างดาราที่มีชื่อเสียงระดับประเทศมาถ่ายภาพคู่กับสินค้าโดยไม่มีคำอธิบายใดๆ",
+                    "ง. ไม่จ้างใครเลยแต่ใช้วิธีปลอมบัญชีอวตารขึ้นมาคอมเมนต์อวยสินค้าตัวเอง"
+                ],
+                optionsEn: [
+                    "A. Spend the entirety of the budget on a single mega-celebrity with 5M followers.",
+                    "B. Distribute the budget across vetted micro- and nano-influencers with dedicated niche followings, superior engagement rates, and aligned lifestyles.",
+                    "C. Pay a mainstream celebrity to pose silently holding the product.",
+                    "D. Create fake sock-puppet accounts to leave deceptive positive reviews."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 2: การวิเคราะห์ข้อมูลและการตลาดเชิงกลยุทธ์ (Data, Analytics & Strategy)
+            {
+                category: "หมวดที่ 2: การวิเคราะห์ข้อมูลและการตลาดเชิงกลยุทธ์",
+                categoryEn: "Category 2: Data, Analytics & Strategy",
+                q: "6. ผู้บริหารฝ่ายการตลาด (CMO) สั่งให้คุณคำนวณค่า Customer Lifetime Value (LTV) ของลูกค้ากลุ่มธุรกิจอาหารสัตว์เลี้ยง เพื่อนำมาเปรียบเทียบกับค่า Customer Acquisition Cost (CAC) ข้อมูลข้อใดคือสิ่งที่คุณต้องนำมาใช้คำนวณ LTV?",
+                qEn: "6. The CMO requests calculating Customer Lifetime Value (LTV) in a pet food business to benchmark against CAC. Which variables are required for LTV calculation?",
+                options: [
+                    "ก. จำนวนเงินเฉลี่ยที่ลูกค้าซื้อต่อครั้ง, ความถี่ในการกลับมาซื้อซ้ำใน 1 ปี และระยะเวลาเฉลี่ยที่ลูกค้าอยู่กับแบรนด์",
+                    "ข. เงินเดือนของทีมการตลาดรวมกับค่าเช่าสตูดิโอถ่ายภาพสินค้า",
+                    "ค. จำนวนยอดกดไลก์บนแฟนเพจหารด้วยจำนวนประชากรในพื้นที่",
+                    "ง. อัตราดอกเบี้ยเงินฝากประจำของธนาคารพาณิชย์ในช่วงไตรมาสล่าสุด"
+                ],
+                optionsEn: [
+                    "A. Average order value, annual repeat purchase frequency, and average customer retention lifespan.",
+                    "B. Combined marketing payroll expenses and photography studio lease fees.",
+                    "C. Total social media page likes divided by geographic population census.",
+                    "D. Prevailing commercial bank fixed deposit interest rates."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 2: การวิเคราะห์ข้อมูลและการตลาดเชิงกลยุทธ์",
+                categoryEn: "Category 2: Data, Analytics & Strategy",
+                q: "7. ยอดขายของสินค้าเรือธง (Hero Product) ของบริษัทเริ่มเติบโตช้าลงอย่างต่อเนื่อง ยอดขายคงที่ในขณะที่ส่วนแบ่งการตลาดสูงมาก เมื่อนำมาวิเคราะห์ตามโมเดล Boston Consulting Group (BCG Matrix) สินค้าชิ้นนี้จัดอยู่ในกลุ่มใดและคุณควรวางกลยุทธ์อย่างไร?",
+                qEn: "7. A flagship product shows stagnant market growth while maintaining dominant market share. Under BCG Matrix analysis, which quadrant is it in and what strategy applies?",
+                options: [
+                    "ก. กลุ่ม Star (ดาวเด่น) ต้องเทงบโฆษณาเพิ่มอีก 5 เท่าเพื่อเร่งยอดขายให้โตขึ้น",
+                    "ข. กลุ่ม Cash Cow (วัวนม) ต้องเน้นการรักษาฐานลูกค้าเดิม บริหารต้นทุนให้มีประสิทธิภาพสูงสุด เพื่อเก็บเกี่ยวเงินสดไปลงทุนในสินค้ากลุ่มใหม่ที่มีอนาคต",
+                    "ค. กลุ่ม Dog (สุนัข) ต้องรีบทำการหักดิบเลิกผลิตและทำลายทิ้งทันที",
+                    "ง. กลุ่ม Question Mark (เครื่องหมายคำถาม) ต้องหยุดการขายแล้วนั่งรอเฉยๆ"
+                ],
+                optionsEn: [
+                    "A. Star: Inject 5x more aggressive ad spend to artificially boost market growth.",
+                    "B. Cash Cow: Defend existing customer share, optimize cost margins, and harvest cash flows to reinvest in high-growth future pipelines.",
+                    "C. Dog: Immediately discontinue production and scrap inventory.",
+                    "D. Question Mark: Halt active promotion and passively wait."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การวิเคราะห์ข้อมูลและการตลาดเชิงกลยุทธ์",
+                categoryEn: "Category 2: Data, Analytics & Strategy",
+                q: "8. คุณได้รับมอบหมายให้ทำวิจัยตลาด (Market Research) เพื่อศึกษาว่าทำไมวัยรุ่นอายุ 18-24 ปี ถึงหันไปซื้อสินค้าจากแบรนด์คู่แข่งมากกว่าแบรนด์ของคุณ วิธีการเก็บข้อมูลเชิงคุณภาพ (Qualitative Research) ข้อใดที่จะช่วยให้ได้ข้อมูล Insight ลึกที่สุด?",
+                qEn: "8. You must investigate why consumers aged 18-24 prefer a competitor's brand. Which qualitative methodology uncovers the deepest psychological insights?",
+                options: [
+                    "ก. การส่งแบบสอบถามออนไลน์ที่มีคำถามปลายปิดให้ติ๊กเลือก ก ข ค ง ส่งกระจายไปในไลน์กลุ่ม",
+                    "ข. การจัดสนทนากลุ่มย่อย (Focus Group) และการสัมภาษณ์เชิงลึก (In-depth Interview) กับกลุ่มเป้าหมายโดยตรง เพื่อซักถามพฤติกรรม ทัศนคติ และแรงจูงใจที่แท้จริง",
+                    "ค. การยืนนับจำนวนคนที่เดินผ่านหน้าร้านของคู่แข่งในช่วงเวลาเย็นวันศุกร์",
+                    "ง. การเดาเอาเองจากประสบการณ์ส่วนตัวที่คุณเคยเป็นวัยรุ่นมาก่อน"
+                ],
+                optionsEn: [
+                    "A. Distributing closed-ended multiple-choice online surveys through chat groups.",
+                    "B. Conducting targeted focus groups and in-depth interviews (IDIs) to probe genuine subconscious drivers, attitudes, and unarticulated behaviors.",
+                    "C. Tallying pedestrian traffic passing outside competitor storefronts on Friday evenings.",
+                    "D. Extrapolating subjective assumptions from personal memories of being young."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การวิเคราะห์ข้อมูลและการตลาดเชิงกลยุทธ์",
+                categoryEn: "Category 2: Data, Analytics & Strategy",
+                q: "9. ในการประเมินความคุ้มค่าของงบประมาณการตลาด (Marketing ROI) แคมเปญใดต่อไปนี้ถือว่ามีประสิทธิภาพในการสร้างรายได้กลับคืนสู่บริษัทสูงที่สุด?",
+                qEn: "9. Evaluating marketing cost efficiency and ROI, which of the following campaigns delivered the highest financial return ratio?",
+                options: [
+                    "ก. แคมเปญ ก: ใช้งบ 10,000 บาท ได้ยอดขายกลับมา 50,000 บาท",
+                    "ข. แคมเปญ ข: ใช้งบ 100,000 บาท ได้ยอดขายกลับมา 200,000 บาท",
+                    "ค. แคมเปญ ค: ใช้งบ 500,000 บาท ได้ยอดขายกลับมา 600,000 บาท",
+                    "ง. แคมเปญ ง: ใช้งบ 50,000 บาท ได้ยอดไลก์เพจเพิ่มขึ้น 100,000 ไลก์ แต่ยอดขายเท่าเดิม"
+                ],
+                optionsEn: [
+                    "A. Campaign A: Spend 10,000 THB -> Generates 50,000 THB in revenue (5x / 400% ROI).",
+                    "B. Campaign B: Spend 100,000 THB -> Generates 200,000 THB in revenue (2x / 100% ROI).",
+                    "C. Campaign C: Spend 500,000 THB -> Generates 600,000 THB in revenue (1.2x / 20% ROI).",
+                    "D. Campaign D: Spend 50,000 THB -> Adds 100,000 vanity likes with zero incremental sales."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 2: การวิเคราะห์ข้อมูลและการตลาดเชิงกลยุทธ์",
+                categoryEn: "Category 2: Data, Analytics & Strategy",
+                q: "10. คู่แข่งรายสำคัญประกาศลดราคาสินค้าประเภทเดียวกับคุณลง 30% พร้อมจัดโปรโมชันซื้อ 1 แถม 1 อย่างรุนแรง ส่งผลกระทบต่อยอดขายหน้าร้านของคุณทันที ในฐานะนักการตลาด คุณจะแก้เกมการแข่งขันนี้อย่างไรโดยไม่ให้แบรนด์เสียคุณค่า (Brand Equity)?",
+                qEn: "10. A primary rival initiates an aggressive 30% discount plus Buy 1 Get 1 free promo. How do you respond strategically without degrading your brand equity?",
+                options: [
+                    "ก. หั่นราคาสินค้าลง 50% ต่ำกว่าคู่แข่งทันทีเพื่อประชดตลาดแม้จะขาดทุน",
+                    "ข. นำเสนอคุณค่าที่แตกต่าง (Value Proposition) เช่น การเพิ่มการรับประกันสินค้า, บริการหลังการขายระดับพรีเมียม หรือจัดแพ็กเกจสินค้าคู่ (Bundling) เพื่อเพิ่มความคุ้มค่าโดยไม่ต้องลดราคาแข่ง",
+                    "ค. พิมพ์ข้อความโจมตีคุณภาพสินค้าของคู่แข่งผ่านทางช่องทางออฟฟิเชียลของบริษัท",
+                    "ง. อยู่เฉยๆ ไม่ปรับเปลี่ยนกลยุทธ์ใดๆ ปล่อยให้ลูกค้าไหลไปหาคู่แข่งจนหมด"
+                ],
+                optionsEn: [
+                    "A. Slash prices by 50% below competitor levels, accepting catastrophic profit loss.",
+                    "B. Fortify unique value propositions: amplify extended warranty protection, deliver premium after-sales service, or introduce value-add bundling without racing to the bottom on price.",
+                    "C. Post public smears attacking the rival's build quality on official channels.",
+                    "D. Take zero tactical action and watch customer footfall migrate to the rival."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 3: การบริหารแคมเปญและการสื่อสารวิกฤต (Campaign Management & Crisis PR)
+            {
+                category: "หมวดที่ 3: การบริหารแคมเปญและการสื่อสารวิกฤต",
+                categoryEn: "Category 3: Campaign Management & Crisis PR",
+                q: "11. พนักงานกราฟิกดีไซเนอร์ในทีมเผลอนำภาพที่มีลิขสิทธิ์ของบุคคลอื่นมาใช้ในโพสต์โฆษณาแคมเปญใหญ่ และโพสต์นั้นถูกแชร์ไปแล้วกว่า 5,000 ครั้ง จนกระทั่งเจ้าของลิขสิทธิ์เข้ามาคอมเมนต์ทวงสิทธิ์และขู่ฟ้องร้อง แอ็กชันแรกที่คุณต้องทำคืออะไร?",
+                qEn: "11. An in-house designer mistakenly used copyrighted artwork in a viral ad campaign (5,000 shares), and the copyright owner publicly threatens legal action. What is your immediate action?",
+                options: [
+                    "ก. ลบคอมเมนต์ของเจ้าของลิขสิทธิ์ทิ้งและบล็อกบัญชีของเขาทันที",
+                    "ข. ซ่อนหรือลบโพสต์ดังกล่าวทันที ออกแถลงการณ์ขออภัยต่อเจ้าของสิทธิ์และสาธารณชนอย่างเป็นทางการผ่านช่องทางออฟฟิเชียล และรีบติดต่ออินบ็อกซ์เจ้าของลิขสิทธิ์เพื่อเจรจาจ่ายค่าชดเชยอย่างถูกต้องตามกฎหมาย",
+                    "ค. ปล่อยโพสต์ไว้ตามปกติและเข้าไปพิมพ์เถียงว่าเป็นการใช้เพื่อการศึกษา",
+                    "ง. โยนความผิดให้พนักงานฝึกงานและประกาศชื่อพนักงานคนนั้นลงบนหน้าเพจ"
+                ],
+                optionsEn: [
+                    "A. Delete the artist's comment and block their social media account.",
+                    "B. Immediately unpublish/remove the post, issue an official corporate apology, and initiate direct settlement discussions with the creator for fair commercial compensation.",
+                    "C. Keep the ad active and falsely argue fair-use educational exemption.",
+                    "D. Publicly scapegoat an intern and post their full name on the fanpage."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การบริหารแคมเปญและการสื่อสารวิกฤต",
+                categoryEn: "Category 3: Campaign Management & Crisis PR",
+                q: "12. เกิดกระแสดราม่าบนโลกออนไลน์เมื่อพรีเซนเตอร์ของแบรนด์คุณโพสต์ข้อความแสดงทัศนคติเชิงลบอย่างรุนแรงบนพื้นที่ส่วนตัว ส่งผลให้แฮชแท็กแบนแบรนด์ของคุณติดเทรนด์ทวิตเตอร์ (X) อันดับ 1 ภายในเวลา 2 ชั่วโมง คุณจะจัดการวิกฤตนี้อย่างไร?",
+                qEn: "12. A brand ambassador publishes an incendiary personal statement, driving a boycott hashtag against your brand to #1 trending within 2 hours. How do you manage this PR crisis?",
+                options: [
+                    "ก. นิ่งเงียบไม่ขยับตัว รอให้เวลาผ่านไป 2-3 สัปดาห์เดี๋ยวคนก็ลืมไปเอง",
+                    "ข. ประชุมด่วนร่วมกับทีมกฎหมายและผู้บริหาร เพื่อออกแถลงการณ์จุดยืนของแบรนด์ที่ไม่สนับสนุนพฤติกรรมดังกล่าว พร้อมประกาศระงับงานหรือยุติสัญญากับพรีเซนเตอร์ท่านนั้นตามเงื่อนไขในสัญญาเพื่อปกป้องภาพลักษณ์แบรนด์",
+                    "ค. เข้าไปพิมพ์คอมเมนต์กดดันและด่าทอผู้บริโภคที่เข้ามาแบนแบรนด์",
+                    "ง. จ้างแฮกเกอร์ให้ไปลบแฮชแท็กนั้นออกจากระบบแพลตฟอร์ม"
+                ],
+                optionsEn: [
+                    "A. Stay silent and hope social media amnesia erases the outrage after a few weeks.",
+                    "B. Convene crisis executive and legal counsel, release a firm statement disavowing the rhetoric, and invoke morality clauses to suspend or terminate the ambassadorship.",
+                    "C. Post combative comments attacking boycotting consumers.",
+                    "D. Hire hackers to attempt unauthorized removal of trending tags."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การบริหารแคมเปญและการสื่อสารวิกฤต",
+                categoryEn: "Category 3: Campaign Management & Crisis PR",
+                q: "13. คุณได้รับงบประมาณก้อนหนึ่งในการจัดอีเวนต์เปิดตัวสินค้ากลางห้างสรรพสินค้าชื่อดัง แต่ก่อนวันงาน 1 วัน รัฐบาลประกาศมาตรการล็อกดาวน์หรือห้ามจัดกิจกรรมรวมกลุ่มในพื้นที่กะทันหันเนื่องจากมีเหตุฉุกเฉิน คุณจะพลิกแพลนงานการตลาดนี้อย่างไร?",
+                qEn: "13. One day prior to a major mall launch event, an emergency municipal decree prohibits public gatherings. How do you pivot the campaign?",
+                options: [
+                    "ก. ดึงดันจัดงานต่อไปแบบลับๆ โดยไม่สนใจคำสั่งราชการ",
+                    "ข. ปรับเปลี่ยนรูปแบบงานสู่ออนไลน์อีเวนต์เต็มรูปแบบ (Virtual Live Launching) ผ่านแพลตฟอร์ม Social Media โยกงบประมาณออฟไลน์ไปใช้อัดฉีดโปรโมชันพิเศษสตรีมสด และจัดส่งชุดสินค้าทดลองไปให้สื่อและอินฟลูเอนเซอร์รีวิวที่บ้านแทน",
+                    "ค. ยกเลิกงานทั้งหมด ทิ้งเงินมัดจำสถานที่ และไม่ทำกิจกรรมการตลาดใดๆ อีกเลยในไตรมาสนี้",
+                    "ง. โทรไปต่อว่าเจ้าหน้าที่รัฐบาลและเรียกร้องค่าเสียหายให้กับบริษัท"
+                ],
+                optionsEn: [
+                    "A. Proceed secretly with the gathering in defiance of government orders.",
+                    "B. Pivot rapidly to a digital live-stream launch, redirect physical setup budget into flash livestream incentives, and courier VIP launch kits to reviewers and press at home.",
+                    "C. Cancel all promotional activities for the entire quarter and forfeit venue deposits.",
+                    "D. Harass municipal officials over the phone demanding compensation."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การบริหารแคมเปญและการสื่อสารวิกฤต",
+                categoryEn: "Category 3: Campaign Management & Crisis PR",
+                q: "14. แบรนด์เครื่องสำอางของคุณถูกผู้บริโภครายหนึ่งโพสต์คลิปวิดีโอเคลมว่าใช้ครีมของแบรนด์แล้วเกิดอาการแพ้อย่างรุนแรง ผิวลอกเป็นแผล จนคลิปกลายเป็นไวรัล มียอดชมหลักล้านภายในคืนเดียว ขั้นตอนการทำงานที่ถูกต้องของทีมการตลาดคือข้อใด?",
+                qEn: "14. A user uploads a viral video claiming severe allergic burns from your skincare cream, accumulating 1M+ views overnight. What is the professional protocol?",
+                options: [
+                    "ก. ส่งทีมทนายไปข่มขู่ให้ผู้บริโภคลบคลิปทันที มิฉะนั้นจะฟ้องร้องข้อหาหมิ่นประมาท 10 ล้านบาท",
+                    "ข. แสดงความห่วงใยอย่างจริงใจผ่านช่องทางสาธารณะ ติดต่อผู้บริโภคเพื่อขอข้อมูลการใช้และอาสาพาไปตรวจรักษากับแพทย์ผิวหนังผู้เชี่ยวชาญโดยแบรนด์ออกค่าใช้จ่ายทั้งหมด พร้อมส่งตัวอย่างล็อตสินค้าตรวจสอบในแล็บเพื่อความโปร่งใส",
+                    "ค. รีบเปลี่ยนชื่อแบรนด์และโลโก้ใหม่ทันทีเพื่อหนีปัญหารอยด่างพร้อย",
+                    "ง. ออกแถลงการณ์ตอบโต้ว่าผิวหน้าของผู้บริโภครายนั้นไม่ดีเอง ไม่เกี่ยวกับสินค้าของบริษัท"
+                ],
+                optionsEn: [
+                    "A. Dispatch litigation threats warning the creator of a 10M THB defamation suit unless taken down.",
+                    "B. Issue an empathetic public statement, reach out to sponsor certified dermatological care and treatment costs, and submit product batch samples for certified third-party lab toxicology tests.",
+                    "C. Discard the company logo and change the brand name immediately.",
+                    "D. Release a statement blaming the consumer's skin predisposition rather than the product."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การบริหารแคมเปญและการสื่อสารวิกฤต",
+                categoryEn: "Category 3: Campaign Management & Crisis PR",
+                q: "15. ในการวางแผนปฏิทินคอนเทนต์ประจำปี (Content Calendar) ข้อใดคือหลักการกระจายสัดส่วนเนื้อหาที่ทำให้นักการตลาดสามารถสร้างยอดขายควบคู่กับการรักษาฐานผู้ติดตาม (Audience Retention) ได้มีประสิทธิภาพที่สุด?",
+                qEn: "15. When architecting an annual content calendar, which content mix principle balances commercial conversions with sustained follower retention?",
+                options: [
+                    "ก. โพสต์คอนเทนต์ขายสินค้าตรงๆ 100% วันละ 10 รอบ ทุกวันไม่มีวันหยุด",
+                    "ข. ใช้กฎ 80/20 คือ 80% เป็นคอนเทนต์ที่ให้คุณค่า ความรู้ หรือความบันเทิงแก่ผู้ฟัง และอีก 20% เป็นคอนเทนต์เพื่อการขายและโปรโมทสินค้าโดยตรง",
+                    "ค. แชร์เฉพาะโพสต์ตลกขบขันและเรื่องดราม่าดารา 99% ขายสินค้าแค่ 1%",
+                    "ง. โพสต์เฉพาะรูปภาพสวัสดีวันจันทร์ถึงวันอาทิตย์เพื่อไม่ให้หน้าเพจเงียบเหงา"
+                ],
+                optionsEn: [
+                    "A. 100% hard-sell promotional posts broadcast 10 times a day, every day.",
+                    "B. The 80/20 rule: 80% delivering educational value, community relevance, or inspiration, and 20% dedicated to direct transactional pitches.",
+                    "C. 99% celebrity gossip and memes with only 1% product presence.",
+                    "D. Posting automated daily greeting greetings to keep feeds technically active."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 4: การบริหารผลิตภัณฑ์และช่องทางการตลาด (Product & Channel Management)
+            {
+                category: "หมวดที่ 4: การบริหารผลิตภัณฑ์และช่องทางการตลาด",
+                categoryEn: "Category 4: Product & Channel Management",
+                q: "16. แบรนด์สินค้าเพื่อสุขภาพของคุณต้องการขยายช่องทางการตลาดเข้าสู่ระบบ E-Commerce (เช่น Shopee, Lazada) การตั้งราคาสินค้าและการจัดโปรโมชันในช่องทางนี้ข้อใดถูกต้องตามหลักการบริหารช่องทางขาย (Channel Management)?",
+                qEn: "16. When entering e-commerce marketplaces (Shopee, Lazada), which pricing and promotional strategy adheres to sound channel management principles?",
+                options: [
+                    "ก. ตั้งราคาขายต่ำกว่าหน้าร้านตัวแทนจำหน่ายออฟไลน์ 50% เพื่อตัดราคาแย่งลูกค้ามาให้หมด",
+                    "ข. วางโครงสร้างราคากลางที่เท่ากันเพื่อป้องกันความขัดแย้งระหว่างช่องทาง (Channel Conflict) แต่เน้นจัดแคมเปญโปรโมชันเฉพาะตัวแพลตฟอร์ม เช่น คูปองส่วนลดพิเศษประจำแอป หรือการจัดชุดของแถมพิเศษ (Exclusive Bundle)",
+                    "ค. ปล่อยให้ร้านค้าปลีกรายย่อยตั้งราคาตามใจชอบโดยไม่มีระบบควบคุม",
+                    "ง. ขายสินค้าราคาแพงกว่าปกติ 2 เท่าเพื่อชดเชยค่าธรรมเนียมการใช้แอปพลิเคชัน"
+                ],
+                optionsEn: [
+                    "A. Undercut offline dealer pricing by 50% to cannibalize brick-and-mortar accounts.",
+                    "B. Maintain unified MSRP baseline pricing to prevent channel conflict while running platform-exclusive promos (in-app subsidy vouchers, exclusive bundles).",
+                    "C. Allow distributors and retail sellers to undercut haphazardly without MAP policies.",
+                    "D. Double list prices across marketplaces to offset platform commissions."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารผลิตภัณฑ์และช่องทางการตลาด",
+                categoryEn: "Category 4: Product & Channel Management",
+                q: "17. สินค้าตัวหนึ่งของบริษัทมียอดขายดีมากในเขตพื้นที่กรุงเทพฯ แต่เมื่อนำไปทำตลาดในพื้นที่ต่างจังหวัดกลับมียอดขายเกือบเป็นศูนย์ หลังจากลงพื้นที่สำรวจข้อใดคือก้าวต่อไปที่นักการตลาดต้องปรับปรุงเชิงกลยุทธ์?",
+                qEn: "17. A product performs exceptionally well in metropolitan Bangkok but records near-zero sales in provincial territories. What is the next strategic marketing adjustment?",
+                options: [
+                    "ก. เลิกขายสินค้าในต่างจังหวัดทันทีเพราะคนต่างจังหวัดไม่มีกำลังซื้อ",
+                    "ข. ทำการวิเคราะห์ส่วนผสมทางการตลาด (Marketing Mix: 4Ps) ใหม่ ปรับปรุงการสื่อสารและแพ็กเกจจิ้งให้สอดคล้องกับพฤติกรรม วัฒนธรรมท้องถิ่น และพิจารณากำหนดขนาดและราคาขาย (Price Point) ให้เข้าถึงง่ายขึ้น",
+                    "ค. ใช้สปอตโฆษณาตัวเดียวกับที่ใช้ในกรุงเทพฯ เปิดกรอกหูซ้ำๆ ในวิทยุท้องถิ่นโดยไม่ปรับเปลี่ยนเนื้อหา",
+                    "ง. บังคับให้พนักงานขายในพื้นที่ซื้อสินค้าไปใช้เองให้หมดเพื่อปั๊มยอด"
+                ],
+                optionsEn: [
+                    "A. Abandon regional markets assuming upcountry consumers lack spending power.",
+                    "B. Re-evaluate the 4Ps mix: localize positioning, refine packaging sizes and price points for affordability, and tailor cultural messaging.",
+                    "C. Air identical Bangkok-centric ads repetitively on provincial radio stations.",
+                    "D. Coerce local field sales staff into personally purchasing unsold stock."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารผลิตภัณฑ์และช่องทางการตลาด",
+                categoryEn: "Category 4: Product & Channel Management",
+                q: "18. บริษัทของคุณต้องการรีแบรนด์ (Rebranding) ภาพลักษณ์แบรนด์เครื่องใช้ไฟฟ้าเก่าแก่ที่มีอายุ 30 ปี ให้ดูทันสมัยและเข้าถึงกลุ่มคนรุ่นใหม่มากขึ้น ความเสี่ยงสูงสุดที่ทีมการตลาดต้องวางแผนตั้งรับคืออะไร?",
+                qEn: "18. When rebranding a 30-year-old heritage electrical appliance brand to appeal to young consumers, what is the single highest strategic risk?",
+                options: [
+                    "ก. การสูญเสียคุณค่าและอัตลักษณ์เดิม (Brand Heritage) จนทำให้กลุ่มลูกค้าเก่าที่จงรักภักดีเกิดความสับสนและเลิกซื้อสินค้า",
+                    "ข. การที่พนักงานในออฟฟิศไม่อยากเปลี่ยนสีเสื้อฟอร์มใหม่",
+                    "ค. การที่สำนักงานเขตเรียกเก็บภาษีป้ายโฆษณาเพิ่มขึ้นจากโลโก้ใหม่",
+                    "ง. การที่ระบบคอมพิวเตอร์พิมพ์โลโก้ใหม่เป็นภาพขาวดำ"
+                ],
+                optionsEn: [
+                    "A. Diluting core brand heritage and trust equity, causing established brand loyalists to feel alienated and abandon the brand.",
+                    "B. Employee resistance to adopting newly colored polo shirts.",
+                    "C. District municipal offices levying signage tax reassessments on new logos.",
+                    "D. Internal printers rendering the updated logo in monochrome."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 4: การบริหารผลิตภัณฑ์และช่องทางการตลาด",
+                categoryEn: "Category 4: Product & Channel Management",
+                q: "19. ข้อมูลระบบ CRM ระบุชัดเจนว่า ลูกค้ามักจะเลิกซื้อสินค้าและบริการของคุณหลังจากใช้งานไปได้ 3 เดือน (Churn Rate สูงในเดือนที่ 3) กลยุทธ์การตลาดแบบผูกใจ (Retention Marketing) ข้อใดที่ควรนำมาใช้ตัดวงจรปัญหานี้?",
+                qEn: "19. CRM data reveals a sharp customer churn drop-off at the 3-month mark. Which retention marketing initiative directly breaks this attrition cycle?",
+                options: [
+                    "ก. การยิงโฆษณาตามหลอกหลอน (Retargeting) เพื่อขายสินค้าตัวเดิมซ้ำๆ ชนิดไม่ให้ตั้งตัว",
+                    "ข. การทำโปรแกรมสิทธิประโยชน์ (Loyalty Program) ส่งมอบสิทธิพิเศษพรีเมียมจัดแคมเปญมอบส่วนลดฉลองครบกำหนด 3 เดือน หรือส่งแบบสอบถามเชิงรุกถามความพึงพอใจเพื่อปรับปรุงบริการก่อนที่ลูกค้าจะตีตัวออกห่าง",
+                    "ค. การโทรศัพท์ไปต่อว่าลูกค้าว่าทำไมถึงไม่ยอมกลับมาซื้อซ้ำ",
+                    "ง. การยกเลิกเบอร์ติดต่อศูนย์บริการลูกค้าเพื่อไม่ให้ลูกค้ารายงานปัญหา"
+                ],
+                optionsEn: [
+                    "A. Aggressively spamming intrusive retargeting ads attempting to resell identical items.",
+                    "B. Deploying proactive 90-day milestone loyalty rewards, personalized renewal perks, and structured satisfaction check-ins before disengagement occurs.",
+                    "C. Telephoning past purchasers to reproach them for not re-ordering.",
+                    "D. Deactivating customer service hotlines to prevent churn complaints."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารผลิตภัณฑ์และช่องทางการตลาด",
+                categoryEn: "Category 4: Product & Channel Management",
+                q: "20. ในการประเมินประสิทธิภาพการทำงานของฝ่ายการตลาดประจำไตรมาส ข้อใดคือกระบวนการที่สะท้อนความเป็นนักการตลาดมืออาชีพที่ขับเคลื่อนด้วยข้อมูล (Data-Driven Marketer) สูงสุด?",
+                qEn: "20. In quarterly marketing performance reviews, which reporting standard best reflects an elite data-driven marketer?",
+                options: [
+                    "ก. การจัดทำสไลด์สรุปงานที่มีแต่รูปภาพบรรยากาศการทำงานในออฟฟิศที่สนุกสนาน",
+                    "ข. การทำรายงานเปรียบเทียบตัวเลขผลลัพธ์ (Actual KPIs) เทียบกับเป้าหมาย (Target KPIs) วิเคราะห์หาต้นทุนต่อผลลัพธ์ (เช่น Cost per Lead, ROI) พร้อมนำเสนอแผนการปรับปรุงจุดบกพร่องและทิศทางในไตรมาสถัดไปอย่างมีหลักการ",
+                    "ค. การบอกผู้บริหารด้วยวาจาว่า \"ไตรมาสนี้ทีมการตลาดเหนื่อยกันมาก ยอดขายน่าจะดี\"",
+                    "ง. การคัดลอกรายงานผลลัพธ์ของไตรมาสที่แล้วมาส่งซ้ำโดยเปลี่ยนแค่วันที่บนหัวกระดาษ"
+                ],
+                optionsEn: [
+                    "A. Presenting slide decks composed entirely of candid team party photographs.",
+                    "B. Benchmarking actual vs. target KPIs, calculating unit economics (CPL, CAC, ROMI), and presenting data-backed corrective roadmaps for the next sprint.",
+                    "C. Verbally telling executives: 'The team worked very hard, so revenue should turn out well.'",
+                    "D. Re-submitting the previous quarter's report with modified header dates."
+                ],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Marketing_Officer';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            const _lBtn = document.getElementById('langToggle');
+            if (_lBtn) {
+                _lBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>${t.langBtn}</span>
+                `;
+            }
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, "เจ้าหน้าที่การตลาด");
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, "เจ้าหน้าที่การตลาด");
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const catText = (currentLang === 'en' && item.categoryEn) ? item.categoryEn : item.category;
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span class="category-badge">${catText}</span>
+                    <span class="progress-text" style="margin-bottom:0;">${t.progress(currentStep + 1, questions.length)}</span>
+                </div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: "Marketing_Officer",
+                uuid: uuid,
+                name: userName,
+                position: "เจ้าหน้าที่การตลาด",
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_category`] = questions[i].category;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "ผ่านเกณฑ์โดดเด่น (เรียกสัมภาษณ์)" : (score >= 12 ? "ผ่านเกณฑ์มาตรฐาน (พิจารณาเพิ่มเติม)" : "ไม่ผ่านเกณฑ์");
+            payload.decisionNote = score >= 16 ? "เรียกสัมภาษณ์ มีทักษะดิจิทัลมาร์เก็ตติ้ง วิเคราะห์ข้อมูล LTV/CAC และการบริหารจัดการแคมเปญดีเยี่ยม" : (score >= 12 ? "พิจารณาผลงาน Portfolio และการสัมภาษณ์เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>

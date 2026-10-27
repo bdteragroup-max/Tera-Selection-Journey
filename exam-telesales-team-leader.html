@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assessment: Telesales Team Leader - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 860px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.18);
+            border: 1px solid rgba(241, 196, 15, 0.45);
+            color: #f1c40f;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 2.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.15rem 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            text-align: left;
+            font-size: 1.02rem;
+            line-height: 1.55;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: #f1c40f;
+            transform: translateX(4px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        #langToggle,
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #langToggle {
+            right: 16px;
+        }
+
+        #backBtn {
+            left: 16px;
+        }
+
+        #langToggle:hover,
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="backBtn" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back</span>
+    </button>
+    <button id="langToggle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="langBtnText">EN</span>
+    </button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.75rem; letter-spacing: -0.3px;">แบบทดสอบตำแหน่ง หัวหน้าทีม Telesales (Telesales Team Leader)</h1>
+            <p id="userInfo" style="opacity: 0.85; font-size: 1.05rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "EN",
+                pageTitle: "แบบทดสอบตำแหน่ง หัวหน้าทีม Telesales (Telesales Team Leader)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "TH",
+                pageTitle: "Assessment: Telesales Team Leader",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            // หมวดที่ 1: การบริหารยอดขายและการวิเคราะห์ประสิทธิภาพ (Sales Target & KPI Management)
+            {
+                category: "หมวดที่ 1: การบริหารยอดขายและการวิเคราะห์ประสิทธิภาพ",
+                categoryEn: "Category 1: Sales Target & KPI Management",
+                q: "1. ในช่วงครึ่งเดือนแรก ทีม Telesales ของคุณทำยอดขายได้เพียง 35% ของเป้าหมายรายเดือน (Target) เนื่องจากสภาวะตลาดซบเซาและคู่แข่งออกโปรโมชันตัดราคา ในฐานะหัวหน้าทีม แอ็กชันแรกที่คุณควรทำเพื่อพลิกสถานการณ์ (Turnaround Strategy) คืออะไร?",
+                qEn: "1. During the first half of the month, your Telesales team achieved only 35% of monthly target due to a sluggish market and competitor discounting. As team leader, what is your immediate turnaround action?",
+                options: [
+                    "ก. เรียกประชุมด่วนเพื่อตักเตือนและขู่ว่าจะตัดค่าคอมมิชชันหากทำยอดไม่ทะลุเป้า",
+                    "ข. ดึงรายงานข้อมูลสายโทรเข้า-ออก (Call Logs) และอัตราการปิดการขาย (Conversion Rate) มาวิเคราะห์แยกรายบุคคล หาจุดบกพร่องของสคริปต์การขาย ร่วมกับปรับกลุ่มลีด (Leads) ที่มีโอกาสซื้อสูงมาให้ทีมเร่งโฟกัสทันที",
+                    "ค. ส่งอีเมลแจ้งผู้บริหารว่าเป้าหมายที่ตั้งไว้สูงเกินไปและขอปรับลดเป้าลงครึ่งหนึ่ง",
+                    "ง. ปล่อยให้ทีมทำงานตามปกติเพราะเชื่อว่าครึ่งเดือนหลังยอดขายจะกลับมาเอง"
+                ],
+                optionsEn: [
+                    "A. Call an urgent meeting to scold the team and threaten commission cuts if target is missed.",
+                    "B. Pull call logs and conversion rate reports for individual analysis, identify script bottlenecks, and prioritize high-propensity lead segments for immediate team focus.",
+                    "C. Email executives claiming the target is unrealistic and request cutting it by half.",
+                    "D. Let the team proceed as usual assuming second-half sales will organically recover."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การบริหารยอดขายและการวิเคราะห์ประสิทธิภาพ",
+                categoryEn: "Category 1: Sales Target & KPI Management",
+                q: "2. คุณสังเกตเห็นว่าพนักงาน Telesales คนหนึ่งในทีมมีปริมาณการโทร (Call Volume) สูงที่สุดในทีม (มากกว่า 150 สายต่อวัน) แต่ยอดขายสะสม (Sales Volume) กลับอยู่ในระดับรั้งท้ายของทีม คุณคิดว่าปัญหาเกิดจากอะไรและจะแก้ไขอย่างไร?",
+                qEn: "2. A sales rep achieves the highest call volume in the team (>150 calls/day), yet has the lowest closed sales volume. What is the root cause and remedy?",
+                options: [
+                    "ก. พนักงานขยันเกินไป ควรสั่งให้ลดปริมาณการโทรลงครึ่งหนึ่ง",
+                    "ข. พนักงานอาจเน้นการวางสายไวหรือรีบจบบทสนทนาโดยไม่พยายามค้นหาความต้องการของลูกค้า (Lack of Engagement) ควรเข้าฟังไฟล์เสียง (Call Listening) เพื่อวิเคราะห์ทักษะการโน้มน้าวใจและปรับสคริปต์การปิดการขายรายบุคคล",
+                    "ค. รายชื่อลูกค้าที่พนักงานคนนี้ได้รับเป็นรายชื่อที่ไม่มีคุณภาพ ควรเปลี่ยนสลับรายชื่อกับคนที่ทำยอดได้ดีที่สุดทันที",
+                    "ง. พนักงานไม่มีโชคในการขาย ควรทำเรื่องย้ายไปอยู่แผนกธุรการแทน"
+                ],
+                optionsEn: [
+                    "A. The rep is too diligent; order them to halve their daily call volume.",
+                    "B. The rep rushes calls without uncovering customer needs (lack of engagement); conduct call listening to analyze persuasive skills and tailor one-on-one closing coaching.",
+                    "C. Their lead list must be poor; swap their entire list with the top performer immediately.",
+                    "D. The rep lacks sales luck; transfer them to the administrative department."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การบริหารยอดขายและการวิเคราะห์ประสิทธิภาพ",
+                categoryEn: "Category 1: Sales Target & KPI Management",
+                q: "3. เกณฑ์ชี้วัด (KPIs) ตัวใดที่หัวหน้าทีม Telesales ควรให้ความสำคัญมากที่สุดในการประเมินประสิทธิภาพ \"คุณภาพการเจรจาและการบริหารเวลา\" ของพนักงานขายในทีม?",
+                qEn: "3. Which metric pair should a Telesales Team Leader prioritize most when evaluating negotiation quality and time management effectiveness?",
+                options: [
+                    "ก. Average Talk Time (เวลาเฉลี่ยในการคุยสาย) ควบคู่กับ Conversion Rate (อัตราการเปลี่ยนเป็นยอดขาย)",
+                    "ข. Number of Inbound Calls (จำนวนสายที่รับเข้า) เพียงอย่างเดียว",
+                    "ค. ข้อมูลจำนวนครั้งที่พนักงานลากิจหรือลาป่วยในรอบปี",
+                    "ง. ความเร็วในการพิมพ์ดีดของพนักงานขณะบันทึกข้อมูลลูกค้า"
+                ],
+                optionsEn: [
+                    "A. Average Talk Time combined with Conversion Rate.",
+                    "B. Total number of inbound calls received alone.",
+                    "C. Annual count of sick and personal leave instances.",
+                    "D. Typing speed while logging customer CRM notes."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 1: การบริหารยอดขายและการวิเคราะห์ประสิทธิภาพ",
+                categoryEn: "Category 1: Sales Target & KPI Management",
+                q: "4. ในช่วงสิ้นไตรมาส ผู้บริหารต้องการให้ทีม Telesales ขยายยอดขายจากฐานลูกค้าเก่าที่ขาดการติดต่อ (Inactive Customers) คุณจะวางกลยุทธ์การแบ่งกลุ่มลูกค้า (Data Segmentation) ให้ทีมอย่างไรเพื่อให้ได้ผลลัพธ์สูงสุด?",
+                qEn: "4. At quarter-end, executives want the team to drive sales from inactive legacy customer accounts. How would you segment the data for maximum results?",
+                options: [
+                    "ก. แจกรายชื่อทั้งหมดให้พนักงานทุกคนเท่าๆ กันโดยใช้วิธีสุ่มเพื่อความยุติธรรม",
+                    "ข. คัดแยกข้อมูลลูกค้าเก่าตามพฤติกรรมการซื้อในอดีต (เช่น ยอดซื้อสูงสุด, ประเภทสินค้าที่เคยชอบ) และส่งต่อลีดเกรด A ให้กับพนักงานระดับ Top-Performer เพื่อเปิดการขายใหม่ ส่วนลีดทั่วไปใช้พนักงานใหม่ในการ Re-connect",
+                    "ค. ให้พนักงานเลือกรายชื่อลูกค้าเก่าที่ตนเองชอบจากระบบตามความสมัครใจ",
+                    "ง. นำรายชื่อทั้งหมดไปยิงโฆษณา SMS ซ้ำๆ โดยไม่จำเป็นต้องให้คนโทรหา"
+                ],
+                optionsEn: [
+                    "A. Distribute lists uniformly and randomly to all reps for equal distribution.",
+                    "B. Segment accounts by past purchasing behavior (high historical value, preferred product lines) and route Grade-A leads to top performers for re-activation while assigning regular leads to newer reps.",
+                    "C. Let reps volunteer to pick whichever past client names they like.",
+                    "D. Blast repeated promotional SMS messages to all numbers without dialing."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การบริหารยอดขายและการวิเคราะห์ประสิทธิภาพ",
+                categoryEn: "Category 1: Sales Target & KPI Management",
+                q: "5. หากบริษัทมีการปรับโครงสร้างค่าคอมมิชชัน (Commission Structure) ใหม่ ซึ่งส่งผลให้พนักงานทำยอดขายได้ยากขึ้นกว่าเดิม จนทำให้คนในทีมเริ่มหมดไฟและยอดขายสัปดาห์แรกตกลงอย่างเห็นได้ชัด คุณจะรับมือกับสถานการณ์นี้อย่างไร?",
+                qEn: "5. The company introduced a revised commission structure making targets harder, leading to demoralization and a sharp first-week sales dip. How do you handle this?",
+                options: [
+                    "ก. พิมพ์ข้อความสั่งในไลน์กลุ่มว่าถ้าใครรับเงื่อนไขใหม่ไม่ได้ให้ยื่นใบลาออก",
+                    "ข. จัดประชุมชี้แจงเหตุผลเชิงกลยุทธ์ของบริษัทอย่างจริงใจ ร่วมกันมองหาโอกาสใหม่จากโครงสร้างนี้ (เช่น โบนัสพิเศษจากการขายพรีเมียม) และจัดแคมเปญแข่งขันระยะสั้น (Short-term Incentive) ในทีมเพื่อกระตุ้นบรรยากาศ",
+                    "ค. แอบแก้ระบบหลังบ้านเพื่อโกงยอดขายช่วยพนักงานให้ได้ค่าคอมมิชชันเท่าเดิม",
+                    "ง. ชวนพนักงานในทีมรวมตัวกันประท้วงหยุดงานเพื่อบีบฝ่ายบริหารให้เปลี่ยนกลับไปใช้ระบบเดิม"
+                ],
+                optionsEn: [
+                    "A. Post a LINE group message demanding anyone dissatisfied with the terms submit their resignation.",
+                    "B. Hold a transparent meeting explaining strategic business objectives, uncover new upside opportunities (such as premium-tier bonus accelerators), and run short-term internal sprint incentives.",
+                    "C. Tamper with backend CRM figures to inflate rep sales numbers.",
+                    "D. Organize a team walkout strike to pressure leadership into reverting the policy."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 2: การโค้ชชิ่ง พัฒนา และรักษาบุคลากร (Coaching, Mentoring & Retention)
+            {
+                category: "หมวดที่ 2: การโค้ชชิ่ง พัฒนา และรักษาบุคลากร",
+                categoryEn: "Category 2: Coaching, Mentoring & Retention",
+                q: "6. พนักงาน Telesales ระดับท็อป (Top Performer) ของทีมเริ่มมีพฤติกรรมมาทำงานสาย ขาดประชุมทีม และไม่บันทึกข้อมูลลูกค้าลงระบบ CRM เนื่องจากคิดว่าตนเองทำยอดขายทะลุเป้าอยู่แล้ว ในฐานะหัวหน้าทีมคุณจะจัดการอย่างไร?",
+                qEn: "6. A top-performing rep begins showing up late, skipping team huddles, and neglecting CRM data entry because their revenue numbers exceed target. How do you handle them?",
+                options: [
+                    "ก. แกล้งทำเป็นมองไม่เห็นพฤติกรรมเหล่านั้นเพื่อรักษาคนทำยอดขายหลักไว้",
+                    "ข. นัดคุยส่วนตัว (One-on-One) เพื่อชื่นชมผลงาน แต่ชี้แจงให้เห็นถึงความสำคัญของวินัยและระบบ CRM ที่ส่งผลต่อทีมโดยรวม พร้อมเสนอโอกาสให้เขาเป็น Mentor ช่วยเทรนพนักงานใหม่เพื่อท้าทายความสามารถและสร้างความรับผิดชอบใหม่",
+                    "ค. ประกาศตำหนิพนักงานคนนี้อย่างรุนแรงต่อหน้าพนักงานทุกคนในห้องสตรีมการขาย",
+                    "ง. หักเงินคอมมิชชันของเขาทันทีโดยไม่มีการตักเตือนล่วงหน้า"
+                ],
+                optionsEn: [
+                    "A. Turn a blind eye to preserve the revenue generator at all costs.",
+                    "B. Conduct a 1-on-1 session praising high performance while articulating the critical impact of discipline and CRM data on company assets, offering them a mentor role to foster new leadership responsibility.",
+                    "C. Publicly humiliate and reprimand them in front of the entire call floor.",
+                    "D. Withhold their earned commission immediately without prior warning."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การโค้ชชิ่ง พัฒนา และรักษาบุคลากร",
+                categoryEn: "Category 2: Coaching, Mentoring & Retention",
+                q: "7. พนักงานใหม่เพิ่งผ่านการอบรมสคริปต์มาได้ 1 สัปดาห์ เริ่มขึ้นสายโทรจริง (Live Call) แล้วโดนปฏิเสธอย่างไร้เยื่อใยจากลูกค้าติดต่อกัน 20 สาย จนเกิดอาการร้องไห้ หมดความมั่นใจ และเดินมาบอกคุณว่าขอลาออกทันที คุณจะระงับเหตุการณ์นี้อย่างไร?",
+                qEn: "7. A novice rep on week one of live calling faces 20 consecutive blunt customer rejections, breaks down in tears, loses confidence, and tenders an immediate resignation. How do you intervene?",
+                options: [
+                    "ก. เซ็นอนุมัติใบลาออกทันทีเพราะถือว่าไม่มีความอดทนพอในอาชีพนี้",
+                    "ข. ให้พนักงานพักเบรกถอดหูฟังทันที พาไปนั่งคุยในห้องเงียบๆ เพื่อปลอบประโลมและปรับ Mindset ว่าการปฏิเสธเป็นเรื่องปกติของ Telesales จากนั้นร่วมฟังไฟล์เสียงของสายที่โดนปฏิเสธเพื่อหาจุดปรับปรุงร่วมกันทีละสเต็ป",
+                    "ค. บังคับให้พนักงานกลับไปนั่งที่โต๊ะและสั่งให้โทรต่อห้ามหยุดจนกว่าจะหมดเวลาทำงาน",
+                    "ง. บอกให้พนักงานไปกราบขอโทษลูกค้าสายถัดไปเพื่อจะได้ปิดการขายได้"
+                ],
+                optionsEn: [
+                    "A. Sign the resignation immediately, citing insufficient resilience.",
+                    "B. Have them take off the headset immediately for a quiet debrief, reframe rejection as standard telesales math, and review call recordings together to diagnose and overcome objections step-by-step.",
+                    "C. Force them back into their cubicle and demand non-stop dialing until shift end.",
+                    "D. Tell them to beg for forgiveness on the next call to secure an order."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การโค้ชชิ่ง พัฒนา และรักษาบุคลากร",
+                categoryEn: "Category 2: Coaching, Mentoring & Retention",
+                q: "8. ในการจัดทำเซสชัน \"Call Listening & Quality Assurance (QA)\" ประจำสัปดาห์ วิธีการโค้ชชิ่งแบบใดที่จะช่วยพัฒนาทักษะพนักงาน Telesales ได้อย่างยั่งยืนที่สุด?",
+                qEn: "8. In weekly Call Listening & QA coaching sessions, which method drives sustainable skill growth for telesales reps?",
+                options: [
+                    "ก. หัวหน้าเป็นผู้เลือกไฟล์เสียงที่แย่ที่สุดมาเปิดประจานให้ทุกคนรุมวิจารณ์",
+                    "ข. ให้พนักงานเลือกไฟล์เสียงของตัวเอง (ทั้งสายที่ปิดได้และปิดไม่ได้) มาเปิดฟังร่วมกัน ชวนพนักงานประเมินตนเองก่อน จากนั้นหัวหน้าค่อยให้ Feedback เชิงบวกและข้อเสนอแนะที่นำไปปรับใช้ได้จริง (Sandwich Feedback)",
+                    "ค. ยกเลิกการฟังไฟล์เสียงแล้วให้พนักงานไปท่องจำสคริปต์ความหนา 50 หน้าแทน",
+                    "ง. ฟังไฟล์เสียงคนเดียวแล้วสุ่มหักคะแนนพนักงานทางอีเมลโดยไม่บอกเหตุผล"
+                ],
+                optionsEn: [
+                    "A. The leader chooses the worst call audio and plays it publicly for group ridicule.",
+                    "B. Allow reps to select their own calls (both won and lost), facilitate self-evaluation first, followed by balanced, actionable sandwich feedback and coaching.",
+                    "C. Cancel call audits and enforce memorization of a 50-page verbatim script.",
+                    "D. Review audio alone and randomly deduct evaluation points via email without rationale."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การโค้ชชิ่ง พัฒนา และรักษาบุคลากร",
+                categoryEn: "Category 2: Coaching, Mentoring & Retention",
+                q: "9. ทีม Telesales ของคุณมีอัตราการลาออกของพนักงาน (Turnover Rate) สูงมาก โดยเฉลี่ยพนักงานใหม่อยู่ได้ไม่เกิน 2 เดือนก็ลาออก หลังจากวิเคราะห์ข้อมูลเบื้องต้น คุณควรปรับปรุงกระบวนการใดเป็นอันดับแรก?",
+                qEn: "9. Your telesales unit suffers high turnover where new hires depart within 2 months. Which process should be improved first?",
+                options: [
+                    "ก. เพิ่มค่าแรงขั้นต่ำให้สูงกว่าตลาด 3 เท่าเพื่อจ้างคนมานั่งทดแทนเรื่อยๆ",
+                    "ข. ปรับปรุงระบบการ Onboarding และจัดระบบพี่เลี้ยง (Buddy System) รวมถึงทบทวนความคาดหวังในงาน (Job Expectation) ตั้งแต่วันสัมภาษณ์ เพื่อให้พนักงานใหม่ไม่รู้สึกโดดเดี่ยวและปรับตัวเข้ากับแรงกดดันได้ดีขึ้น",
+                    "ค. สั่งให้ฝ่ายบุคคล (HR) เลิกรับสมัครพนักงานรุ่นใหม่ (Gen Z) เข้าทำงาน",
+                    "ง. ปรับสภาพแวดล้อมในออฟฟิศให้มืดสนิทเพื่อไม่ให้พนักงานมองเห็นเวลากลับบ้าน"
+                ],
+                optionsEn: [
+                    "A. Triple base wages above market to churn and replace warm bodies continuously.",
+                    "B. Overhaul the onboarding program, pair hires with dedicated senior buddies, and clarify realistic job expectations during interviews so newcomers feel supported against call stress.",
+                    "C. Mandate HR to cease hiring Gen Z applicants entirely.",
+                    "D. Black out office windows so reps lose track of time."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การโค้ชชิ่ง พัฒนา และรักษาบุคลากร",
+                categoryEn: "Category 2: Coaching, Mentoring & Retention",
+                q: "10. เมื่อพนักงานสองคนในทีมเกิดการแย่งลีดลูกค้า (Lead Dupes) เนื่องจากระบบข้อมูลซ้ำซ้อน และเริ่มมีการใช้ถ้อยคำรุนแรงทะเลาะกันกลางห้องทำงาน คุณในฐานะหัวหน้าทีมจะจัดการข้อพิพาทนี้อย่างไร?",
+                qEn: "10. Two sales reps engage in a heated floor argument over a duplicate customer lead. As team leader, how do you resolve the dispute?",
+                options: [
+                    "ก. ยึดลีดลูกค้ารายนั้นมาเป็นของตนเองและกินค่าคอมมิชชันเอง",
+                    "ข. แยกทั้งคู่เข้าห้องประชุมทันที ตรวจสอบ Timestamps ในระบบ CRM ว่าใครเป็นผู้คีย์บันทึกและติดต่อลูกค้ารายนี้เป็นคนแรกตามกฎของบริษัท ตัดสินสิทธิ์ตามหลักฐานอย่างเที่ยงตรง และสั่งการให้ไอทีแก้ระบบป้องกันลีดซ้ำ",
+                    "ค. สั่งให้ทั้งสองคนเป่ายิ้งฉุบเพื่อหาผู้ชนะที่จะได้สิทธิ์ดูแลลูกค้า",
+                    "ง. ลงโทษไล่ออกทั้งสองคนทันทีเพื่อไม่ให้เป็นเยี่ยงอย่างแก่คนอื่น"
+                ],
+                optionsEn: [
+                    "A. Confiscate the lead and claim the sales commission for yourself.",
+                    "B. Separate both into a meeting room, inspect CRM timestamps for first-touch and logging compliance per company SOP, rule fairly based on audit trails, and submit an IT fix request for deduplication.",
+                    "C. Have them play rock-paper-scissors to decide lead ownership.",
+                    "D. Terminate both reps on the spot to set an example."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 3: การจัดการข้อร้องเรียน สคริปต์ และวิกฤตหน้างาน (Compliance, Scripting & Escalation)
+            {
+                category: "หมวดที่ 3: การจัดการข้อร้องเรียน สคริปต์ และวิกฤตหน้างาน",
+                categoryEn: "Category 3: Compliance, Scripting & Escalation",
+                q: "11. พนักงานในทีมเผลอพูดข้อมูลคุณสมบัติสินค้าเกินจริง (Overclaim) เพื่อปิดการขายกับลูกค้ารายใหญ่ ต่อมาลูกค้าจับได้และขู่จะฟ้องร้องบริษัทรวมถึงร้องเรียนต่อ สคบ. ข้อใดคือแนวทางการแก้ไขปัญหาเชิงบริหารของหัวหน้าทีม?",
+                qEn: "11. A rep made deceptive product overclaims to close a major buyer. The customer discovered the distortion and threatens legal action and consumer protection filings. What is your leadership response?",
+                options: [
+                    "ก. บอกให้พนักงานคนนั้นลบไฟล์เสียงทิ้งและปฏิเสธทุกข้อกล่าวหา",
+                    "ข. โทรติดต่อลูกค้ารายนั้นด้วยตนเองทันทีเพื่อขออภัยอย่างเป็นทางการ ยอมรับความผิดพลาดชี้แจงแนวทางเยียวยาชดเชยตามความเหมาะสม นำเคสนี้มาทำ Case Study เทรนพนักงานเรื่อง Compliance และคาดโทษพนักงานที่ทำผิดกฎ",
+                    "ค. โอนสายของลูกค้ารายนั้นไปให้แผนกไอทีเป็นผู้รับผิดชอบระบบเสียงแทน",
+                    "ง. ปล่อยให้ลูกค้าดำเนินการฟ้องร้องไปตามกฎหมายโดยไม่ต้องสนใจ"
+                ],
+                optionsEn: [
+                    "A. Instruct the rep to delete call recordings and deny everything.",
+                    "B. Directly contact the customer to deliver a formal apology, propose fair remediation, convert the incident into a team compliance case study, and issue formal disciplinary warning to the rep.",
+                    "C. Transfer the complaining customer to the IT telephony department.",
+                    "D. Ignore the threat and let the consumer proceed to court."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การจัดการข้อร้องเรียน สคริปต์ และวิกฤตหน้างาน",
+                categoryEn: "Category 3: Compliance, Scripting & Escalation",
+                q: "12. กฎหมายคุ้มครองข้อมูลส่วนบุคคล (PDPA) มีความเข้มงวดมาก หากลูกค้าปลายสายถามพนักงานของคุณว่า \"คุณเอาเบอร์โทรศัพท์และชื่อของฉันมาจากไหน ใครให้สิทธิ์คุณโทรมา?\" คุณควรเทรนให้ทีมตอบตามข้อใดจึงจะถูกต้องตามหลัก Compliance?",
+                qEn: "12. Under strict PDPA privacy regulations, if a recipient asks: 'Where did you get my personal number and who authorized this call?', what is the compliant scripted response?",
+                options: [
+                    "ก. ตอบว่า \"สุ่มเดาตัวเลขขึ้นมาเองค่ะ ไม่ได้เอามาจากไหนเลย\"",
+                    "ข. ตอบตามข้อเท็จจริงของแหล่งที่มาลีดอย่างสุภาพ (เช่น จากการที่ลูกค้าเคยลงทะเบียนร่วมกิจกรรมหรือพันธมิตรอย่างเป็นทางการ) พร้อมแจ้งสิทธิ์ในการขอยกเลิกการติดต่อ (Opt-out) หากลูกค้าไม่ประสงค์จะรับสายอีก",
+                    "ค. วางสายใส่ลูกค้าทันทีเพื่อหลีกเลี่ยงการตอบคำถามข้อกฎหมาย",
+                    "ง. โต้เถียงกับลูกค้าว่าบริษัทของเราถูกต้องตามกฎหมายทุกอย่าง ลูกค้าไม่มีสิทธิ์มาซักไซ้"
+                ],
+                optionsEn: [
+                    "A. Reply: 'We randomly guessed digits, no data source was used.'",
+                    "B. Politely disclose verifiable lead origin (e.g. opt-in through authorized promotional campaigns) and promptly present their right to opt-out and erase from call rosters.",
+                    "C. Hang up instantly to avoid legal interrogation.",
+                    "D. Argue that the company is entirely within legal rights and the customer has no authority to question it."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การจัดการข้อร้องเรียน สคริปต์ และวิกฤตหน้างาน",
+                categoryEn: "Category 3: Compliance, Scripting & Escalation",
+                q: "13. ยอดตระเวนโทร (Contact Rate) ของทีมตกลงอย่างน่าใจหาย เนื่องจากระบบเครือข่ายโทรศัพท์พื้นฐานของคู่ค้าสัญญาณล่มข้ามวัน ทำให้พนักงานไม่สามารถโทรออกหาลูกค้าได้เลย คุณจะบริหารจัดการเวลาของพนักงานในทีม (Downtime Management) อย่างไรให้เกิดประโยชน์สูงสุด?",
+                qEn: "13. Telephony carrier trunk lines go down citywide for the day, disabling outbound dialers. How should you maximize rep productivity during this unscheduled downtime?",
+                options: [
+                    "ก. อนุญาตให้พนักงานทุกคนกลับบ้านไปนอนพักผ่อนโดยไม่หักวันลา",
+                    "ข. ปรับเปลี่ยนตารางงานเป็นการจัดอบรม (In-house Training) ทบทวน Product Knowledge, ซ้อมบทบาทสมมติ (Role-play) เพื่ออัปเกรดทักษะแก้ข้อโต้แย้ง หรือให้ทีมช่วยกันเคลียร์ข้อมูลพิมพ์บันทึกประวัติลูกค้าที่ค้างอยู่ในระบบ",
+                    "ค. บังคับให้พนักงานใช้โทรศัพท์มือถือและเงินส่วนตัวโทรหาลูกค้าแทนระบบบริษัท",
+                    "ง. สั่งให้พนักงานทุกคนนั่งจ้องหน้าจอคอมพิวเตอร์เฉยๆ ห้ามขยับไปไหนจนกว่าระบบจะมา"
+                ],
+                optionsEn: [
+                    "A. Send all reps home on unearned paid leave.",
+                    "B. Pivot immediately to internal upskilling: conduct product knowledge refreshers, objection-handling role-plays, and clear backlog CRM record hygiene.",
+                    "C. Compel staff to dial clients using personal mobile phones and airtime.",
+                    "D. Mandate reps sit frozen staring at blank monitors until service resumes."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การจัดการข้อร้องเรียน สคริปต์ และวิกฤตหน้างาน",
+                categoryEn: "Category 3: Compliance, Scripting & Escalation",
+                q: "14. สคริปต์การขาย (Sales Script) ตัวเดิมที่เคยใช้ได้ผลดี เริ่มมีอัตราการปฏิเสธจากลูกค้า (Rejection Rate) สูงขึ้นถึง 80% ในช่วงเดือนที่ผ่านมา ในฐานะหัวหน้าทีมคุณจะดำเนินการปรับปรุงสคริปต์อย่างไร?",
+                qEn: "14. A previously proven sales script suffers an 80% rejection spike over the past month. How should you overhaul the script?",
+                options: [
+                    "ก. สั่งให้พนักงานฝืนใช้สคริปต์เดิมต่อไปและเพิ่มแรงกดดันในการพูดให้เสียงดังขึ้น",
+                    "ข. นำข้อมูล Objection (ข้อโต้แย้งหลักของลูกค้า เช่น ไม่มีเงิน, สินค้าแพงไป) มาจัดหมวดหมู่ เรียกตัวแทนพนักงานขายระดับท็อปมาร่วมทำ Brainstorming ปรับคำเปิดใจ (Opening Statement) และสร้างชุดคำตอบแก้ข้อโต้แย้งใหม่",
+                    "ค. ลอกสคริปต์การขายของบริษัทคู่แข่งมาใช้ทั้งหมดโดยไม่ปรับแก้",
+                    "ง. ยกเลิกการใช้สคริปต์และปล่อยให้พนักงานคิดคำพูดสดหน้าร้านเอาเองตามยถากรรม"
+                ],
+                optionsEn: [
+                    "A. Enforce the old script and instruct reps to speak louder and more aggressively.",
+                    "B. Aggregate and categorize customer objection data (e.g. pricing resistance), brainstorm with top performers to reshape opening value hooks, and engineer fresh rebuttal playbooks.",
+                    "C. Plagiarize a rival firm's script word-for-word without contextual tuning.",
+                    "D. Abolish scripts entirely and leave pitches entirely to individual improvisation."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การจัดการข้อร้องเรียน สคริปต์ และวิกฤตหน้างาน",
+                categoryEn: "Category 3: Compliance, Scripting & Escalation",
+                q: "15. ระหว่างที่พนักงานกำลังคุยสายอยู่ ลูกค้าปลายสายส่งเสียงสัญญาณตวาดเสียงดังลั่นห้องออฟฟิศ และพนักงานเริ่มควบคุมอารมณ์ไม่ได้จนหลุดพูดคำว่า \"ถ้าไม่ซื้อก็ไม่ต้องพูดมาก\" ออกไปใส่ลูกค้า คุณจะจัดการเหตุการณ์วิกฤตนี้ทันทีอย่างไร?",
+                qEn: "15. An irate caller shouts furiously, causing a rep to lose composure and snap back: 'If you aren't buying, stop talking!'. What is your immediate crisis intervention?",
+                options: [
+                    "ก. นั่งหัวเราะและชมพนักงานว่าตอบโต้ได้สะใจดีมาก",
+                    "ข. เข้าประชิดตัวพนักงาน ส่งสัญญาณให้กดโอนสาย (Transfer Call) มาที่เครื่องของคุณทันที เพื่อให้คุณเป็นผู้รับช่วงสนทนาในการขอโทษและดึงสถานการณ์กลับมา จากนั้นค่อยแยกพนักงานไปตักเตือนและปรับทัศนคติหลังวางสาย",
+                    "ค. เดินไปดึงปลั๊กคอมพิวเตอร์ของพนักงานออกเพื่อให้สายหลุดไปเอง",
+                    "ง. เดินไปตบหน้าพนักงานกลางห้องทำงานเพื่อแสดงให้ลูกค้าเห็นว่าเราลงโทษแล้ว"
+                ],
+                optionsEn: [
+                    "A. Laugh and congratulate the rep on standing their ground.",
+                    "B. Step in immediately, signal a call transfer to your supervisory console, defuse and apologize directly to the customer, then privately counsel and coach the rep afterward.",
+                    "C. Yank the power cord from the rep's PC to drop the call abruptly.",
+                    "D. Strike the rep in the middle of the floor to prove punishment to the customer."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 4: วัฒนธรรมทีม จิตวิทยา และการบริหารประสิทธิภาพ (Team Culture & Performance Drive)
+            {
+                category: "หมวดที่ 4: วัฒนธรรมทีม จิตวิทยา และการบริหารประสิทธิภาพ",
+                categoryEn: "Category 4: Team Culture & Performance Drive",
+                q: "16. มีข่าวลือหนาหูในทีม Telesales ว่าบริษัทกำลังจะเลย์ออฟ (Layoff) แผนกขายเพื่อไปใช้ระบบ AI โทรแทน ส่งผลให้ขวัญกำลังใจของพนักงานดิ่งลงอย่างมากและยอดขายสัปดาห์นั้นร่วงลงทันที หัวหน้าทีมควรจัดการกับข่าวลือนี้อย่างไร?",
+                qEn: "16. Rampant rumors circulate that management plans to lay off sales reps to replace them with AI dialers, crashing morale and sales. How should the team leader respond?",
+                options: [
+                    "ก. แกล้งทำเป็นผสมโรงร่วมด่าบริษัทกับพนักงานเพื่อสร้างพวกพ้อง",
+                    "ข. เข้าพบฝ่ายบริหารหรือ HR เพื่อขอข้อเท็จจริงที่ถูกต้อง จากนั้นจัดประชุมทีมอย่างเป็นทางการเพื่อชี้แจงความจริง ดับข่าวลือ และเน้นย้ำถึงคุณค่าของทักษะมนุษย์ (Empathy) ที่ AI ยังทดแทนไม่ได้ เพื่อเรียกความเชื่อมั่นกลับมา",
+                    "ค. แอบส่งไลน์ไปบอกพนักงานสนิทให้รีบหางานใหม่ล่วงหน้า",
+                    "ง. เงียบเฉยไม่พูดอะไรปล่อยให้พนักงานเดาเอาเองจนกว่าจะถึงวันไล่ออกจริง"
+                ],
+                optionsEn: [
+                    "A. Join the staff in bashing leadership to curry favor with the team.",
+                    "B. Consult executive management and HR for verified facts, convene a transparent team forum to dispel rumors, and articulate the irreplaceable value of human consultative empathy to restore confidence.",
+                    "C. Secretly tell personal favorites to begin searching for outside jobs.",
+                    "D. Remain silent and let speculation fester until official termination notices arrive."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: วัฒนธรรมทีม จิตวิทยา และการบริหารประสิทธิภาพ",
+                categoryEn: "Category 4: Team Culture & Performance Drive",
+                q: "17. การจัดสรรกลุ่มรายชื่อลูกค้า (Lead Allocation) ในทีม Telesales ข้อใดคือแนวปฏิบัติที่แสดงถึงความเป็นผู้นำที่โปร่งใสและสร้างแรงจูงใจให้ทีมได้อย่างเป็นธรรมที่สุด?",
+                qEn: "17. In lead allocation rules, which methodology best demonstrates transparent leadership and fair performance motivation?",
+                options: [
+                    "ก. เก็บลีดที่ดีที่สุดไว้ให้พนักงานที่ชอบเอาอกเอาใจหัวหน้าเท่านั้น",
+                    "ข. กำหนดเกณฑ์การกระจายลีดตามประสิทธิภาพ (Performance-based Allocation) เช่น ลีดคุณภาพสูงจะถูกจัดสรรให้พนักงานที่มี Conversion Rate สูงตามสัดส่วน ควบคู่กับมีโควตาลีดพื้นฐานที่พนักงานทุกคนได้รับเท่ากันอย่างชัดเจน",
+                    "ค. โยนกองเอกสารรายชื่อไว้กลางห้องใครวิ่งมาหยิบก่อนได้ก่อน",
+                    "ง. สุ่มแจกรายชื่อแบบปิดตาคลำเพื่อไม่ให้ใครสามารถตรวจสอบระบบได้"
+                ],
+                optionsEn: [
+                    "A. Reserve prime leads exclusively for reps who flatter the supervisor.",
+                    "B. Establish performance-weighted tiering where premium hot leads are proportionally awarded to high-conversion closers, complemented by a transparent guaranteed baseline quota for all reps.",
+                    "C. Toss printed sheets on the floor for a first-come, first-grab scramble.",
+                    "D. Hand out leads in sealed blind envelopes so no one can audit allocations."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: วัฒนธรรมทีม จิตวิทยา และการบริหารประสิทธิภาพ",
+                categoryEn: "Category 4: Team Culture & Performance Drive",
+                q: "18. พนักงาน Telesales ที่เป็นเด็กใหม่ (Gen Z) มีศักยภาพสูงมากแต่ไม่ชอบการทำงานภายใต้กฎระเบียบที่ตึงเกินไป เช่น การห้ามใช้มือถือระหว่างสแตนด์บายสาย คุณจะผสมผสานการบริหาร (Hybrid Management) อย่างไรให้ได้งานและได้ใจ?",
+                qEn: "18. A talented Gen Z sales rep dislikes rigid micro-management (such as total personal phone bans during standby). How do you balance discipline and empathy?",
+                options: [
+                    "ก. ยึดโทรศัพท์มือถือของพนักงานใส่ล็อกเกอร์ตั้งแต่ก้าวเท้าเข้าออฟฟิศ",
+                    "ข. ตั้งกฎกติกาที่ชัดเจนร่วมกันในทีม (Team Agreement) เช่น ให้โฟกัสเต็มที่ในช่วงเวลาสตรีมสาย 50 นาที และมีเวลาเบรกอิสระ 10 นาทีสำหรับเช็กมือถือ พร้อมผูกผลลัพธ์กับยอดขายที่ต้องส่งตามเดดไลน์แทนการจับผิดรายนาที",
+                    "ค. ปล่อยปละละเลยให้พนักงานเล่นเกมในมือถือได้ตลอดเวลาในขณะคุยสายกับลูกค้า",
+                    "ง. รายงานฝ่ายบุคคลให้หักเงินเดือนพนักงานคนนี้ทุกครั้งที่มองหน้าจอมือถือ"
+                ],
+                optionsEn: [
+                    "A. Confiscate personal phones into lockers upon entering the office premises.",
+                    "B. Co-create clear team agreements (e.g. 50-minute focused calling blocks with structured 10-minute micro-breaks for phone usage), evaluating output on milestone conversions rather than minute-by-minute policing.",
+                    "C. Permit uninhibited mobile gaming while simultaneously conversing with clients.",
+                    "D. Penalize pay through HR deductions each time their eyes glance at a phone screen."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: วัฒนธรรมทีม จิตวิทยา และการบริหารประสิทธิภาพ",
+                categoryEn: "Category 4: Team Culture & Performance Drive",
+                q: "19. เมื่อคุณต้องประกาศเป้าหมายยอดขายใหม่ประจำปี (Annual Sales Target) ซึ่งสูงขึ้นกว่าปีที่แล้วถึง 40% ต่อหน้าทีมงาน เทคนิคการสื่อสารข้อใดที่จะช่วยลดแรงต้านและเปลี่ยนเป็นพลังขับเคลื่อนได้ดีที่สุด?",
+                qEn: "19. When rolling out an annual sales target that is 40% higher than last year, which communication technique minimizes resistance and sparks motivation?",
+                options: [
+                    "ก. ประกาศตัวเลขแล้วบอกว่า \"นี่คือคำสั่งจากเบื้องบน ใครทำไม่ได้ก็เตรียมตัวโดนไล่ออก\"",
+                    "ข. แตกเป้าใหญ่ให้กลายเป็นเป้าหมายรายวันและรายบุคคลย่อยๆ (Breakdown Target) แสดงให้เห็นถึงแผนสนับสนุนจากบริษัท (เช่น การเพิ่มงบการตลาดหนุนลีดเพิ่ม) และชี้ให้เห็นสัดส่วนรายได้ค่าคอมมิชชันที่จะเพิ่มขึ้นมหาศาลตามยอด",
+                    "ค. บอกทีมงานว่าเป้าหมายนี้ตั้งไว้เล่นๆ ไม่ต้องซีเรียส ทำได้เท่าไหร่เอาเท่านั้น",
+                    "ง. แอบส่งเป้าหมายให้พนักงานดูทางอีเมลตอนเที่ยงคืนวันศุกร์เพื่อเลี่ยงการเผชิญหน้า"
+                ],
+                optionsEn: [
+                    "A. Announce the number bluntly: 'This is an executive decree; fail and you are fired.'",
+                    "B. Deconstruct the stretch target into actionable daily/individual micro-goals, outline corporate marketing enablers (expanded lead generation), and showcase the substantial commission windfall awaiting them.",
+                    "C. Tell reps the target is purely fictional and they should just deliver whatever they feel like.",
+                    "D. Quietly email targets at midnight on Friday to dodge confrontation."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: วัฒนธรรมทีม จิตวิทยา และการบริหารประสิทธิภาพ",
+                categoryEn: "Category 4: Team Culture & Performance Drive",
+                q: "20. ในวันสุดท้ายของเดือน ทีมของคุณขาดอีกเพียงแค่ 50,000 บาท ยอดขายก็จะทะลุเป้าใหญ่ของบริษัทและจะได้รับโบนัสทีมยกแผง บรรยากาศในห้องคอลเซ็นเตอร์กำลังเคร่งเครียดและพนักงานเริ่มเหนื่อยล้า พลังการเป็นผู้นำ (Leadership Drive) ข้อใดที่คุณควรแสดงออก ณ เวลานั้น?",
+                qEn: "20. On month-end day, your team is 50,000 THB shy of hitting company-wide bonus triggers. Energy is depleted and tension is palpable. What leadership intervention should you deploy?",
+                options: [
+                    "ก. นั่งนับถอยหลังกดดันพนักงานที่โต๊ะทำงานทีละคนทุกๆ 5 นาที",
+                    "ข. ลุกขึ้นมาสร้างบรรยากาศที่สนุกสนาน (Energize) จัดกิจกรรมกระตุ้นระยะสั้นนาทีทอง เสนอตัวช่วยพนักงานปิดเคสยากๆ (Closing Support) และสั่งอาหาร/เครื่องดื่มมาเติมพลังให้ทีมเพื่อสู้ไปด้วยกันจนวินาทีสุดท้าย",
+                    "ค. เดินออกจากห้องทำงานไปหาความสุขส่วนตัวเพราะถือว่าตนเองคุมงานมาทั้งเดือนแล้ว",
+                    "ง. พูดประชดประชันทีมงานว่าทำงานไม่ได้เรื่องจนเป้าจะแตกอยู่แล้ว"
+                ],
+                optionsEn: [
+                    "A. Hover over reps' desks counting down remaining minutes every 5 minutes.",
+                    "B. Energize the floor with high enthusiasm, launch mini flash-closing challenges, step in to co-close tough stalled prospects, and supply refreshments to rally the unit until the final buzzer.",
+                    "C. Abandon the floor for recreational downtime since you managed all month already.",
+                    "D. Berate the floor with sarcastic insults for choking before the finish line."
+                ],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Telesales_Team_Leader';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            const _lBtn = document.getElementById('langToggle');
+            if (_lBtn) {
+                _lBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>${t.langBtn}</span>
+                `;
+            }
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, "หัวหน้าทีม Telesales");
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, "หัวหน้าทีม Telesales");
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const catText = (currentLang === 'en' && item.categoryEn) ? item.categoryEn : item.category;
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span class="category-badge">${catText}</span>
+                    <span class="progress-text" style="margin-bottom:0;">${t.progress(currentStep + 1, questions.length)}</span>
+                </div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: "Telesales_Team_Leader",
+                uuid: uuid,
+                name: userName,
+                position: "หัวหน้าทีม Telesales",
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_category`] = questions[i].category;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "ผ่านเกณฑ์โดดเด่น (เรียกสัมภาษณ์)" : (score >= 12 ? "ผ่านเกณฑ์มาตรฐาน (พิจารณาเพิ่มเติม)" : "ไม่ผ่านเกณฑ์");
+            payload.decisionNote = score >= 16 ? "เรียกสัมภาษณ์ มีทักษะความเป็นผู้นำ โค้ชชิ่ง วิเคราะห์ข้อมูล KPI และแก้ปัญหายอดขายได้ยอดเยี่ยม" : (score >= 12 ? "พิจารณาประวัติการบริหารทีมและการสัมภาษณ์เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
