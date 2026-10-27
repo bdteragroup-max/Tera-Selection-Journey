@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Sales Assessment - TERA</title>
+    <title>Assessment: Sales - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
@@ -95,7 +95,7 @@
         #langToggle:hover {
             background: rgba(255, 255, 255, 0.28);
         }
-    
+
         #backBtn {
             position: fixed;
             top: 16px;
@@ -116,26 +116,32 @@
         #backBtn:hover {
             background: rgba(255, 255, 255, 0.28);
         }
-
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
 
-        <button id="backBtn" onclick="goBack()" style="display:inline-flex; align-items:center; gap:6px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    <button id="backBtn" onclick="goBack()" style="display:inline-flex; align-items:center; gap:6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+        </svg>
         <span>Back</span>
     </button>
     <button id="langToggle" style="display:inline-flex; align-items:center; gap:6px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
         <span id="langBtnText">EN</span>
     </button>
 
     <div class="exam-container">
         <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Sales</h1>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง พนักงานขาย (Sales)</h1>
             <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
         </header>
 
@@ -151,7 +157,7 @@
         const ui = {
             th: {
                 langBtn: "EN",
-                pageTitle: "แบบทดสอบตำแหน่ง Sales",
+                pageTitle: "แบบทดสอบตำแหน่ง พนักงานขาย (Sales)",
                 userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
                 progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
                 saving: "กำลังบันทึกข้อมูล...",
@@ -162,7 +168,7 @@
             },
             en: {
                 langBtn: "TH",
-                pageTitle: "Assessment: Sales",
+                pageTitle: "Assessment: Sales Representative (Sales)",
                 userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
                 progress: (cur, total) => `Question ${cur} of ${total}`,
                 saving: "Submitting your responses...",
@@ -178,143 +184,343 @@
         ============================================================ */
         const questions = [
             {
-                q: "1. หัวใจสำคัญของการเป็นพนักงานขายในยุคปัจจุบันคืออะไร?",
-                qEn: "1. What is the most important quality of a modern salesperson?",
-                options: ["ก. การรอคอยลูกค้าติดต่อเข้ามาเอง", "ข. การส่งอีเมลโฆษณาจำนวนมหาศาล", "ค. การโน้มน้าวใจให้ลูกค้าคล้อยตามเราทุกเรื่อง", "ง. การวิเคราะห์ปัญหาลูกค้า (Pain Points) และนำเสนอโซลูชัน"],
-                optionsEn: ["A. Waiting for customers to reach out on their own.", "B. Sending out mass advertising emails.", "C. Persuading customers to agree with everything you say.", "D. Analysing customer pain points and presenting tailored solutions."],
+                q: "1. โปรดเลือกคำตอบที่ถูกต้องที่สุดเพียงข้อเดียว",
+                qEn: "1. Please select the single best answer (The core principle of modern salesmanship):",
+                options: [
+                    "ก. การรักษาตำแหน่งประจำสำนักงานเพื่อรอคอยการติดต่อเข้ามาเองจากกลุ่มเป้าหมาย",
+                    "ข. การสื่อสารโฆษณาผ่านจดหมายอิเล็กทรอนิกส์ไปยังฐานข้อมูลขนาดใหญ่เพื่อเพิ่มโอกาสการรับรู้",
+                    "ค. การใช้ทักษะการโน้มน้าวใจขั้นสูงเพื่อให้ลูกค้าคล้อยตามความคิดเห็นของเราในทุกประเด็น",
+                    "ง. การวิเคราะห์ปัญหาของลูกค้า (Pain Points) และนำเสนอโซลูชันที่ตอบโจทย์ได้อย่างมีประสิทธิภาพ"
+                ],
+                optionsEn: [
+                    "A. Remaining stationed at the office waiting for prospective clients to reach out independently.",
+                    "B. Blasting promotional electronic direct mail to mass databases to maximize brand awareness.",
+                    "C. Applying advanced persuasion to compel customers to agree with our views on every matter.",
+                    "D. Diagnosing customer pain points and delivering solutions that address their needs effectively."
+                ],
                 ans: 3
             },
             {
-                q: "2. หากลูกค้าบอกว่า 'สินค้าของคุณราคาแพงเกินไป' คุณควรตอบสนองอย่างไรเป็นอันดับแรก?",
-                qEn: "2. If a customer says 'Your product is too expensive', what should you do first?",
-                options: ["ก. วิจารณ์คู่แข่งว่าคุณภาพต่ำกว่า", "ข. ปรับลดราคาลงทันที 50%", "ค. ยุติการสนทนาทันที", "ง. ตรวจสอบสมมติฐานและนำเสนอ 'คุณค่าที่ได้รับ' (Value Proposition)"],
-                optionsEn: ["A. Criticise competitors for having lower quality.", "B. Immediately drop the price by 50%.", "C. End the conversation immediately.", "D. Probe the assumption and present your Value Proposition."],
+                q: "2. หากลูกค้าบอกว่า \"สินค้าของคุณราคาแพงเกินไป\" คุณควรตอบสนองอย่างไรเป็นอันดับแรก?",
+                qEn: "2. If a customer says 'Your product is too expensive', what should be your first response?",
+                options: [
+                    "ก. การวิพากษ์วิจารณ์สินค้าของคู่แข่งขันว่ามีคุณภาพต่ำกว่ามาตรฐานเพื่อสร้างความได้เปรียบ",
+                    "ข. การปรับลดราคาสินค้าลงทันที 50% เพื่อรักษาโอกาสในการปิดการขายให้ได้เร็วที่สุด",
+                    "ค. การยุติการสนทนาหากประเมินว่าลูกค้าไม่มีกำลังซื้อที่สอดคล้องกับตำแหน่งของสินค้า",
+                    "ง. การตรวจสอบสมมติฐานของลูกค้าและนำเสนอ \"คุณค่าที่ได้รับ\" (Value Proposition) เมื่อเทียบกับต้นทุน"
+                ],
+                optionsEn: [
+                    "A. Criticizing competitor products as substandard to gain a comparative advantage.",
+                    "B. Immediately cutting the product price by 50% to secure a rapid close.",
+                    "C. Terminating dialogue if the prospect is deemed to lack purchasing power.",
+                    "D. Validating customer assumptions and articulating the Value Proposition relative to cost."
+                ],
                 ans: 3
             },
             {
-                q: "3. ขั้นตอน 'Prospecting' ในกระบวนการขายหมายถึงอะไร?",
-                qEn: "3. What does the 'Prospecting' stage of the sales process mean?",
-                options: ["ก. การจัดกิจกรรมสันทนาการกับลูกค้าเก่า", "ข. การระบุและคัดกรองกลุ่มเป้าหมาย (Lead Qualification)", "ค. การออกใบแจ้งหนี้ตามรอบบัญชี", "ง. การจัดเตรียมเครื่องแบบเข้าพบลูกค้า"],
-                optionsEn: ["A. Organising recreational activities with existing customers.", "B. Identifying and qualifying potential leads.", "C. Issuing invoices on a billing cycle.", "D. Preparing a uniform or dress code for client visits."],
+                q: "3. ขั้นตอน \"Prospecting\" ในกระบวนการขายหมายถึงอะไร?",
+                qEn: "3. What does the 'Prospecting' stage signify in the sales cycle?",
+                options: [
+                    "ก. การจัดกิจกรรมสันทนาการเพื่อสร้างความสัมพันธ์ส่วนตัวกับลูกค้าที่มีอยู่เดิม",
+                    "ข. การระบุและคัดกรองกลุ่มเป้าหมาย (Lead Qualification) ที่มีศักยภาพในการเปลี่ยนเป็นลูกค้าจริง",
+                    "ค. การดำเนินการออกเอกสารเรียกเก็บเงินและใบแจ้งหนี้ให้แก่ลูกค้าตามรอบบัญชี",
+                    "ง. การจัดเตรียมภาพลักษณ์และเครื่องแบบที่เหมาะสมสำหรับการเข้าพบลูกค้าในระดับบริหาร"
+                ],
+                optionsEn: [
+                    "A. Hosting recreational outings to nurture personal ties with existing accounts.",
+                    "B. Identifying and qualifying potential leads with genuine propensity to convert into buyers.",
+                    "C. Processing billing statements and official invoices per the accounting cycle.",
+                    "D. Preparing personal grooming and attire suitable for executive client meetings."
+                ],
                 ans: 1
             },
             {
-                q: "4. การขายแบบ 'Consultative Selling' (การขายแบบที่ปรึกษา) คืออะไร?",
+                q: "4. การขายแบบ \"Consultative Selling\" (การขายแบบที่ปรึกษา) คืออะไร?",
                 qEn: "4. What is 'Consultative Selling'?",
-                options: ["ก. การจ้างผู้เชี่ยวชาญภายนอกมาขายแทน", "ข. การใช้เสียงหนักแน่นเพื่อให้ลูกค้าเกรงใจ", "ค. การถามคำถามเชิงลึกเพื่อวินิจฉัยความต้องการและให้คำแนะนำ", "ง. การขายให้เฉพาะกลุ่มอาชีพที่ปรึกษา"],
-                optionsEn: ["A. Hiring an external expert to sell on your behalf.", "B. Using a firm voice to make customers feel intimidated.", "C. Asking in-depth questions to diagnose needs and provide tailored advice.", "D. Selling exclusively to consultant professionals."],
+                options: [
+                    "ก. การจ้างผู้เชี่ยวชาญจากภายนอกมาทำหน้าที่เจรจาต่อรองแทนพนักงานขายของบริษัท",
+                    "ข. การมุ่งเน้นการใช้ระดับเสียงและท่าทางที่หนักแน่นเพื่อให้ลูกค้าเกิดความเกรงใจในการปฏิเสธ",
+                    "ค. การใช้เทคนิคการถามคำถามเชิงลึกเพื่อวินิจฉัยความต้องการ และให้คำแนะนำที่สร้างประโยชน์สูงสุด",
+                    "ง. การกำหนดกลุ่มเป้าหมายเฉพาะบุคคลที่ประกอบอาชีพเป็นที่ปรึกษาทางธุรกิจเท่านั้น"
+                ],
+                optionsEn: [
+                    "A. Hiring third-party subject matter experts to negotiate on behalf of sales reps.",
+                    "B. Projecting an imposing voice and posture so customers feel too intimidated to decline.",
+                    "C. Using probing inquiries to diagnose true needs and advising tailored value solutions.",
+                    "D. Restricting sales prospecting exclusively to professional business consultants."
+                ],
                 ans: 2
             },
             {
-                q: "5. หากคุณต้องทำ 'Cold Calling' สิ่งที่ควรทำใน 10 วินาทีแรกคืออะไร?",
-                qEn: "5. When making a Cold Call, what should you do in the first 10 seconds?",
-                options: ["ก. เสนอโปรโมชั่นพิเศษทันที", "ข. แนะนำตนเองอย่างมืออาชีพพร้อมระบุคุณค่าที่จะมอบให้", "ค. ขอข้อมูลส่วนตัวหรือการเงิน", "ง. ชวนคุยเรื่องดินฟ้าอากาศ"],
-                optionsEn: ["A. Immediately pitch a special promotion.", "B. Introduce yourself professionally and state the value you can offer.", "C. Ask for personal or financial information.", "D. Start with small talk about the weather."],
+                q: "5. หากคุณต้องหาลูกค้าใหม่แบบ \"Cold Calling\" (โทรหาโดยไม่นัดหมาย) สิ่งที่ควรทำใน 10 วินาทีแรกคืออะไร?",
+                qEn: "5. When conducting Cold Calling, what should be achieved within the first 10 seconds?",
+                options: [
+                    "ก. การเสนอราคาโปรโมชั่นพิเศษสุดเพื่อดึงดูดความสนใจของลูกค้าในทันที",
+                    "ข. การแนะนำตนเองอย่างมืออาชีพพร้อมระบุเหตุผลที่การสนทนานี้จะสร้างคุณค่าให้แก่ตัวลูกค้า",
+                    "ค. การร้องขอข้อมูลส่วนบุคคลหรือข้อมูลทางการเงินเพื่อใช้ในการเปิดบัญชีลูกค้าใหม่",
+                    "ง. การชวนสนทนาเรื่องทั่วไป เช่น สภาพภูมิอากาศ เพื่อสร้างความคุ้นเคยก่อนเข้าเรื่องงาน"
+                ],
+                optionsEn: [
+                    "A. Immediately pitching extreme discounts to grab prospective attention.",
+                    "B. Introducing yourself professionally and articulating why the call creates genuine value for them.",
+                    "C. Demanding personal or banking details to open a new customer account.",
+                    "D. Making casual small talk about weather patterns to establish familiarity."
+                ],
                 ans: 1
             },
             {
-                q: "6. 'After-Sales Service' มีความสำคัญอย่างไรต่อพนักงานขาย?",
-                qEn: "6. Why is 'After-Sales Service' important for a salesperson?",
-                options: ["ก. เป็นหน้าที่ฝ่ายเทคนิค ไม่เกี่ยวกับงานขาย", "ข. ช่วยลดภาระทางภาษี", "ค. เป็นข้ออ้างในการโทรหาลูกค้า", "ง. เพิ่มมูลค่าตลอดช่วงชีวิตลูกค้า (CLV) และส่งเสริมการบอกต่อ"],
-                optionsEn: ["A. It is a technical team's responsibility, not related to sales.", "B. It helps reduce tax obligations.", "C. It provides an excuse to call customers.", "D. It increases Customer Lifetime Value (CLV) and encourages word-of-mouth referrals."],
+                q: "6. \"After-Sales Service\" (บริการหลังการขาย) มีความสำคัญอย่างไรต่อพนักงานขาย?",
+                qEn: "6. Why is 'After-Sales Service' critically significant to a professional salesperson?",
+                options: [
+                    "ก. เป็นภาระหน้าที่ของแผนกบริการเทคนิค ไม่มีความสำคัญโดยตรงต่อยอดขายในอนาคต",
+                    "ข. ช่วยลดภาระทางภาษีขององค์กรผ่านการบันทึกค่าใช้จ่ายด้านการบริการลูกค้า",
+                    "ค. เป็นกลยุทธ์เพื่อให้พนักงานขายมีข้ออ้างทางกฎหมายในการติดต่อลูกค้าอย่างต่อเนื่อง",
+                    "ง. การเพิ่มมูลค่าตลอดช่วงชีวิตลูกค้า (Customer Lifetime Value) และส่งเสริมการบอกต่อ (Referral)"
+                ],
+                optionsEn: [
+                    "A. It belongs solely to the field service team with no direct bearing on future revenue.",
+                    "B. It minimizes corporate tax liability through recognized customer service expenses.",
+                    "C. It grants reps a legal justification to repeatedly contact accounts.",
+                    "D. It maximizes Customer Lifetime Value (CLV) and drives organic client referrals."
+                ],
                 ans: 3
             },
             {
                 q: "7. เมื่อลูกค้าปฏิเสธการซื้อ (Rejection) พนักงานขายที่ดีควรทำอย่างไร?",
-                qEn: "7. When a customer rejects a purchase, what should a good salesperson do?",
-                options: ["ก. แสดงความไม่พอใจและตัดการติดต่อ", "ข. ตามตื้อจนกว่าลูกค้าจะรำคาญและยอมซื้อ", "ค. เช็กข้อมูลว่าลูกค้าไปซื้อคู่แข่งรายไหนเพื่อสกัดกั้น", "ง. บริหารจัดการอารมณ์และสอบถาม Feedback เพื่อรักษาความสัมพันธ์"],
-                optionsEn: ["A. Express frustration and cut off contact.", "B. Persistently follow up until the customer is annoyed enough to buy.", "C. Investigate which competitor they went to in order to block the deal.", "D. Manage emotions professionally and ask for feedback to preserve the relationship."],
+                qEn: "7. When encountering prospect rejection, how should an exemplary salesperson respond?",
+                options: [
+                    "ก. การแสดงความไม่พอใจและยุติการติดต่อสื่อสารทุกช่องทางทันทีเพื่อลดการเสียเวลา",
+                    "ข. การติดตามผล (Follow-up) อย่างเข้มข้นและต่อเนื่องจนกว่าลูกค้าจะตัดสินใจซื้อเพื่อตัดความรำคาญ",
+                    "ค. การเข้าตรวจสอบข้อมูลเชิงลึกว่าลูกค้าเปลี่ยนไปใช้สินค้าของคู่แข่งรายใดเพื่อหาทางสกัดกั้น",
+                    "ง. การบริหารจัดการอารมณ์และสอบถาม Feedback เพื่อรักษาความสัมพันธ์เชิงกลยุทธ์ในอนาคต"
+                ],
+                optionsEn: [
+                    "A. Display frustration and sever all communications immediately to avoid wasting time.",
+                    "B. Aggressively pursue repetitive follow-ups until the prospect relents out of annoyance.",
+                    "C. Investigate which rival supplier won the deal to aggressively undermine them.",
+                    "D. Regulate emotional composure and solicit objective feedback to maintain strategic ties."
+                ],
                 ans: 3
             },
             {
-                q: "8. 'Cross-selling' หมายถึงเทคนิคการขายแบบใด?",
-                qEn: "8. What does 'Cross-selling' mean as a sales technique?",
-                options: ["ก. ขายต่ำกว่าทุนเพื่อดึงลูกค้า", "ข. นำเสนอสินค้าที่เกี่ยวข้องหรือเสริมประสิทธิภาพให้สินค้าหลัก", "ค. ขายข้ามพื้นที่รับผิดชอบ", "ง. โน้มน้าวให้ลูกค้าซื้อสิ่งที่ไม่จำเป็นเพื่อทำยอด"],
-                optionsEn: ["A. Selling below cost to attract customers.", "B. Offering related or complementary products that enhance the main purchase.", "C. Selling outside your assigned territory.", "D. Persuading customers to buy unnecessary items just to meet quota."],
+                q: "8. \"Cross-selling\" หมายถึงเทคนิคการขายแบบใด?",
+                qEn: "8. What sales technique does 'Cross-selling' describe?",
+                options: [
+                    "ก. การขายสินค้าในราคาที่ต่ำกว่าทุนเพื่อดึงดูดลูกค้าให้เปลี่ยนใจจากแบรนด์คู่แข่ง",
+                    "ข. การนำเสนอสินค้าที่มีความเกี่ยวข้องหรือเสริมประสิทธิภาพให้กับสินค้าหลักที่ลูกค้าซื้อ",
+                    "ค. การขยายเขตความรับผิดชอบในการขายข้ามพื้นที่ที่บริษัทกำหนดไว้",
+                    "ง. การโน้มน้าวให้ลูกค้าซื้อสินค้าที่ไม่มีความจำเป็นต่อธุรกิจของเขาเลยเพื่อทำยอดขายให้ครบตามเป้า"
+                ],
+                optionsEn: [
+                    "A. Selling merchandise below cost to lure buyers away from rival brands.",
+                    "B. Recommending related or complementary offerings that enhance the primary product purchased.",
+                    "C. Soliciting accounts beyond designated territorial sales jurisdictions.",
+                    "D. Pressuring customers into buying unnecessary equipment solely to hit sales quotas."
+                ],
                 ans: 1
             },
             {
-                q: "9. KPI ที่สำคัญที่สุดสำหรับพนักงานขายคือข้อใด?",
-                qEn: "9. What are the most important KPIs for a salesperson?",
-                options: ["ก. ยอดขายสุทธิ (Sales Revenue) และอัตราการบรรลุเป้าหมาย (Quota)", "ข. ความสวยงามของสไลด์นำเสนอ", "ค. ชั่วโมงการทำงานในออฟฟิศ", "ง. จำนวนผู้ติดตามในโซเชียลส่วนตัว"],
-                optionsEn: ["A. Net Sales Revenue and Quota Attainment Rate.", "B. The visual quality of presentation slides.", "C. Hours spent working in the office.", "D. Number of followers on personal social media."],
+                q: "9. KPI ที่สำคัญที่สุดสำหรับพนักงานขายส่วนใหญ่คือข้อใด?",
+                qEn: "9. Which key performance indicator is most critical for the vast majority of sales professionals?",
+                options: [
+                    "ก. ยอดขายสุทธิ (Sales Revenue) และอัตราการบรรลุเป้าหมายที่ได้รับมอบหมาย (Quota)",
+                    "ข. ความสวยงามและความซับซ้อนของสื่อนำเสนอ (Sales Presentation) ที่จัดทำขึ้น",
+                    "ค. จำนวนชั่วโมงที่ใช้ในการปฏิบัติงานภายในสำนักงานใหญ่ต่อสัปดาห์",
+                    "ง. ปริมาณการโต้ตอบและจำนวนผู้ติดตามในสื่อสังคมออนไลน์ส่วนบุคคล"
+                ],
+                optionsEn: [
+                    "A. Net Sales Revenue and assigned sales quota attainment rate.",
+                    "B. Visual sophistication and graphic elegance of presentation pitch decks.",
+                    "C. Total hours spent present at corporate headquarters per workweek.",
+                    "D. Engagement volume and follower tallies on personal social networks."
+                ],
                 ans: 0
             },
             {
                 q: "10. การปิดการขาย (Closing the Sale) ควรทำในช่วงเวลาใด?",
-                qEn: "10. When should you attempt to close a sale?",
-                options: ["ก. เริ่มต้นการสนทนาทันที", "ข. รอให้ลูกค้าขอซื้อเอง", "ค. เมื่อลูกค้ากำลังจะเดินออกจากห้อง", "ง. เมื่อพบสัญญาณการซื้อ (Buying Signals) และตอบข้อโต้แย้งครบแล้ว"],
-                optionsEn: ["A. Immediately at the start of the conversation.", "B. Wait for the customer to ask to buy on their own.", "C. When the customer is about to leave the room.", "D. When you detect buying signals and have addressed all objections."],
+                qEn: "10. At what point should a salesperson initiate closing the deal?",
+                options: [
+                    "ก. ทันทีที่เริ่มการปฏิสัมพันธ์กับลูกค้าเพื่อให้เกิดประสิทธิภาพสูงสุดในด้านเวลา",
+                    "ข. การรอคอยให้ลูกค้าเป็นผู้แสดงความจำนงในการขอซื้อเองเพื่อหลีกเลี่ยงการกดดัน",
+                    "ค. ในช่วงเวลาที่ลูกค้ากำลังจะยุติการประชุมและก้าวออกจากห้องสนทนา",
+                    "ง. เมื่อระบุสัญญาณการซื้อ (Buying Signals) และตอบข้อโต้แย้งของลูกค้าได้ครบถ้วนแล้ว"
+                ],
+                optionsEn: [
+                    "A. Right at the very start of interaction to maximize time efficiency.",
+                    "B. Passively waiting for the client to ask to sign a purchase order.",
+                    "C. As the customer stands up to exit the conference room.",
+                    "D. When explicit buying signals are identified and key objections are satisfactorily resolved."
+                ],
                 ans: 3
             },
             {
-                q: "11. 'Handling Objections' หมายถึงทักษะใด?",
-                qEn: "11. What skill does 'Handling Objections' refer to?",
-                options: ["ก. ศิลปะการจัดการข้อกังวลเพื่อเปลี่ยนอุปสรรคเป็นโอกาส", "ข. ทักษะการยกของหนักในโลจิสติกส์", "ค. ทักษะการจดรายงานการประชุม", "ง. การขับรถเข้าพบลูกค้าให้ตรงเวลา"],
-                optionsEn: ["A. The art of addressing concerns to turn obstacles into opportunities.", "B. The skill of lifting heavy loads in logistics.", "C. The skill of writing meeting minutes.", "D. Driving to client meetings on time."],
+                q: "11. \"Handling Objections\" หมายถึงทักษะใด?",
+                qEn: "11. What skill set does 'Handling Objections' encompass?",
+                options: [
+                    "ก. ศิลปะในการจัดการกับข้อกังวลหรือข้อสงสัยของลูกค้า เพื่อเปลี่ยนอุปสรรคให้เป็นโอกาส",
+                    "ข. ทักษะการจัดการกระบวนการโลจิสติกส์และการเคลื่อนย้ายสินค้าที่มีน้ำหนักมาก",
+                    "ค. ทักษะการจดบันทึกและสรุปรายงานการประชุมเพื่อส่งต่อให้ฝ่ายบริหาร",
+                    "ง. ความสามารถในการใช้พาหนะส่วนตัวเพื่อเข้าพบลูกค้าให้ตรงตามเวลานัดหมาย"
+                ],
+                optionsEn: [
+                    "A. The art of addressing customer hesitations to convert hesitations into buying opportunities.",
+                    "B. Logistics competence in maneuvering heavy cargo items.",
+                    "C. Stenography skills for summarizing meeting minutes for upper management.",
+                    "D. Navigating personal vehicles through traffic to arrive on schedule."
+                ],
                 ans: 0
             },
             {
-                q: "12. หากพบว่าสินค้าคู่แข่งมีจุดที่ดียิ่งกว่าของคุณ คุณควรทำอย่างไร?",
-                qEn: "12. If a competitor's product has features that are superior to yours, what should you do?",
-                options: ["ก. สร้างข้อมูลเท็จหลอกลูกค้า", "ข. ให้ร้ายสถานะการเงินของคู่แข่ง", "ค. ลาออกไปอยู่บริษัทคู่แข่งทันที", "ง. ยอมรับข้อเท็จจริงและเน้นจุดแข็ง (USP) ที่เราเหนือกว่า"],
-                optionsEn: ["A. Fabricate false information to deceive the customer.", "B. Spread rumours about the competitor's financial instability.", "C. Immediately resign and join the competitor.", "D. Acknowledge the fact and highlight your own superior Unique Selling Points (USPs)."],
+                q: "12. หากคุณพบว่าสินค้าของคู่แข่งมีคุณสมบัติบางอย่างดีกว่าของคุณ คุณควรทำอย่างไร?",
+                qEn: "12. If a competitor product possesses verifiable advantages over yours, how should you proceed?",
+                options: [
+                    "ก. การสร้างข้อมูลเท็จเกี่ยวกับคุณสมบัติสินค้าของตนเองเพื่อให้ทัดเทียมกับคู่แข่ง",
+                    "ข. การให้ข้อมูลด้านลบเกี่ยวกับสถานะทางการเงินของคู่แข่งเพื่อให้ลูกค้าเกิดความไม่มั่นใจ",
+                    "ค. การยุติการปฏิบัติหน้าที่ในบริษัทเดิมและย้ายไปร่วมงานกับบริษัทคู่แข่งที่มีสินค้าดีกว่าทันที",
+                    "ง. การยอมรับในข้อเท็จจริงและเบี่ยงเบนความสนใจไปยังจุดแข็ง (Unique Selling Point) ที่เราเหนือกว่า"
+                ],
+                optionsEn: [
+                    "A. Fabricate misleading product specifications to claim parity with the competitor.",
+                    "B. Spread disparaging remarks regarding the competitor's financial liquidity.",
+                    "C. Resign immediately to go work for the competing vendor with the better model.",
+                    "D. Acknowledge technical facts objectively and pivot focus to your Unique Selling Points (USPs)."
+                ],
                 ans: 3
             },
             {
-                q: "13. ทักษะ 'Active Listening' มีประโยชน์ต่อ Sales อย่างไร?",
-                qEn: "13. How does 'Active Listening' benefit a salesperson?",
-                options: ["ก. ช่วยให้นำเรื่องบันเทิงมาคุยกับลูกค้าได้", "ข. ช่วยให้จำชื่อลูกค้าได้แม่นยำ", "ค. ช่วยให้ไม่ต้องพูดมาก เก็บแรงไว้หาลูกค้ารายอื่น", "ง. ช่วยให้เข้าใจปัญหาที่แท้จริงและแรงจูงใจเบื้องลึกของลูกค้า"],
-                optionsEn: ["A. It helps bring up entertaining topics with customers.", "B. It helps you remember customer names more accurately.", "C. It means you don't have to talk much, saving energy for other customers.", "D. It helps you understand the customer's true problems and underlying motivations."],
+                q: "13. ทักษะ \"Active Listening\" (การฟังเชิงรุก) มีประโยชน์ต่อ Sales อย่างไร?",
+                qEn: "13. How does 'Active Listening' empower sales professionals in customer engagements?",
+                options: [
+                    "ก. ช่วยพัฒนาทักษะการรับฟังข้อมูลข่าวสารผ่านสื่อบันเทิงเพื่อนำมาเป็นหัวข้อสนทนากับลูกค้า",
+                    "ข. ช่วยเพิ่มสมรรถภาพในการจดจำชื่อและนามสกุลของลูกค้าได้อย่างแม่นยำในการพบกันครั้งแรก",
+                    "ค. ช่วยให้พนักงานขายไม่ต้องใช้แรงในการพูดมากเกินไปทำให้สามารถพบลูกค้าได้หลายรายต่อวัน",
+                    "ง. ช่วยให้เข้าใจปัญหาที่แท้จริงและแรงจูงใจเบื้องลึก ของลูกค้าเพื่อการเสนอโซลูชันที่แม่นยำ"
+                ],
+                optionsEn: [
+                    "A. Enhancing comprehension of entertainment media to use as small-talk banter.",
+                    "B. Boosting memory retention of client full names during initial introductions.",
+                    "C. Conserving vocal energy so sales reps can sprint through more daily appointments.",
+                    "D. Uncovering underlying core issues and psychological drivers to tailor pinpoint solutions."
+                ],
                 ans: 3
             },
             {
-                q: "14. 'Sales Pipeline' ช่วยพนักงานขายจัดการงานได้อย่างไร?",
-                qEn: "14. How does a 'Sales Pipeline' help a salesperson manage their work?",
-                options: ["ก. คำนวณค่าน้ำมันรถ", "ข. จัดการระบบระบายน้ำในออฟฟิศ", "ค. เป็นตู้นิรภัยเก็บเงินสด", "ง. มองเห็นภาพรวมและสถานะดีลเพื่อพยากรณ์ยอดขาย"],
-                optionsEn: ["A. It calculates fuel expenses.", "B. It manages the office drainage system.", "C. It acts as a safe for storing cash.", "D. It provides an overview of all deals and their status for accurate sales forecasting."],
+                q: "14. \"Sales Pipeline\" (กรวยการขาย) ช่วยให้พนักงานขายจัดการงานได้อย่างไร?",
+                qEn: "14. How does managing a 'Sales Pipeline' aid sales performance?",
+                options: [
+                    "ก. ใช้สำหรับการคำนวณอัตราการสิ้นเปลืองน้ำมันเชื้อเพลิงของยานพาหนะฝ่ายขาย",
+                    "ข. เป็นเครื่องมือสำหรับระบบชลประทานและระบายน้ำเสียภายในพื้นที่สำนักงาน",
+                    "ค. เป็นอุปกรณ์นิรภัยสำหรับการจัดเก็บเงินสดที่ได้รับจากการปิดการขายหน้างาน",
+                    "ง. การมองเห็นภาพรวมและสถานะของดีลการขายในแต่ละลำดับ เพื่อการพยากรณ์ยอดขาย"
+                ],
+                optionsEn: [
+                    "A. Calculating fleet fuel consumption metrics across sales journeys.",
+                    "B. Regulating hydraulic wastewater drainage in commercial offices.",
+                    "C. Serving as a physical depository safe for collected cash deposits.",
+                    "D. Providing end-to-end visualization of deal stages for disciplined forecasting and cadence."
+                ],
                 ans: 3
             },
             {
-                q: "15. ในการนำเสนอสินค้า (Sales Presentation) ข้อใดควรทำมากที่สุด?",
-                qEn: "15. During a Sales Presentation, which approach is most effective?",
-                options: ["ก. อ่านสเปกตามเอกสารให้ฟังทุกตัว", "ข. มั่นใจเกินเหตุจนดูไม่น่าเชื่อถือ", "ค. พูดให้เร็วที่สุดเพื่อประหยัดเวลา", "ง. เชื่อมโยงคุณลักษณะ (Features) ให้เห็นเป็นประโยชน์ (Benefits)"],
-                optionsEn: ["A. Read out every specification from the document.", "B. Be excessively confident to the point of appearing untrustworthy.", "C. Speak as quickly as possible to save time.", "D. Connect product Features to customer Benefits."],
+                q: "15. ในการนำเสนอสินค้า (Sales Presentation) ข้อใดคือสิ่งที่ควรทำมากที่สุด?",
+                qEn: "15. During a formal Sales Presentation, which practice delivers optimal impact?",
+                options: [
+                    "ก. การอ่านข้อมูลเชิงเทคนิคจากเอกสารประกอบการขายให้ลูกค้าฟังอย่างละเอียดทุกหัวข้อ",
+                    "ข. การแสดงออกถึงความมั่นใจในระดับที่สูงมากจนอาจส่งผลต่อความน่าเชื่อถือในตัวพนักงาน",
+                    "ค. การนำเสนอด้วยความรวดเร็วที่สุดเพื่อเป็นการประหยัดเวลาอันมีค่าของกลุ่มเป้าหมาย",
+                    "ง. การเชื่อมโยงคุณลักษณะของสินค้า (Features) ให้เห็นเป็นประโยชน์ (Benefits) ที่ชัดเจน"
+                ],
+                optionsEn: [
+                    "A. Reading technical data sheets verbatim item-by-item to prospective buyers.",
+                    "B. Projecting extreme bravado that risks undermining professional credibility.",
+                    "C. Speed-talking through the slide deck to save the prospect's calendar time.",
+                    "D. Translating technical features into compelling, quantifiable tangible customer benefits."
+                ],
                 ans: 3
             },
             {
-                q: "16. หากได้รับมอบหมายพื้นที่ใหม่ที่ไม่มีฐานลูกค้าเลย ควรทำสิ่งใดก่อน?",
-                qEn: "16. If you are assigned a new territory with no existing customer base, what should you do first?",
-                options: ["ก. ทำแผน Territory Management และวิเคราะห์ตลาด", "ข. รอรายชื่อจากฝ่ายการตลาดอย่างเดียว", "ค. สุ่มแจกใบปลิวในที่คนเยอะๆ", "ง. รายงานว่าเป้าหมายเป็นไปไม่ได้"],
-                optionsEn: ["A. Create a Territory Management plan and conduct a market analysis.", "B. Wait solely for a lead list from the marketing team.", "C. Randomly distribute flyers in crowded areas.", "D. Report that the target is unachievable."],
+                q: "16. หากได้รับมอบหมายให้ทำยอดขายในเขตพื้นที่ใหม่ที่คุณไม่มีฐานลูกค้าเลย สิ่งแรกที่ควรทำคือ?",
+                qEn: "16. Assigned to build revenue in a greenfield territory with zero existing client base, what is step one?",
+                options: [
+                    "ก. การทำแผนบริหารจัดการพื้นที่ (Territory Management) และวิเคราะห์ส่วนแบ่งการตลาด",
+                    "ข. การรอคอยให้แผนกการตลาดส่วนกลางส่งรายชื่อผู้มุ่งหวัง (Lead) มาให้เพียงอย่างเดียว",
+                    "ค. การสุ่มแจกเอกสารประชาสัมพันธ์ในพื้นที่ที่มีผู้คนพลุกพล่านโดยไม่จำกัดกลุ่มเป้าหมาย",
+                    "ง. การรายงานต่อผู้บังคับบัญชาว่าเป้าหมายที่ได้รับมอบหมายนั้นไม่สามารถเป็นไปได้ในทางปฏิบัติ"
+                ],
+                optionsEn: [
+                    "A. Formulating a structured territory management plan and evaluating addressable market share.",
+                    "B. Passively waiting for centralized marketing to supply qualified leads.",
+                    "C. Handing out promotional leaflets randomly in bustling pedestrian transit hubs.",
+                    "D. Informing executives that entering the assigned market is operationally impossible."
+                ],
                 ans: 0
             },
             {
-                q: "17. พฤติกรรมใดถือว่า 'เสียจรรยาบรรณ' ของพนักงานขาย?",
-                qEn: "17. Which behaviour is considered a violation of sales professional ethics?",
-                options: ["ก. ไปถึงก่อนเวลานัด 15 นาที", "ข. ขออนุญาตก่อนส่งอีเมลขายของ", "ค. แต่งกายสุภาพเหมาะสมกับแบรนด์", "ง. บิดเบือนข้อมูลหรือรับรองผลเกินจริงเพื่อปิดยอด"],
-                optionsEn: ["A. Arriving 15 minutes before a scheduled meeting.", "B. Asking permission before sending sales emails.", "C. Dressing appropriately and in line with the brand.", "D. Distorting information or making exaggerated guarantees to close a sale."],
+                q: "17. พฤติกรรมใดที่ถือว่า \"เสียจรรยาบรรณ\" ของพนักงานขาย?",
+                qEn: "17. Which behavior constitutes a direct breach of professional sales ethics?",
+                options: [
+                    "ก. การเดินทางไปถึงสถานที่นัดหมายก่อนเวลา 10-15 นาทีเพื่อแสดงความเป็นมืออาชีพ",
+                    "ข. การขอความยินยอมจากลูกค้าก่อนการส่งข้อมูลข่าวสารทางการค้าผ่านอีเมล",
+                    "ค. การเลือกใช้เครื่องแต่งกายที่สุภาพและเหมาะสมกับภาพลักษณ์ตราสินค้าของบริษัท",
+                    "ง. การบิดเบือนข้อมูลหรือการรับรองผลลัพธ์เกินจริง เพื่อมุ่งหวังผลกำไรระยะสั้น"
+                ],
+                optionsEn: [
+                    "A. Arriving 10-15 minutes early to scheduled appointments to exhibit punctuality.",
+                    "B. Requesting explicit opt-in consent before distributing marketing materials via email.",
+                    "C. Selecting professional attire consistent with the corporate brand image.",
+                    "D. Misrepresenting product specifications or guaranteeing inflated outcomes for short-term gains."
+                ],
                 ans: 3
             },
             {
-                q: "18. การรักษาลูกค้าเดิม (Retention) มีต้นทุนอย่างไรเมื่อเทียบกับลูกค้าใหม่?",
-                qEn: "18. How does the cost of customer Retention compare to acquiring new customers?",
-                options: ["ก. สูงกว่าเพราะต้องดูแลตลอด", "ข. เท่ากันทุกกรณี", "ค. ต่ำกว่าและสร้างกำไรยั่งยืนในระยะยาว", "ง. ไม่มีค่าใช้จ่ายเลย"],
-                optionsEn: ["A. Higher, because ongoing care is required.", "B. Equal in all cases.", "C. Lower, and it generates sustainable long-term profit.", "D. There is no cost at all."],
+                q: "18. การรักษาความสัมพันธ์กับลูกค้าเดิม (Customer Retention) มีค่าใช้จ่ายอย่างไรเมื่อเทียบกับการหาลูกค้าใหม่?",
+                qEn: "18. How does the economic cost of Customer Retention compare to acquiring new customer accounts?",
+                options: [
+                    "ก. มักจะมีต้นทุนที่สูงกว่าเนื่องจากต้องใช้ทรัพยากรในการปรนนิบัติลูกค้าอย่างต่อเนื่อง",
+                    "ข. มีความคุ้มค่าเท่ากันในทุกกรณีเนื่องจากต้องใช้ทีมงานฝ่ายขายชุดเดียวกัน",
+                    "ค. มักจะมีต้นทุนที่ต่ำกว่าและสร้างความยั่งยืน ให้กับกำไรของบริษัทในระยะยาว",
+                    "ง. ไม่ก่อให้เกิดค่าใช้จ่ายใดๆ ต่อองค์กรหลังจากมีการปิดการขายครั้งแรกเรียบร้อยแล้ว"
+                ],
+                optionsEn: [
+                    "A. Significantly more expensive due to perpetual servicing and hospitality expenses.",
+                    "B. Exactly identical in cost as the same sales reps handle both pipelines.",
+                    "C. Substantially lower cost, generating resilient recurring profitability over the long run.",
+                    "D. Completely free with zero ongoing overhead once initial acquisition completes."
+                ],
                 ans: 2
             },
             {
-                q: "19. คำว่า 'BANT' ใช้เพื่อวัตถุประสงค์ใด?",
-                qEn: "19. What is 'BANT' used for?",
-                options: ["ก. ขอสินเชื่อธนาคาร", "ข. รหัสส่วนลดสวัสดิการพนักงาน", "ค. ระบบจัดการคลังสินค้า", "ง. ประเมินศักยภาพผู้มุ่งหวัง (Lead Qualification)"],
-                optionsEn: ["A. Applying for a bank loan.", "B. An employee benefits discount code.", "C. A warehouse management system.", "D. Qualifying sales leads (Budget, Authority, Need, Timeline)."],
+                q: "19. คำว่า \"BANT\" (Budget, Authority, Need, Timeline) ใช้เพื่อวัตถุประสงค์ใด?",
+                qEn: "19. For what strategic purpose is the 'BANT' framework utilized in professional sales?",
+                options: [
+                    "ก. เป็นคำย่อของสถาบันการเงินที่บริษัทใช้สำหรับการขอสินเชื่อเพื่อการค้า",
+                    "ข. เป็นรหัสส่วนลดมาตรฐานสำหรับพนักงานในการเข้าถึงระบบสวัสดิการของบริษัท",
+                    "ค. เป็นชื่อระบบจัดการฐานข้อมูลสินค้าคงคลังที่เชื่อมต่อกับฝ่ายผลิต",
+                    "ง. ใช้ในการประเมินศักยภาพของผู้มุ่งหวัง (Lead Qualification) ว่าพร้อมจะเป็นลูกค้าหรือไม่"
+                ],
+                optionsEn: [
+                    "A. An acronym designating commercial banking entities for revolving credit facilities.",
+                    "B. An employee corporate discount coupon code for internal welfare programs.",
+                    "C. A warehouse inventory management system interfacing with factory lines.",
+                    "D. Qualifying prospect maturity and readiness (Budget, Authority, Need, Timeline)."
+                ],
                 ans: 3
             },
             {
-                q: "20. พนักงานขายระดับ Top Sales มักมีลักษณะใดโดดเด่น?",
-                qEn: "20. What quality most distinguishes a Top Sales performer?",
-                options: ["ก. เลิกพยายามทันทีเมื่อถูกปฏิเสธ", "ข. พูดแทรกเก่งเพื่อแย่งนำเสนอ", "ค. ทำงานตามอารมณ์ไม่ทำตามแผน", "ง. ความเพียรพยายาม (Persistence) และมุ่งเน้นผลลัพธ์ (Results-oriented)"],
-                optionsEn: ["A. Giving up immediately after a rejection.", "B. Frequently interrupting to dominate the presentation.", "C. Working based on mood rather than a structured plan.", "D. Persistence and a strong results-oriented mindset."],
+                q: "20. พนักงานขายที่ประสบความสำเร็จ (Top Sales) มักจะมีลักษณะนิสัยใดที่โดดเด่น?",
+                qEn: "20. Which defining behavioral trait characterizes elite Top Sales performers?",
+                options: [
+                    "ก. การพิจารณาลดระดับความพยายามลงทันทีเมื่อเผชิญกับการปฏิเสธจากลูกค้า",
+                    "ข. การมุ่งเน้นการพูดแทรกเพื่อนำเสนอคุณสมบัติสินค้าให้ครบถ้วนในเวลาที่จำกัด",
+                    "ค. การปฏิบัติงานตามความรู้สึกหรืออารมณ์ในแต่ละวันมากกว่าการทำตามแผนงานที่วางไว้",
+                    "ง. ความเพียรพยายาม (Persistence) และทัศนคติแบบที่มุ่งเน้นความสำเร็จ (Results-oriented)"
+                ],
+                optionsEn: [
+                    "A. Immediately giving up upon receiving prospect hesitation or denial.",
+                    "B. Frequently interrupting prospects to jam product specs into conversations.",
+                    "C. Operating by daily transient moods rather than systematic account execution.",
+                    "D. Unyielding persistence paired with an outcome-driven, results-oriented mindset."
+                ],
                 ans: 3
             }
         ];
@@ -348,13 +554,8 @@
         });
 
         /* ============================================================
-           Render
+           Render Question
         ============================================================ */
-        window.onload = () => {
-            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
-            renderQuestion();
-        };
-
         function renderQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = "";
@@ -373,12 +574,13 @@
                     ${opts.map((opt, i) => `
                         <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
                     `).join('')}
-                </div>`;
+                </div>
+            `;
             container.appendChild(card);
         }
 
         /* ============================================================
-           Logic
+           Selection & Flow
         ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
@@ -404,29 +606,7 @@
                     <h2 style="color:#f1c40f;">${t.saving}</h2>
                     <p style="opacity:0.8;">${t.savingDesc}</p>
                 </div>
-                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
-        #backBtn {
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            z-index: 9000;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            color: #fff;
-            padding: 7px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            backdrop-filter: blur(8px);
-            transition: background 0.2s;
-        }
-
-        #backBtn:hover {
-            background: rgba(255, 255, 255, 0.28);
-        }
-
-    </style>`;
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
@@ -464,15 +644,21 @@
             }
         }
 
-        
         function goBack() {
             const preScore = urlParams.get('preScore') || '0';
-            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}`;
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
         }
 
         function goHome() {
             window.location.href = "index.html";
         }
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            renderQuestion();
+        };
     </script>
 
     <!-- Modal -->
@@ -485,13 +671,12 @@
                 text-align: center; border: 1px solid rgba(255,255,255,0.2);
                 box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-        </div>
-            <h2 id="modalTitle"
-                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
                 ขอบคุณสำหรับคำตอบ!</h2>
             <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
                 ขอให้คุณโชคดีในการสัมภาษณ์</p>
