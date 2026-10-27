@@ -32,21 +32,23 @@ const i18n = {
     btnNext: "ไปต่อ",
     assessSectionPill: "ส่วนที่ 1: แบบประเมินทัศนคติ",
     // IQ Intro & Assessment
-    iqIntroTitle: "ส่วนที่ 2: แบบทดสอบความฉลาดทางเชาวน์ปัญญา (IQ Test)",
-    btnStartIq: "เริ่มทำแบบทดสอบ IQ",
+    iqIntroTitle: "ส่วนที่ 2: การคิดเชิงเหตุผล (IQ Test)",
+    iqIntroDesc: "จำนวน 20 ข้อ (เวลา 25 นาที) • วัดทักษะรูปแบบตัวเลข การคำนวณ ตรรกะ และการวิเคราะห์เงื่อนไขข้อมูล\n* ทำด้วยตนเอง สามารถใช้กระดาษทดได้ (ไม่ใช้เครื่องคิดเลข)",
+    btnStartIq: "เริ่มทำแบบทดสอบ IQ (20 ข้อ)",
     iqProgressPrefix: "ข้อที่ ",
     // EQ Intro & Assessment
-    eqIntroTitle: "ส่วนที่ 3: แบบทดสอบความฉลาดทางอารมณ์ในการทำงาน (EQ Test)",
-    btnStartEq: "เริ่มทำแบบทดสอบ EQ",
+    eqIntroTitle: "ส่วนที่ 3: สถานการณ์ EQ ในที่ทำงาน (EQ Test)",
+    eqIntroDesc: "จำนวน 12 ข้อ (เวลา 20 นาที) • ประเมินการตัดสินใจ วุฒิภาวะทางอารมณ์ และการทำงานร่วมกับผู้อื่น\n* เลือกวิธีตอบสนองที่เหมาะสมที่สุดตามข้อมูลที่ให้ในแต่ละสถานการณ์",
+    btnStartEq: "เริ่มทำแบบทดสอบ EQ (12 ข้อ)",
     eqProgressPrefix: "ข้อที่ ",
     // Results
     resultHeading: "เตรียมตัวให้พร้อม!",
     // Exam Picker
     examSaved: "บันทึกข้อมูลทัศนคติเรียบร้อยแล้ว",
-    iqSaved: "บันทึกผลทดสอบเชาวน์ปัญญา (IQ) เรียบร้อยแล้ว",
-    eqSaved: "บันทึกผลทดสอบความฉลาดทางอารมณ์ (EQ) เรียบร้อยแล้ว",
+    iqSaved: "บันทึกผลทดสอบการคิดเชิงเหตุผล (IQ) เรียบร้อยแล้ว",
+    eqSaved: "บันทึกผลทดสอบสถานการณ์ EQ เรียบร้อยแล้ว",
     examPickTitle: "กรุณาเลือกชุดข้อสอบประจำตำแหน่ง",
-    examPickDesc: "เลือกให้ตรงกับแผนก/ตำแหน่งที่สมัคร เพื่อไปทำข้อสอบเฉพาะทาง",
+    examPickDesc: "โปรดเลือกชุดข้อสอบที่ตรงกับตำแหน่งที่คุณสมัคร เพื่อเข้าสู่ขั้นตอนการทำแบบทดสอบเฉพาะทาง",
     examRedirecting: "กำลังพาไปยังข้อสอบชุดถัดไป...",
   },
   en: {
@@ -72,21 +74,23 @@ const i18n = {
     btnNext: "Next",
     assessSectionPill: "Part 1: Psychological Assessment",
     // IQ Intro & Assessment
-    iqIntroTitle: "Part 2: Cognitive & Logic Assessment (IQ Test)",
-    btnStartIq: "Start IQ Test",
+    iqIntroTitle: "Part 2: Cognitive & Logical Reasoning (IQ Test)",
+    iqIntroDesc: "20 Questions (25 Mins) • Number series, work calculation, logic & spatial direction, and data conditions.\n* Complete on your own; scratch paper allowed (no calculator).",
+    btnStartIq: "Start IQ Test (20 Questions)",
     iqProgressPrefix: "Question ",
     // EQ Intro & Assessment
-    eqIntroTitle: "Part 3: Workplace Emotional Intelligence Assessment (EQ Test)",
-    btnStartEq: "Start EQ Test",
+    eqIntroTitle: "Part 3: Workplace Situational EQ Assessment (EQ Test)",
+    eqIntroDesc: "12 Situations (20 Mins) • Evaluates decision-making, emotional regulation, teamwork, and feedback adaptability.\n* Choose the most appropriate response for each given workplace scenario.",
+    btnStartEq: "Start EQ Test (12 Questions)",
     eqProgressPrefix: "Question ",
     // Results
     resultHeading: "Get Ready!",
     // Exam Picker
     examSaved: "Attitude assessment data saved successfully",
-    iqSaved: "Cognitive (IQ) test data saved successfully",
-    eqSaved: "Emotional Intelligence (EQ) data saved successfully",
-    examPickTitle: "Please select an exam set",
-    examPickDesc: "Choose the one that matches your department / position to proceed.",
+    iqSaved: "Cognitive reasoning (IQ) test data saved successfully",
+    eqSaved: "Workplace EQ situational data saved successfully",
+    examPickTitle: "Please select the examination set for the position",
+    examPickDesc: "Please choose the examination set that matches your applied position to continue.",
     examRedirecting: "Redirecting to the next exam...",
   },
 };
@@ -157,12 +161,16 @@ function applyLang(lang) {
   // IQ Intro
   const iqTitle = $("iqIntroTitle");
   if (iqTitle) iqTitle.textContent = t.iqIntroTitle;
+  const iqDesc = $("iqIntroDesc");
+  if (iqDesc && t.iqIntroDesc) iqDesc.innerHTML = t.iqIntroDesc.replace(/\n/g, "<br/>");
   const btnStartIq = $("btnStartIq");
   if (btnStartIq) btnStartIq.textContent = t.btnStartIq;
 
   // EQ Intro
   const eqTitle = $("eqIntroTitle");
   if (eqTitle) eqTitle.textContent = t.eqIntroTitle;
+  const eqDesc = $("eqIntroDesc");
+  if (eqDesc && t.eqIntroDesc) eqDesc.innerHTML = t.eqIntroDesc.replace(/\n/g, "<br/>");
   const btnStartEq = $("btnStartEq");
   if (btnStartEq) btnStartEq.textContent = t.btnStartEq;
 
@@ -321,371 +329,537 @@ const questions = [
   },
 ];
 
-/* ===== Part 2: Cognitive & Logic Assessment (IQ Test - 10 questions) ===== */
+/* ===== Part 2: Cognitive & Logic Assessment (IQ Test - 20 questions) ===== */
 const iqQuestions = [
   {
-    category: "อนุกรมตัวเลข",
+    category: "รูปแบบตัวเลข",
     categoryEn: "Number Series",
-    q: "1. ตัวเลขถัดไปในอนุกรม 3, 7, 15, 31, 63, ... คือตัวเลขใด?",
-    qEn: "1. What is the next number in the sequence 3, 7, 15, 31, 63, ...?",
-    options: ["ก. 95", "ข. 126", "ค. 127", "ง. 129"],
-    optionsEn: ["A. 95", "B. 126", "C. 127", "D. 129"],
-    ans: 2,
-    reason: "คูณ 2 แล้วบวก 1 ในแต่ละขั้น หรือผลต่างเพิ่มขึ้นทีละ 4, 8, 16, 32, 64 ดังนั้น 63 + 64 = 127",
-    reasonEn: "Multiply by 2 and add 1 at each step; alternatively, the increments are 4, 8, 16, 32, 64, so 63 + 64 = 127.",
-  },
-  {
-    category: "การคำนวณเชิงธุรกิจ",
-    categoryEn: "Business Calculation",
-    q: "2. สินค้าชิ้นหนึ่งลดราคา 20% จากราคาป้าย และขายไปในราคา 640 บาท อยากทราบว่าราคาเดิมก่อนลดราคาคือเท่าใด?",
-    qEn: "2. An item is marked down by 20% from its original price and sold for 640 THB. What was the original price before the discount?",
-    options: ["ก. 768 บาท", "ข. 780 บาท", "ค. 800 บาท", "ง. 840 บาท"],
-    optionsEn: ["A. 768 THB", "B. 780 THB", "C. 800 THB", "D. 840 THB"],
-    ans: 2,
-    reason: "640 บาท คิดเป็น 80% ของราคาเดิม ดังนั้น ราคาเดิม = (640 × 100) / 80 = 800 บาท",
-    reasonEn: "640 THB represents 80% of the original price; therefore, the original price = (640 × 100) / 80 = 800 THB.",
-  },
-  {
-    category: "การให้เหตุผลเชิงตรรกะ",
-    categoryEn: "Logical Reasoning",
-    q: "3. กำหนดให้ \"พนักงานขายทุกคนเป็นคนพูดเก่ง\" และ \"สมชายเป็นคนพูดเก่ง\" ข้อสรุปใดถูกต้องและสมเหตุสมผลที่สุด?",
-    qEn: "3. Given that \"all sales staff are articulate\" and \"Somchai is articulate,\" which of the following is the most accurate conclusion?",
-    options: [
-      "ก. สมชายเป็นพนักงานขายอย่างแน่นอน",
-      "ข. สมชายไม่ได้เป็นพนักงานขาย",
-      "ค. สมชายต้องทำงานที่บริษัทนี้",
-      "ง. ไม่สามารถสรุปได้ว่าสมชายเป็นพนักงานขายหรือไม่",
-    ],
-    optionsEn: [
-      "A. Somchai is definitely a sales employee.",
-      "B. Somchai is not a sales employee.",
-      "C. Somchai must work at this company.",
-      "D. It cannot be concluded whether or not Somchai is a sales employee.",
-    ],
-    ans: 3,
-    reason: "พนักงานขายเป็นเพียงหนึ่งในกลุ่มคนที่พูดเก่ง แต่คนที่พูดเก่งอาจทำอาชีพหรืออยู่แผนกอื่นก็ได้ จึงไม่สามารถสรุปได้",
-    reasonEn: "Sales employees are just one group of people who are good at speaking; however, someone who is good at speaking could also work in a different profession or department.",
-  },
-  {
-    category: "การวิเคราะห์ความสัมพันธ์ของคำ",
-    categoryEn: "Analyzing Word Relationships",
-    q: "4. ข้อใดมีความสัมพันธ์ของคู่คำในลักษณะเดียวกับ \"เข็มทิศ : ทิศทาง\"?",
-    qEn: "4. Which option follows the same relationship as \"Compass : Direction\"?",
-    options: [
-      "ก. นาฬิกา : เวลา",
-      "ข. เทอร์โมมิเตอร์ : ความร้อน",
-      "ค. แผนที่ : การเดินทาง",
-      "ง. ไม้บรรทัด : รูปทรง",
-    ],
-    optionsEn: [
-      "A. Clock : Time",
-      "B. Thermometer : Heat",
-      "C. Map : Travel",
-      "D. Ruler : Shape",
-    ],
-    ans: 0,
-    reason: "เข็มทิศเป็นเครื่องมือสำหรับบอกทิศทาง เช่นเดียวกับนาฬิกาที่เป็นเครื่องมือบอกเวลา ส่วนเทอร์โมมิเตอร์ใช้วัดอุณหภูมิ ไม่ใช่ความร้อน",
-    reasonEn: "A compass is a tool used to determine direction, just as a clock is a tool used to determine time. A thermometer, meanwhile, is used to measure \"temperature,\" not heat.",
-  },
-  {
-    category: "การวิเคราะห์อัตราส่วนและเวลา",
-    categoryEn: "Analyzing Ratios and Time",
-    q: "5. หากเครื่องจักร 5 เครื่อง ผลิตสินค้าได้ 5 ชิ้น ในเวลา 5 นาที แล้วถ้ามีเครื่องจักร 50 เครื่อง จะใช้เวลากี่นาทีในการผลิตสินค้า 50 ชิ้น?",
-    qEn: "5. If 5 machines can produce 5 items in 5 minutes, how many minutes will it take for 50 machines to produce 50 items?",
-    options: ["ก. 1 นาที", "ข. 5 นาที", "ค. 10 นาที", "ง. 50 นาที"],
-    optionsEn: ["A. 1 minute", "B. 5 minutes", "C. 10 minutes", "D. 50 minutes"],
+    q: "1. จำนวนถัดไปของ 3, 7, 11, 15, ... คือข้อใด",
+    qEn: "1. What is the next number in the sequence 3, 7, 11, 15, ...?",
+    options: ["ก. 17", "ข. 19", "ค. 20", "ง. 23"],
+    optionsEn: ["A. 17", "B. 19", "C. 20", "D. 23"],
     ans: 1,
-    reason: "เครื่องจักร 1 เครื่อง ใช้เวลา 5 นาทีในการผลิต 1 ชิ้น ดังนั้นเมื่อเครื่องจักร 50 เครื่องทำงานพร้อมกันเพื่อผลิต 50 ชิ้น ก็ยังคงใช้เวลา 5 นาทีเท่าเดิม",
-    reasonEn: "One machine takes 5 minutes to produce one item; therefore, if 50 machines work simultaneously to produce 50 items, it will still take 5 minutes.",
+    reason: "เพิ่มครั้งละ 4 จึงได้ 15 + 4 = 19",
+    reasonEn: "Increases by 4 each step: 15 + 4 = 19.",
   },
   {
-    category: "การจัดลำดับข้อมูล",
-    categoryEn: "Sequencing Information",
-    q: "6. ในการส่งงาน \"ก้อง ส่งงานช้ากว่า แพรว\", \"นนท์ ส่งงานเร็วกว่า ก้อง แต่ช้ากว่า ฟ้า\" และ \"แพรว ส่งงานช้ากว่า นนท์\" ใครเป็นผู้ส่งงานเป็นคนแรก?",
-    qEn: "6. In a task submission, \"Kong submitted his work later than Praew,\" \"Non submitted his work earlier than Kong but later than Fah,\" and \"Praew submitted her work later than Non.\" Who submitted their work first?",
-    options: ["ก. ก้อง", "ข. แพรว", "ค. นนท์", "ง. ฟ้า"],
-    optionsEn: ["A. Kong", "B. Praew", "C. Non", "D. Fah"],
+    category: "รูปแบบตัวเลข",
+    categoryEn: "Number Series",
+    q: "2. จำนวนถัดไปของ 2, 6, 12, 20, 30, ... คือข้อใด",
+    qEn: "2. What is the next number in the sequence 2, 6, 12, 20, 30, ...?",
+    options: ["ก. 36", "ข. 38", "ค. 40", "ง. 42"],
+    optionsEn: ["A. 36", "B. 38", "C. 40", "D. 42"],
     ans: 3,
-    reason: "เรียงลำดับการส่งงานจากเร็วที่สุดไปช้าที่สุด: ฟ้า -> นนท์ -> แพรว -> ก้อง ดังนั้น ฟ้า ส่งงานคนแรก",
-    reasonEn: "Ordering the individuals by the speed at which they submitted their work—from fastest to slowest—gives: Fah -> Non -> Praew -> Kong.",
+    reason: "ผลต่างคือ 4, 6, 8, 10 และ 12 จึงได้ 30 + 12 = 42",
+    reasonEn: "Differences are +4, +6, +8, +10, and +12; therefore, 30 + 12 = 42.",
   },
   {
-    category: "การคิดย้อนกลับ",
-    categoryEn: "Reverse Thinking",
-    q: "7. พนักงานคนหนึ่งได้รับมอบหมายให้บรรจุสินค้าลงกล่อง ทุกๆ 1 ชั่วโมง ปริมาณสินค้าที่บรรจุจะเพิ่มขึ้นเป็น 2 เท่าของชั่วโมงก่อนหน้า หลังผ่านไป 6 ชั่วโมง กล่องบรรจุเต็มพอดี อยากทราบว่าต้องใช้เวลากี่ชั่วโมงกล่องจึงจะมีสินค้าอยู่ครึ่งกล่อง?",
-    qEn: "7. An employee is tasked with packing products into containers. Every hour, the amount packed doubles compared to the previous hour. After 6 hours, the container is completely full. How many hours did it take to fill the container halfway?",
-    options: ["ก. 3 ชั่วโมง", "ข. 4 ชั่วโมง", "ค. 5 ชั่วโมง", "ง. 5.5 ชั่วโมง"],
-    optionsEn: ["A. 3 hours", "B. 4 hours", "C. 5 hours", "D. 5.5 hours"],
+    category: "รูปแบบตัวเลข",
+    categoryEn: "Number Series",
+    q: "3. จำนวนถัดไปของ 1, 2, 4, 7, 11, ... คือข้อใด",
+    qEn: "3. What is the next number in the sequence 1, 2, 4, 7, 11, ...?",
+    options: ["ก. 16", "ข. 15", "ค. 17", "ง. 22"],
+    optionsEn: ["A. 16", "B. 15", "C. 17", "D. 22"],
+    ans: 0,
+    reason: "เพิ่ม 1, 2, 3, 4 และ 5 จึงได้ 11 + 5 = 16",
+    reasonEn: "Increments are +1, +2, +3, +4, and +5; therefore, 11 + 5 = 16.",
+  },
+  {
+    category: "รูปแบบตัวเลข",
+    categoryEn: "Number Series",
+    q: "4. จำนวนถัดไปของ 81, 27, 9, 3, ... คือข้อใด",
+    qEn: "4. What is the next number in the sequence 81, 27, 9, 3, ...?",
+    options: ["ก. 0", "ข. 2", "ค. 1", "ง. 6"],
+    optionsEn: ["A. 0", "B. 2", "C. 1", "D. 6"],
     ans: 2,
-    reason: "เนื่องจากปริมาณเพิ่มเป็น 2 เท่าทุกชั่วโมง ถ้าชั่วโมงที่ 6 เต็มกล่อง แสดงว่าชั่วโมงที่ 5 จะต้องมีสินค้าอยู่ครึ่งกล่อง",
-    reasonEn: "Since the volume of work doubles every hour, if the container is full at the 6th hour, it must have been half-full at the 5th hour.",
+    reason: "หารด้วย 3 ทุกครั้ง จึงได้ 3 ÷ 3 = 1",
+    reasonEn: "Divided by 3 each step: 3 ÷ 3 = 1.",
   },
   {
-    category: "การจำแนกความแตกต่าง",
-    categoryEn: "Identifying Differences",
-    q: "8. คำใดต่อไปนี้ ไม่เข้าพวก กับข้ออื่น?",
-    qEn: "8. Which term does not fit with the others?",
+    category: "รูปแบบตัวเลข",
+    categoryEn: "Number Series",
+    q: "5. จำนวนถัดไปของ 4, 9, 19, 39, ... คือข้อใด",
+    qEn: "5. What is the next number in the sequence 4, 9, 19, 39, ...?",
+    options: ["ก. 69", "ข. 79", "ค. 78", "ง. 89"],
+    optionsEn: ["A. 69", "B. 79", "C. 78", "D. 89"],
+    ans: 1,
+    reason: "คูณ 2 แล้วบวก 1 ทุกครั้ง (หรือผลต่างเพิ่มเป็นสองเท่า: +5, +10, +20, +40) จึงได้ 39 + 40 = 79",
+    reasonEn: "Multiply by 2 and add 1 at each step (or difference doubles: +5, +10, +20, +40), giving 39 + 40 = 79.",
+  },
+  {
+    category: "คำนวณจากโจทย์งาน",
+    categoryEn: "Work Calculation",
+    q: "6. พนักงานแผนก ก ต่อแผนก ข มีอัตราส่วน 3 ต่อ 5 หากรวมกัน 64 คน แผนก ก มีกี่คน",
+    qEn: "6. The ratio of staff in Department A to Department B is 3:5. If there are 64 staff in total, how many are in Department A?",
+    options: ["ก. 20 คน", "ข. 32 คน", "ค. 24 คน", "ง. 40 คน"],
+    optionsEn: ["A. 20 people", "B. 32 people", "C. 24 people", "D. 40 people"],
+    ans: 2,
+    reason: "64 ÷ 8 = 8 คนต่อส่วน แผนก ก มี 3 × 8 = 24 คน",
+    reasonEn: "64 ÷ (3 + 5) = 8 people per part. Department A has 3 × 8 = 24 people.",
+  },
+  {
+    category: "คำนวณจากโจทย์งาน",
+    categoryEn: "Work Calculation",
+    q: "7. สินค้าราคา 480 บาท ลดราคา 15% ต้องจ่ายกี่บาท โดยไม่มีค่าใช้จ่ายอื่น",
+    qEn: "7. An item is priced at 480 THB and discounted by 15%. How much must be paid with no other expenses?",
+    options: ["ก. 408 บาท", "ข. 420 บาท", "ค. 432 บาท", "ง. 465 บาท"],
+    optionsEn: ["A. 408 THB", "B. 420 THB", "C. 432 THB", "D. 465 THB"],
+    ans: 0,
+    reason: "ส่วนลด 72 บาท จ่าย 480 - 72 = 408 บาท",
+    reasonEn: "Discount is 480 × 0.15 = 72 THB. Final price = 480 - 72 = 408 THB.",
+  },
+  {
+    category: "คำนวณจากโจทย์งาน",
+    categoryEn: "Work Calculation",
+    q: "8. เครื่องจักรเหมือนกัน 3 เครื่อง ผลิตได้รวม 90 ชิ้นใน 6 ชั่วโมง หากทุกเครื่องทำงานด้วยอัตราคงที่เท่ากัน 5 เครื่องใน 4 ชั่วโมงจะผลิตได้กี่ชิ้น",
+    qEn: "8. 3 identical machines produce 90 pieces in 6 hours. At the same constant rate, how many pieces will 5 machines produce in 4 hours?",
+    options: ["ก. 90 ชิ้น", "ข. 100 ชิ้น", "ค. 120 ชิ้น", "ง. 150 ชิ้น"],
+    optionsEn: ["A. 90 pieces", "B. 100 pieces", "C. 120 pieces", "D. 150 pieces"],
+    ans: 1,
+    reason: "หนึ่งเครื่องผลิตได้ 90 ÷ (3 × 6) = 5 ชิ้นต่อชั่วโมง ดังนั้น 5 เครื่องใน 4 ชั่วโมง = 5 × 4 × 5 = 100 ชิ้น",
+    reasonEn: "One machine produces 90 ÷ (3 × 6) = 5 pieces/hr. Therefore, 5 machines in 4 hours = 5 × 4 × 5 = 100 pieces.",
+  },
+  {
+    category: "คำนวณจากโจทย์งาน",
+    categoryEn: "Work Calculation",
+    q: "9. วันแรกตรวจเอกสารได้ 12 ฉบับ วันที่สอง 18 ฉบับ หากต้องการค่าเฉลี่ย 3 วันเท่ากับวันละ 20 ฉบับ วันที่สามต้องตรวจได้กี่ฉบับ",
+    qEn: "9. Day 1 reviewed 12 documents, Day 2 reviewed 18 documents. To achieve an average of 20 documents/day over 3 days, how many must be reviewed on Day 3?",
+    options: ["ก. 20 ฉบับ", "ข. 24 ฉบับ", "ค. 28 ฉบับ", "ง. 30 ฉบับ"],
+    optionsEn: ["A. 20 documents", "B. 24 documents", "C. 28 documents", "D. 30 documents"],
+    ans: 3,
+    reason: "ผลรวม 3 วันต้องได้ 3 × 20 = 60 ฉบับ วันที่สามคือ 60 - 12 - 18 = 30 ฉบับ",
+    reasonEn: "Total required for 3 days = 3 × 20 = 60 documents. Day 3 = 60 - 12 - 18 = 30 documents.",
+  },
+  {
+    category: "คำนวณจากโจทย์งาน",
+    categoryEn: "Work Calculation",
+    q: "10. สินค้ามีราคา 120 บาท เพิ่มราคา 25% แล้วลดจากราคาใหม่ 20% ราคาสุดท้ายเท่าใด",
+    qEn: "10. An item is priced at 120 THB. The price is raised by 25%, and then discounted by 20% from the new price. What is the final price?",
+    options: ["ก. 114 บาท", "ข. 118 บาท", "ค. 120 บาท", "ง. 126 บาท"],
+    optionsEn: ["A. 114 THB", "B. 118 THB", "C. 120 THB", "D. 126 THB"],
+    ans: 2,
+    reason: "120 × 1.25 = 150 บาท จากนั้นลด 20% คือ 150 × 0.8 = 120 บาท",
+    reasonEn: "120 × 1.25 = 150 THB. Then discounted 20%: 150 × 0.8 = 120 THB.",
+  },
+  {
+    category: "ตรรกะและทิศทาง",
+    categoryEn: "Logic & Direction",
+    q: "11. กำหนดว่าเอกสารที่ติดป้ายด่วนทุกฉบับได้รับอนุมัติแล้ว และเอกสาร P ติดป้ายด่วน ข้อใดสรุปได้แน่นอน",
+    qEn: "11. Given that all urgent-tagged documents are approved, and document P is tagged urgent, which conclusion is definitely true?",
     options: [
-      "ก. กำไรสุทธิ (Net Profit)",
-      "ข. รายได้รวม (Total Revenue)",
-      "ค. ต้นทุนคงที่ (Fixed Cost)",
-      "ง. ทัศนคติองค์กร (Corporate Attitude)",
+      "ก. เอกสารที่อนุมัติทุกฉบับติดป้ายด่วน",
+      "ข. เอกสาร P ส่งถึงลูกค้าแล้ว",
+      "ค. เอกสาร P ได้รับอนุมัติแล้ว",
+      "ง. เอกสาร P เป็นฉบับเดียวที่ได้รับอนุมัติ",
     ],
     optionsEn: [
-      "A. Net Profit",
-      "B. Total Revenue",
-      "C. Fixed Cost",
-      "D. Corporate Attitude",
+      "A. All approved documents are tagged urgent.",
+      "B. Document P has been sent to the client.",
+      "C. Document P is approved.",
+      "D. Document P is the only approved document.",
     ],
-    ans: 3,
-    reason: "ตัวเลือก A, B และ C เป็นตัวชี้วัดทางการเงินหรือการบัญชี ส่วนตัวเลือก D เกี่ยวข้องกับพฤติกรรมและวัฒนธรรมองค์กร",
-    reasonEn: "Options A, B, and C are all financial or accounting metrics, whereas option D relates to behavior and organizational culture.",
-  },
-  {
-    category: "คณิตศาสตร์ประยุกต์",
-    categoryEn: "Applied Mathematics",
-    q: "9. แผนกหนึ่งมีพนักงานทั้งหมด 30 คน มี 18 คนที่ชำนาญ Excel ขั้นสูง และมี 15 คนที่ชำนาญโปรแกรมตัดต่อวิดีโอ หากมีพนักงาน 5 คนที่ไม่ชำนาญทั้งสองโปรแกรมเลย มีพนักงานกี่คนที่ชำนาญทั้งสองโปรแกรม?",
-    qEn: "9. A department has 30 employees in total. 18 employees are proficient in advanced Excel, and 15 are proficient in video editing software. If 5 employees are not proficient in either program, how many employees are proficient in both programs?",
-    options: ["ก. 3 คน", "ข. 5 คน", "ค. 8 คน", "ง. 10 คน"],
-    optionsEn: ["A. 3 people", "B. 5 people", "C. 8 people", "D. 10 people"],
     ans: 2,
-    reason: "มีพนักงานที่ใช้โปรแกรมเป็น 30 - 5 = 25 คน ผลรวมของคนที่ใช้แต่ละโปรแกรมคือ 18 + 15 = 33 ดังนั้น คนที่ใช้เป็นทั้งสองโปรแกรมคือ 33 - 25 = 8 คน",
-    reasonEn: "There are 30 - 5 = 25 employees who know how to use the programs. The total number of users for each program combined is 18 + 15 = 33. Therefore, the number of people who overlap—meaning they can use both programs—is 33 - 25 = 8.",
+    reason: "P อยู่ในกลุ่มเอกสารด่วน จึงได้รับอนุมัติตามเงื่อนไขที่ให้",
+    reasonEn: "P is tagged urgent, so it is definitely approved according to the rule.",
   },
   {
-    category: "การจัดลำดับความสำคัญและเงื่อนไข",
-    categoryEn: "Prioritization and Conditions",
-    q: "10. คุณมี 4 งานที่ต้องทำให้เสร็จในวันนี้: งาน A (ใช้เวลา 2 ชม. ต้องส่งก่อนเที่ยง), งาน B (ใช้เวลา 1 ชม. เริ่มได้หลังจากงาน C เสร็จแล้วเท่านั้น), งาน C (ใช้เวลา 1 ชม. ไม่มีกำหนดส่งเจาะจง) และงาน D (ใช้เวลา 3 ชม. ต้องส่งก่อน 15:00 น.) หากเริ่มงาน 9:00 น. และพักเที่ยง 12:00 - 13:00 น. ลำดับการทำงานใดที่ทำให้ส่งงานได้ทันกำหนดทั้งหมด?",
-    qEn: "10. You have 4 tasks to complete today: Task A (takes 2 hours, must be submitted before noon), Task B (takes 1 hour, can only be started after Task C is finished), Task C (takes 1 hour, no specific submission deadline), and Task D (takes 3 hours, must be submitted before 3:00 PM). If you begin working at 9:00 AM and take a lunch break from 12:00 PM to 1:00 PM, which sequence of tasks ensures that everything is submitted on time?",
+    category: "ตรรกะและทิศทาง",
+    categoryEn: "Logic & Direction",
+    q: "12. ผู้ที่ผ่านหลักสูตร A ทุกคนผ่านหลักสูตร B คุณนิดไม่ผ่านหลักสูตร B ข้อใดสรุปได้แน่นอน",
+    qEn: "12. Everyone who passes Course A passes Course B. Khun Nid did not pass Course B. Which conclusion is definitely true?",
     options: [
-      "ก. A -> C -> พักเที่ยง -> D -> B",
-      "ข. C -> B -> พักเที่ยง -> A -> D",
-      "ค. A -> B -> พักเที่ยง -> D -> C",
-      "ง. D -> พักเที่ยง -> A -> C -> B",
+      "ก. คุณนิดไม่ผ่านหลักสูตร A",
+      "ข. คุณนิดผ่านหลักสูตร A",
+      "ค. ทุกคนที่ผ่าน B ต้องผ่าน A",
+      "ง. ไม่มีใครผ่านทั้งสองหลักสูตร",
     ],
     optionsEn: [
-      "A. A -> C -> Lunch -> D -> B",
-      "B. C -> B -> Lunch -> A -> D",
-      "C. A -> B -> Lunch -> D -> C",
-      "D. D -> Lunch -> A -> C -> B",
+      "A. Khun Nid did not pass Course A.",
+      "B. Khun Nid passed Course A.",
+      "C. Everyone who passes B must pass A.",
+      "D. Nobody passed both courses.",
     ],
     ans: 0,
-    reason: "ช่วงเช้า 9:00 - 12:00 น. มีเวลา 3 ชม. ทำงาน A (2 ชม.) เสร็จก่อนเที่ยง จากนั้นทำงาน C (1 ชม.) จนถึงเที่ยง หลังพักเที่ยง 13:00 - 16:00 น. ทำงาน D (3 ชม.) ซึ่งจะเสร็จทันหรือส่งตามเงื่อนไข และสุดท้ายทำงาน B",
-    reasonEn: "In the morning, from 9:00 AM to 12:00 PM, you have 3 hours available; Task A (2 hours) must be completed before noon. Then, move on to Task C (1 hour), which will take you up to noon. Afterward, from 1:00 PM to 4:00 PM, focus on completing Task D (3 hours) by the 3:00 PM/4:00 PM deadline, and finally, wrap things up with Task B.",
+    reason: "ถ้าคุณนิดผ่าน A ต้องผ่าน B จึงขัดกับข้อมูลที่ไม่ผ่าน B (สรุปได้ว่าคุณนิดไม่ผ่านหลักสูตร A)",
+    reasonEn: "If Khun Nid passed A she must pass B, which contradicts her not passing B; thus she did not pass A.",
+  },
+  {
+    category: "ตรรกะและทิศทาง",
+    categoryEn: "Logic & Direction",
+    q: "13. ต้องทำงาน K ก่อน L ทำ M หลัง L และทำ N ก่อน K ลำดับใดทำได้ตามเงื่อนไขทั้งหมด",
+    qEn: "13. Task K must precede L, task M comes after L, and task N comes before K. Which sequence satisfies all conditions?",
+    options: ["ก. K, N, L, M", "ข. N, L, K, M", "ค. N, K, M, L", "ง. N, K, L, M"],
+    optionsEn: ["A. K, N, L, M", "B. N, L, K, M", "C. N, K, M, L", "D. N, K, L, M"],
+    ans: 3,
+    reason: "ต้องเรียง N ก่อน K ก่อน L ก่อน M (N -> K -> L -> M)",
+    reasonEn: "Order must satisfy N before K, K before L, and L before M (N -> K -> L -> M).",
+  },
+  {
+    category: "ตรรกะและทิศทาง",
+    categoryEn: "Logic & Direction",
+    q: "14. กำหนดว่า ก สูงกว่า ข และ ข สูงกว่า ค ส่วน ง สูงกว่า ก ใครเตี้ยที่สุด",
+    qEn: "14. Given that A is taller than B, B is taller than C, and D is taller than A. Who is the shortest?",
+    options: ["ก. ก", "ข. ค", "ค. ข", "ง. ง"],
+    optionsEn: ["A. A", "B. C", "C. B", "D. D"],
+    ans: 1,
+    reason: "เรียงจากสูงไปต่ำได้ ง > ก > ข > ค ดังนั้น ค เตี้ยที่สุด",
+    reasonEn: "Ranking from tallest to shortest: D > A > B > C. Therefore, C is the shortest.",
+  },
+  {
+    category: "ตรรกะและทิศทาง",
+    categoryEn: "Logic & Direction",
+    q: "15. เริ่มต้นที่จุดหนึ่ง หันหน้าไปทางเหนือ เลี้ยวขวาแล้วเดิน 10 เมตร จากนั้นเลี้ยวซ้ายเดิน 5 เมตร แล้วเลี้ยวซ้ายเดิน 10 เมตร จุดสุดท้ายอยู่ทิศใดจากจุดเริ่มต้น",
+    qEn: "15. Starting facing North: turn right and walk 10 m, turn left and walk 5 m, then turn left and walk 10 m. In which direction is the final point from the start?",
+    options: ["ก. ตะวันออก", "ข. ตะวันตก", "ค. เหนือ", "ง. ใต้"],
+    optionsEn: ["A. East", "B. West", "C. North", "D. South"],
+    ans: 2,
+    reason: "การเดินตะวันออก 10 ม. และตะวันตก 10 ม. หักล้างกัน เหลืออยู่ทางทิศเหนือ 5 เมตร",
+    reasonEn: "Walking 10m East and 10m West cancel out, leaving the final point 5m to the North.",
+  },
+  {
+    category: "เงื่อนไขและข้อมูล",
+    categoryEn: "Conditions & Data",
+    q: "16. ส่งสินค้าได้ก็ต่อเมื่อจำนวนครบ รหัสถูก และปิดผนึกแล้ว กล่องหนึ่งจำนวนครบและรหัสถูก แต่ยังไม่ปิดผนึก ข้อใดถูกต้อง",
+    qEn: "16. Goods can be dispatched only when quantity is complete, code is correct, and sealed. A box has complete quantity and correct code, but is not sealed. Which statement is correct?",
+    options: [
+      "ก. ส่งได้เพราะจำนวนครบ",
+      "ข. ส่งได้เพราะรหัสถูก",
+      "ค. ส่งได้หากใกล้หมดเวลางาน",
+      "ง. ยังส่งไม่ได้ตามเงื่อนไข",
+    ],
+    optionsEn: [
+      "A. Can be dispatched because quantity is complete.",
+      "B. Can be dispatched because code is correct.",
+      "C. Can be dispatched if work hours are almost over.",
+      "D. Cannot be dispatched yet according to conditions.",
+    ],
+    ans: 3,
+    reason: "ต้องครบทั้งสามเงื่อนไข แต่ยังขาดการปิดผนึก จึงยังส่งไม่ได้ตามเงื่อนไข",
+    reasonEn: "All three conditions must be satisfied, but sealing is missing. It cannot be dispatched yet.",
+  },
+  {
+    category: "เงื่อนไขและข้อมูล",
+    categoryEn: "Conditions & Data",
+    q: "17. รหัสต้นฉบับคือ TP-6408-K9 ตัวเลือกใดตรงกับต้นฉบับทุกตัว",
+    qEn: "17. The original code is TP-6408-K9. Which option matches the original exactly in every character?",
+    options: ["ก. TP-6408-K9", "ข. TP-640B-K9", "ค. TP-6048-K9", "ง. TP-6408-K6"],
+    optionsEn: ["A. TP-6408-K9", "B. TP-640B-K9", "C. TP-6048-K9", "D. TP-6408-K6"],
+    ans: 0,
+    reason: "ก ตรงทุกตำแหน่ง ตัวเลือกอื่นเปลี่ยนตัวเลขหรือตัวอักษร",
+    reasonEn: "Option A matches every character; other options modify digits or letters.",
+  },
+  {
+    category: "เงื่อนไขและข้อมูล",
+    categoryEn: "Conditions & Data",
+    q: "18. จากข้อมูลด้านล่าง ทีมใดมีอัตรางานเสร็จต่อจำนวนงานที่ได้รับสูงที่สุด\n(ทีม ก: ได้รับ 24 เสร็จ 18 | ทีม ข: ได้รับ 40 เสร็จ 24 | ทีม ค: ได้รับ 28 เสร็จ 21 | ทีม ง: ได้รับ 20 เสร็จ 16)",
+    qEn: "18. Based on the data below, which team has the highest completion rate (completed / received)?\n(Team A: Received 24, Completed 18 | Team B: Received 40, Completed 24 | Team C: Received 28, Completed 21 | Team D: Received 20, Completed 16)",
+    options: ["ก. ทีม ก", "ข. ทีม ข", "ค. ทีม ค", "ง. ทีม ง"],
+    optionsEn: ["A. Team A", "B. Team B", "C. Team C", "D. Team D"],
+    ans: 3,
+    reason: "อัตราคือ ทีม ก 75%, ข 60%, ค 75% และ ง 80% ตามลำดับ ทีม ง มีอัตราสูงสุด",
+    reasonEn: "Completion rates: A = 75%, B = 60%, C = 75%, D = 80%. Team D is highest.",
+  },
+  {
+    category: "เงื่อนไขและข้อมูล",
+    categoryEn: "Conditions & Data",
+    q: "19. กล่องหนึ่งใส่แฟ้มได้ไม่เกิน 8 แฟ้ม มีแฟ้ม 53 แฟ้ม ต้องใช้กล่องอย่างน้อยกี่กล่อง",
+    qEn: "19. A box can hold at most 8 folders. With 53 folders, what is the minimum number of boxes needed?",
+    options: ["ก. 6 กล่อง", "ข. 7 กล่อง", "ค. 8 กล่อง", "ง. 9 กล่อง"],
+    optionsEn: ["A. 6 boxes", "B. 7 boxes", "C. 8 boxes", "D. 9 boxes"],
+    ans: 1,
+    reason: "6 กล่องใส่ได้เพียง 48 แฟ้ม จึงต้องใช้กล่องที่ 7 (53 ÷ 8 = 6.625 จึงต้องใช้ 7 กล่อง)",
+    reasonEn: "6 boxes can hold at most 48 folders, so 7 boxes are required (ceil(53/8) = 7).",
+  },
+  {
+    category: "เงื่อนไขและข้อมูล",
+    categoryEn: "Conditions & Data",
+    q: "20. ข้อมูล 4 จำนวนมีค่าเฉลี่ย 25 เมื่อตัดจำนวน 40 ออก ค่าเฉลี่ยของ 3 จำนวนที่เหลือเท่าใด",
+    qEn: "20. The average of 4 numbers is 25. If the number 40 is removed, what is the average of the remaining 3 numbers?",
+    options: ["ก. 20", "ข. 22", "ค. 25", "ง. 30"],
+    optionsEn: ["A. 20", "B. 22", "C. 25", "D. 30"],
+    ans: 0,
+    reason: "ผลรวมเดิม 4 × 25 = 100 เมื่อตัด 40 เหลือ 60 หาร 3 = 20",
+    reasonEn: "Original sum = 4 × 25 = 100. Removing 40 leaves 60. 60 ÷ 3 = 20.",
   },
 ];
 
-/* ===== Part 3: Emotional Intelligence Assessment (EQ Test - 10 questions) ===== */
+/* ===== Part 3: Emotional Intelligence Assessment (EQ Test - 12 questions) ===== */
 const eqQuestions = [
   {
-    category: "การควบคุมอารมณ์และเปิดใจรับฟัง",
-    categoryEn: "Self-Regulation & Openness",
-    q: "1. หากคุณนำเสนอไอเดียในที่ประชุม แล้วถูกหัวหน้าหรือเพื่อนร่วมงานวิจารณ์อย่างตรงไปตรงมาว่า \"ไอเดียนี้ยังไม่น่าจะใช้ได้จริง\" คุณจะทำอย่างไร?",
-    qEn: "1. If you present an idea in a meeting and your manager or colleague criticises it directly, saying \"this idea probably won't work in practice,\" what would you do?",
+    category: "ควบคุมอารมณ์และจัดการความกังวล",
+    categoryEn: "Emotional Control & Anxiety Management",
+    q: "1. เพื่อนร่วมงานวิจารณ์งานของคุณในกลุ่มแชต คุณเริ่มโกรธ แต่เรื่องนี้ไม่มีเหตุฉุกเฉิน คุณควรทำอย่างไร?",
+    qEn: "1. A colleague criticises your work in a group chat. You start to feel angry, but there is no emergency. What should you do?",
     options: [
-      "ก. อธิบายโต้แย้งทันทีเพื่อปกป้องผลงานและชี้แจงว่าทำไมไอเดียนี้ถึงดีที่สุด",
-      "ข. เงียบและยอมรับคำตัดสิน แต่รู้สึกหมดกำลังใจในการนำเสนอครั้งต่อไป",
-      "ค. รับฟังด้วยความใจเย็น ขอบคุณสำหรับความคิดเห็น และสอบถามเพิ่มเติมว่าควรปรับปรุงจุดใดบ้าง",
-      "ง. เปลี่ยนไปสนับสนุนไอเดียของคนอื่นแทนทันทีเพื่อหลีกเลี่ยงความขัดแย้งในที่ประชุม",
+      "ก. ชี้แจงทุกประเด็นในกลุ่มทันทีเพื่อให้คนอื่นเข้าใจมุมของคุณ",
+      "ข. พักตั้งสติ ตรวจข้อเท็จจริง แล้วคุยกับผู้เกี่ยวข้องเพื่อหาทางแก้",
+      "ค. ขอหัวหน้าช่วยประสานการพูดคุย เพราะคุณยังคุยโดยสงบไม่ได้",
+      "ง. หยุดตอบเรื่องงานกับเพื่อนคนนั้นตลอดวันโดยไม่แจ้งเหตุผล",
     ],
     optionsEn: [
-      "A. Argue back immediately to defend your proposal and explain why it is the best idea.",
-      "B. Stay silent and accept the verdict, but feel discouraged from presenting next time.",
-      "C. Listen calmly, thank them for the feedback, and ask for specific suggestions on what can be improved.",
-      "D. Immediately switch to supporting someone else's idea to avoid any conflict in the meeting.",
+      "A. Clarify every point in the group chat immediately so others understand your perspective.",
+      "B. Pause to regain composure, check facts, and then talk with the relevant person to find a solution.",
+      "C. Ask your manager to mediate because you cannot yet discuss it calmly.",
+      "D. Stop responding to that colleague on work matters for the rest of the day without giving a reason.",
     ],
-    ans: 2,
-    reason: "วัดทักษะการควบคุมอารมณ์และการเปิดใจรับฟังความคิดเห็น (Self-Regulation & Openness)",
-    reasonEn: "Measures self-regulation and openness to constructive feedback.",
-  },
-  {
-    category: "การแก้ไขความขัดแย้งอย่างมีวุฒิภาวะ",
-    categoryEn: "Conflict Resolution",
-    q: "2. เมื่อเกิดความผิดพลาดในโปรเจกต์ที่ทำร่วมกันเป็นทีม แต่เพื่อนร่วมงานกลับโยนความผิดมาที่คุณคนเดียวต่อหน้าหัวหน้า คุณจะจัดการอย่างไร?",
-    qEn: "2. When a mistake occurs in a team project, but a colleague shifts all the blame onto you in front of the manager, how do you handle it?",
-    options: [
-      "ก. โต้กลับทันทีในที่ประชุมเพื่อให้ทุกคนรู้ความจริงว่าเพื่อนร่วมงานคนนั้นก็ทำผิดเช่นกัน",
-      "ข. ชี้แจงลำดับเหตุการณ์ตามข้อเท็จจริงอย่างสุภาพโดยไม่ใช้อารมณ์ และเสนอแนวทางแก้ไขปัญหาเฉพาะหน้าก่อน",
-      "ค. ยอมรับผิดไปคนเดียวเพื่อให้เรื่องจบเร็วที่สุด แล้วค่อยไปต่อว่าเพื่อนร่วมงานหลังเลิกประชุม",
-      "ง. ปฏิเสธความรับผิดชอบทั้งหมดและบอกให้หัวหน้าไปตรวจสอบหาคนผิดเอง",
-    ],
-    optionsEn: [
-      "A. Counter-attack immediately in the meeting so everyone knows that the colleague also made mistakes.",
-      "B. Politely clarify the factual timeline without getting emotional, and propose immediate solutions to resolve the issue first.",
-      "C. Take all the blame alone just to end the discussion quickly, then confront the colleague after the meeting.",
-      "D. Deny all responsibility entirely and tell the manager to investigate who is to blame.",
-    ],
+    scores: [1, 3, 2, 0],
+    bestChoice: 1,
     ans: 1,
-    reason: "วัดทักษะการแก้ไขความขัดแย้งอย่างมีวุฒิภาวะและการมุ่งเน้นการแก้ปัญหา (Conflict Resolution)",
-    reasonEn: "Measures mature conflict resolution and focus on constructive solutions.",
+    reason: "หยุดปฏิกิริยาทันทีและกลับไปแก้ปัญหาด้วยข้อเท็จจริง (คำถามสัมภาษณ์ต่อ: ขอให้ยกตัวอย่างวิธีตั้งสติก่อนตอบข้อความที่ทำให้โกรธ)",
+    reasonEn: "Pause reactive impulses and return to problem-solving with facts. (Follow-up: Ask for an example of how you compose yourself before responding to an angering message).",
   },
   {
-    category: "การปรับตัวและการทำงานเป็นทีม",
-    categoryEn: "Adaptability & Teamwork",
-    q: "3. หากคุณต้องทำงานร่วมกับเพื่อนร่วมงานที่มีนิสัยและสไตล์การทำงานตรงข้ามกับคุณอย่างสิ้นเชิง คุณจะทำอย่างไรให้งานสำเร็จ?",
-    qEn: "3. If you have to work with a colleague whose personality and work style are the exact opposite of yours, how do you ensure the project succeeds?",
+    category: "ควบคุมอารมณ์และจัดการความกังวล",
+    categoryEn: "Emotional Control & Anxiety Management",
+    q: "2. ลูกค้าพูดด้วยน้ำเสียงรุนแรงระหว่างโทรศัพท์ คุณรู้สึกว่ากำลังจะขึ้นเสียง และมีเพื่อนร่วมงานพร้อมช่วย คุณควรทำอย่างไร?",
+    qEn: "2. A customer speaks in an aggressive tone during a phone call. You feel you are about to raise your voice, and a colleague is available to help. What should you do?",
     options: [
-      "ก. ขอหัวหน้าเปลี่ยนตัวผู้ร่วมงานทันที เพราะทำงานด้วยกันไปก็ไม่มีความสุข",
-      "ข. แบ่งงานกันทำแบบแยกขาดจากกัน เพื่อจะได้ไม่ต้องพูดคุยหรือประสานงานกัน",
-      "ค. พยายามบังคับให้อีกฝ่ายปรับวิธีการทำงานให้เข้ากับมาตรฐานของคุณ",
-      "ง. พูดคุยเพื่อทำความเข้าใจสไตล์การทำงานของกันและกัน และหาข้อตกลงร่วมกันโดยยึดเป้าหมายของงานเป็นหลัก",
+      "ก. คุยต่อด้วยน้ำเสียงแข็งขึ้นเพื่อให้ลูกค้าหยุดพูดแทรก",
+      "ข. จบสายทันที แล้วรอให้ลูกค้าติดต่อกลับมาเองเมื่อใจเย็น",
+      "ค. ขอส่งต่อให้เพื่อนช่วยรับสาย แล้วติดตามปัญหากับเพื่อนภายหลัง",
+      "ง. ขอพักสายสั้น ๆ ตั้งสติ แล้วกลับมาทวนปัญหาและขั้นตอนช่วยเหลือ",
     ],
     optionsEn: [
-      "A. Immediately ask the manager to replace the partner, because working together would be unhappy.",
-      "B. Divide the work strictly into silos so you don't have to talk or coordinate with each other.",
-      "C. Try to force the other person to adjust their work method to match your standards.",
-      "D. Communicate to understand each other's work styles and reach a shared agreement aligned with the project goals.",
+      "A. Continue talking in a firmer tone to make the customer stop interrupting.",
+      "B. End the call immediately and wait for the customer to call back when calm.",
+      "C. Ask to hand the call over to your colleague and follow up on the issue with them later.",
+      "D. Ask to place the call on a brief hold to compose yourself, then return to review the issue and steps to assist.",
     ],
+    scores: [0, 1, 2, 3],
+    bestChoice: 3,
     ans: 3,
-    reason: "วัดทักษะการปรับตัวและการทำงานเป็นทีม (Adaptability & Teamwork)",
-    reasonEn: "Measures adaptability and effective teamwork across diverse working styles.",
+    reason: "จัดการอารมณ์ตนเองและดูแลความต่อเนื่องของการช่วยลูกค้า (คำถามสัมภาษณ์ต่อ: ถามว่าหากยังควบคุมน้ำเสียงไม่ได้ จะส่งต่องานอย่างไร)",
+    reasonEn: "Manage your own emotions while maintaining continuity in helping the customer. (Follow-up: Ask how they would hand over the task if they still could not regulate their tone).",
   },
   {
-    category: "ความเห็นอกเห็นใจและการจัดลำดับความสำคัญ",
-    categoryEn: "Empathy & Prioritization",
-    q: "4. ขณะที่คุณกำลังเร่งทำงานสำคัญที่ต้องส่งภายในเย็นวันนี้ จู่ๆ มีเพื่อนร่วมงานเข้ามาขอความช่วยเหลือด่วนด้วยท่าทางหงุดหงิดและร้อนรน คุณจะรับมืออย่างไร?",
-    qEn: "4. While rushing on an important task due this evening, a colleague suddenly approaches you in an agitated and flustered state asking for urgent help. How do you handle it?",
+    category: "ควบคุมอารมณ์และจัดการความกังวล",
+    categoryEn: "Emotional Control & Anxiety Management",
+    q: "3. คุณพบตัวเลขผิดในเอกสารที่ส่งให้ลูกค้าแล้ว แต่ลูกค้ายังไม่ได้ใช้งาน คุณรู้สึกกังวลว่าจะถูกตำหนิ คุณควรทำอย่างไร?",
+    qEn: "3. You discover incorrect numbers in a document already sent to a client, but the client has not used it yet. You feel anxious about being blamed. What should you do?",
     options: [
-      "ก. ปฏิเสธทันทีด้วยน้ำเสียงจริงจัง เพราะงานของตัวเองก็กำลังเร่งด่วนมากเช่นกัน",
-      "ข. รับฟังปัญหาอย่างใจเย็น ประเมินความเร่งด่วน หากใช้เวลาไม่นานก็ช่วยชี้แนะทันที หรือหากต้องใช้เวลานานให้แจ้งเวลาที่สะดวกช่วยหลังจากส่งงานด่วนเสร็จ",
-      "ค. ทิ้งงานสำคัญของตัวเองทันทีเพื่อไปช่วยงานของเพื่อนให้เสร็จก่อน เพราะกลัวเพื่อนโกรธ",
-      "ง. บอกให้เพื่อนไปขอความช่วยเหลือจากคนอื่นแทนโดยไม่อธิบายเหตุผล",
+      "ก. รีบแจ้งจุดผิด ส่งฉบับแก้ไข และทบทวนขั้นตอนตรวจเพื่อป้องกันซ้ำ",
+      "ข. แก้ไฟล์ที่แชร์ไว้เงียบ ๆ โดยไม่แจ้งผู้ที่ได้รับฉบับเดิม",
+      "ค. ขอหัวหน้าช่วยแจ้งและแก้ไขกับลูกค้า แต่ยังไม่ทบทวนสาเหตุ",
+      "ง. รอให้ลูกค้าถามก่อน แล้วจึงอธิบายว่าข้อมูลผิดตรงไหน",
     ],
     optionsEn: [
-      "A. Immediately refuse in a stern tone because your own work is also very urgent.",
-      "B. Calmly listen and assess urgency; if quick, give immediate guidance, or if time-consuming, specify when you can help after submitting your urgent task.",
-      "C. Immediately abandon your own critical task to help your friend first, out of fear that they will be upset.",
-      "D. Tell the colleague to ask someone else without providing any explanation.",
+      "A. Promptly notify them of the error, send the revised version, and review checking procedures to prevent recurrence.",
+      "B. Quietly edit the shared file without informing those who received the original version.",
+      "C. Ask your manager to notify and correct it with the client, but not yet review the root cause.",
+      "D. Wait until the client asks, and only then explain where the data was incorrect.",
     ],
-    ans: 1,
-    reason: "วัดความเห็นอกเห็นใจผู้อื่นควบคู่กับการจัดลำดับความสำคัญ (Empathy & Prioritization)",
-    reasonEn: "Measures empathy balanced with effective time and priority management.",
-  },
-  {
-    category: "การตระหนักรู้ในตนเองและการจัดการความเครียด",
-    categoryEn: "Self-Awareness & Stress Management",
-    q: "5. เมื่อคุณรู้สึกเครียดสะสมหรือเหนื่อยล้าจากการทำงานหนักติดต่อกันหลายวัน คุณมักจะจัดการกับอารมณ์ของตัวเองอย่างไร?",
-    qEn: "5. When experiencing accumulated stress or fatigue from intense work over several days, how do you manage your emotions?",
-    options: [
-      "ก. ระบายความหงุดหงิดใส่คนรอบข้างเพื่อให้รู้สึกโล่งขึ้น",
-      "ข. เก็บกดความรู้สึกไว้คนเดียวและฝืนทำงานหนักต่อไปโดยไม่พัก",
-      "ค. สังเกตอารมณ์ตัวเอง หาเวลาพักเบรกสั้นๆ เพื่อผ่อนคลาย และจัดลำดับงานใหม่หรือปรึกษาหัวหน้าหากงานเกินกำลัง",
-      "ง. ลางานกะทันหันโดยไม่แจ้งล่วงหน้าเพื่อหนีไปพักผ่อน",
-    ],
-    optionsEn: [
-      "A. Vent frustration onto people around you to relieve tension.",
-      "B. Suppress your feelings and force yourself to keep pushing without taking a break.",
-      "C. Notice your emotional state, take short relaxation breaks, re-prioritise tasks, and consult your manager if overloaded.",
-      "D. Take sudden leave without advance notice to escape and rest.",
-    ],
-    ans: 2,
-    reason: "วัดการตระหนักรู้ในตนเองและการจัดการความเครียด (Self-Awareness & Stress Management)",
-    reasonEn: "Measures emotional self-awareness and healthy stress management techniques.",
-  },
-  {
-    category: "ความเห็นอกเห็นใจและทักษะทางสังคม",
-    categoryEn: "Empathy & Social Skill",
-    q: "6. หากคุณสังเกตเห็นว่าเพื่อนร่วมงานที่เคยนั่งคุยสนุกสนาน ดูซึมเศร้า ทำงานผิดพลาดบ่อยขึ้น และแยกตัวออกจากกลุ่ม คุณจะทำอย่างไร?",
-    qEn: "6. If you notice a colleague who used to be cheerful has become withdrawn, makes frequent mistakes, and isolates from the team, what would you do?",
-    options: [
-      "ก. ไม่เข้าไปยุ่งเพราะเป็นเรื่องส่วนตัว และตั้งใจทำงานของตัวเองต่อไป",
-      "ข. นำเรื่องนี้ไปพูดคุยกับเพื่อนคนอื่นๆ ในแผนกว่าเกิดอะไรขึ้นกับเขา",
-      "ค. แจ้งหัวหน้างานทันทีว่าเพื่อนคนนี้กำลังทำให้ประสิทธิภาพของทีมลดลง",
-      "ง. หาจังหวะที่เหมาะสมเข้าไปถามไถ่ด้วยความห่วงใยเป็นการส่วนตัว และรับฟังโดยไม่ตัดสิน",
-    ],
-    optionsEn: [
-      "A. Mind your own business as it is personal, and focus solely on your own work.",
-      "B. Gossip about it with other colleagues in the department to guess what is wrong.",
-      "C. Report immediately to the manager that this colleague is dragging down team productivity.",
-      "D. Find an appropriate moment to check in privately with genuine care, listening without judgment.",
-    ],
-    ans: 3,
-    reason: "วัดความเห็นอกเห็นใจและทักษะทางสังคม (Empathy & Social Skill)",
-    reasonEn: "Measures interpersonal sensitivity, empathy, and constructive social skills.",
-  },
-  {
-    category: "ความรับผิดชอบและการฟื้นตัวจากความผิดพลาด",
-    categoryEn: "Accountability & Resilience",
-    q: "7. หากคุณตรวจสอบพบว่าตนเองทำงานชิ้นสำคัญผิดพลาด และส่งผลกระทบต่อกำหนดการของทีม คุณจะทำอย่างไรเป็นอันดับแรก?",
-    qEn: "7. If you discover that you made a mistake on an important task that affects the team's schedule, what is the very first thing you do?",
-    options: [
-      "ก. รีบแจ้งหัวหน้าและทีมตามความจริงทันที พร้อมเตรียมแนวทางแก้ไขเบื้องต้นไปเสนอด้วย",
-      "ข. พยายามปกปิดความผิดพลาดและแอบแก้ไขด้วยตัวเองเงียบๆ จนกว่าจะมีคนจับได้",
-      "ค. หาเหตุผลหรือปัจจัยแวดล้อมอื่นๆ มาอ้างเพื่อลดทอนความผิดของตัวเอง",
-      "ง. รอให้หัวหน้าเป็นคนตรวจเจอเอง แล้วค่อยกล่าวคำขอโทษ",
-    ],
-    optionsEn: [
-      "A. Promptly inform your manager and team with full transparency, bringing proposed solutions and recovery steps.",
-      "B. Try to cover up the mistake and quietly fix it yourself until someone catches on.",
-      "C. Find external excuses or environmental factors to downplay your responsibility.",
-      "D. Wait for the manager to spot it themselves, then offer an apology.",
-    ],
+    scores: [3, 1, 2, 0],
+    bestChoice: 0,
     ans: 0,
-    reason: "วัดความรับผิดชอบและการฟื้นตัวจากความผิดพลาด (Accountability & Resilience)",
-    reasonEn: "Measures personal accountability, transparency, and problem recovery resilience.",
+    reason: "ยอมรับความกังวลแต่ยังจัดการผลกระทบและป้องกันความผิดซ้ำ (คำถามสัมภาษณ์ต่อ: ถามถึงเหตุการณ์ที่ยอมรับความผิดพลาดและสิ่งที่เปลี่ยนหลังจากนั้น)",
+    reasonEn: "Acknowledge anxiety while actively mitigating impact and preventing recurring mistakes. (Follow-up: Ask for an incident where they admitted a mistake and what changed afterwards).",
   },
   {
-    category: "ความยืดหยุ่นและทัศนคติเชิงบวก",
-    categoryEn: "Flexibility & Growth Mindset",
-    q: "8. เมื่อบริษัทประกาศนำระบบซอฟต์แวร์ใหม่เข้ามาใช้ ซึ่งทำให้คุณต้องเปลี่ยนวิธีการทำงานเดิมที่คุ้นเคยทั้งหมด คุณมีมุมมองและท่าทีอย่างไร?",
-    qEn: "8. When the company introduces a new software system that requires completely changing your familiar workflows, what is your mindset and approach?",
+    category: "เข้าใจผู้อื่นและสื่อสาร",
+    categoryEn: "Empathy & Communication",
+    q: "4. ลูกค้าร้องเรียนว่าสินค้ามาช้า คุณยังไม่ทราบเวลาส่งที่ยืนยันได้ และไม่มีอำนาจรับปากวันส่งใหม่ คุณควรทำอย่างไร?",
+    qEn: "4. A customer complains that an order is delayed. You do not yet have a confirmed delivery time and lack authority to promise a new date. What should you do?",
     options: [
-      "ก. รู้สึกต่อต้านและพยายามใช้วิธีเดิมต่อไปให้นานที่สุดเท่าที่จะทำได้",
-      "ข. บ่นกับเพื่อนร่วมงานว่าระบบใหม่ยุ่งยากและเสียเวลาทำงาน",
-      "ค. เปิดใจเรียนรู้ระบบใหม่ ตั้งใจฝึกฝน และมองว่าเป็นโอกาสในการพัฒนาทักษะและเพิ่มประสิทธิภาพระยะยาว",
-      "ง. รอให้คนอื่นเรียนรู้จนคล่องก่อน แล้วค่อยให้เขามาช่วยทำส่วนของตัวเอง",
+      "ก. รับปากว่าจะส่งพรุ่งนี้ เพื่อให้ลูกค้ารู้สึกสบายใจก่อน",
+      "ข. ส่งเบอร์คลังสินค้าให้ลูกค้าตามเรื่องเอง โดยไม่ติดตามต่อ",
+      "ค. รับฟังผลกระทบ ตรวจสถานะ และตกลงเวลาที่จะกลับมาอัปเดต",
+      "ง. ขอโทษและเริ่มตรวจสถานะ แต่ยังไม่บอกว่าจะอัปเดตเมื่อใด",
     ],
     optionsEn: [
-      "A. Resist the change and try to stick with the old method as long as possible.",
-      "B. Complain to colleagues that the new system is complicated and wastes working time.",
-      "C. Keep an open mind, practice diligently, and view it as an opportunity to upskill and enhance long-term efficiency.",
-      "D. Wait until others master it, then rely on them to do your portion.",
+      "A. Promise that it will be delivered tomorrow just to make the customer feel reassured first.",
+      "B. Give the warehouse phone number to the customer to follow up on their own, without further tracking.",
+      "C. Listen to their impact, check the status, and agree on a specific time to follow up with an update.",
+      "D. Apologise and start checking status, but without stating when you will provide an update.",
     ],
+    scores: [0, 1, 3, 2],
+    bestChoice: 2,
     ans: 2,
-    reason: "วัดความยืดหยุ่นและทัศนคติเชิงบวกต่อการเปลี่ยนแปลง (Flexibility & Growth Mindset)",
-    reasonEn: "Measures adaptability, willingness to learn, and growth mindset towards organizational change.",
+    reason: "รับฟังความเดือดร้อนและให้ความคืบหน้าที่ทำได้จริง (คำถามสัมภาษณ์ต่อ: ถามว่าจะสื่อสารอย่างไรเมื่อยังตอบวันส่งที่แน่นอนไม่ได้)",
+    reasonEn: "Listen empathetically to their hardship and provide actionable, realistic progress. (Follow-up: Ask how they communicate when a definite delivery date cannot yet be given).",
   },
   {
-    category: "ทักษะการสื่อสารเชิงบวก",
-    categoryEn: "Effective Communication",
-    q: "9. หากลูกค้า (หรือผู้ประสานงานต่างแผนก) ขอให้คุณช่วยทำงานบางอย่างที่อยู่นอกเหนือขอบเขตงานและขัดต่อระเบียบของบริษัท คุณจะสื่อสารอย่างไร?",
-    qEn: "9. If a customer or a coordinator from another department asks you to perform an out-of-scope task that violates company policy, how do you communicate?",
+    category: "เข้าใจผู้อื่นและสื่อสาร",
+    categoryEn: "Empathy & Communication",
+    q: "5. เพื่อนร่วมงานเงียบลงและส่งงานช้ากว่าปกติหนึ่งครั้ง คุณยังไม่รู้สาเหตุ และงานส่วนถัดไปต้องรอเขา คุณควรเริ่มอย่างไร?",
+    qEn: "5. A colleague becomes quiet and submits work later than usual once. You don't know the cause, and the next step depends on them. How should you begin?",
     options: [
-      "ก. ปฏิเสธทันทีอย่างเด็ดขาดว่า \"ทำไม่ได้เพราะผิดกฎบริษัท\" แล้ววางสายหรือเดินหนี",
-      "ข. แสดงความเข้าใจในความต้องการของอีกฝ่าย อธิบายเหตุผลด้านระเบียบอย่างสุภาพ และเสนอทางเลือกอื่นที่ถูกต้องตามขั้นตอนให้แทน",
-      "ค. ยอมทำให้เป็นกรณีพิเศษเพราะเกรงใจและไม่อยากเสียความสัมพันธ์",
-      "ง. รับปากส่งๆ ไปก่อนเพื่อให้เขาสบายใจ แล้วค่อยหาข้ออ้างไม่ทำในภายหลัง",
+      "ก. คุยเป็นการส่วนตัว ถามอุปสรรค รับฟัง และตกลงเวลาติดตามงาน",
+      "ข. ขอหัวหน้าช่วยตรวจภาระงานของเพื่อน โดยยังไม่ได้คุยกับเพื่อน",
+      "ค. ส่งข้อความเร่งให้ส่งตามกำหนด โดยยังไม่ถามว่าติดขัดอะไร",
+      "ง. บอกทีมว่าเพื่อนไม่รับผิดชอบ เพื่อให้ทุกคนช่วยกันกดดัน",
     ],
     optionsEn: [
-      "A. Bluntly refuse saying \"Cannot do that, it violates company policy\" and hang up or walk away.",
-      "B. Acknowledge their need with understanding, politely explain policy reasons, and propose compliant alternative solutions.",
-      "C. Give in and do it as a special exception out of fear of damaging the relationship.",
-      "D. Agree insincerely to placate them in the moment, then find an excuse not to do it later.",
+      "A. Speak privately, inquire about obstacles, listen actively, and agree on a follow-up time.",
+      "B. Ask the manager to check the colleague's workload without speaking to the colleague first.",
+      "C. Send an urgent reminder to submit on time without asking what difficulties they face.",
+      "D. Tell the team that the colleague is irresponsible so everyone can apply pressure together.",
     ],
-    ans: 1,
-    reason: "วัดทักษะการสื่อสารเชิงบวกและการรักษาน้ำใจ (Effective Communication)",
-    reasonEn: "Measures assertive communication, tact, and solution-oriented boundary setting.",
+    scores: [3, 2, 1, 0],
+    bestChoice: 0,
+    ans: 0,
+    reason: "ตรวจสอบสาเหตุโดยไม่ด่วนตัดสิน พร้อมคงความชัดเจนเรื่องงาน (คำถามสัมภาษณ์ต่อ: ถามว่าจะทำอย่างไรหากรับฟังแล้วแต่เพื่อนยังส่งงานล่าช้า)",
+    reasonEn: "Investigate root causes without jumping to conclusions while maintaining work clarity. (Follow-up: Ask what they would do if after listening, the colleague still delays submission).",
   },
   {
-    category: "แรงจูงใจภายในและวุฒิภาวะทางอารมณ์",
-    categoryEn: "Intrinsic Motivation & Maturity",
-    q: "10. ในวันที่ทีมของคุณทำงานสำเร็จตามเป้าหมายใหญ่ แต่หัวหน้ากลับกล่าวชมเชยภาพรวมของทีมโดยไม่ได้เอ่ยชื่อคุณที่เป็นคนทำส่วนสำคัญ คุณจะรู้สึกและทำอย่างไร?",
-    qEn: "10. On the day your team achieves a major milestone, but your manager praises the team as a whole without mentioning you personally despite your key contribution, how do you feel and react?",
+    category: "เข้าใจผู้อื่นและสื่อสาร",
+    categoryEn: "Empathy & Communication",
+    q: "6. หัวหน้าสั่งงานที่ยังไม่ชัดเรื่องผลลัพธ์และวันส่ง หัวหน้าพร้อมให้ถาม คุณควรทำอย่างไร?",
+    qEn: "6. Your manager assigns a task where deliverables and deadlines are unclear, but the manager is open to questions. What should you do?",
     options: [
-      "ก. รู้สึกโกรธและพูดแทรกกลางวงประชุมว่าตัวเองเป็นคนทำงานชิ้นนี้เกือบทั้งหมด",
-      "ข. ร่วมยินดีกับความสำเร็จของทีมอย่างจริงใจ และภูมิใจในคุณค่าของงานที่ตนเองได้มีส่วนร่วมสร้างขึ้น",
-      "ค. หมดไฟในการทำงาน และตั้งใจว่างานหน้าจะทำแค่พอผ่านเพราะทำดีไปก็ไม่มีคนเห็น",
-      "ง. นำเรื่องนี้ไปนินทากับเพื่อนร่วมงานว่าหัวหน้าไม่ยุติธรรม",
+      "ก. ตีความเองและเริ่มทำทั้งหมดทันที เพื่อไม่เสียเวลาถาม",
+      "ข. ปฏิเสธการเริ่มงานจนกว่าจะได้คำสั่งเป็นเอกสารครบทุกเรื่อง",
+      "ค. ถามเพื่อนที่เคยทำแล้วเริ่มตามคำแนะนำ โดยยังไม่ยืนยันกับหัวหน้า",
+      "ง. ทวนเป้าหมาย ถามข้อมูลที่ขาด และยืนยันสิ่งส่งมอบกับกำหนดเวลา",
     ],
     optionsEn: [
-      "A. Feel enraged and interrupt the meeting to declare that you did almost all the work.",
-      "B. Sincerely celebrate the team's success and take internal pride in the meaningful impact of your contribution.",
-      "C. Lose all motivation and resolve to only do the bare minimum next time since effort goes unrecognized.",
-      "D. Complain and gossip behind the manager's back that they are unfair.",
+      "A. Interpret it yourself and start doing everything immediately to avoid wasting time asking.",
+      "B. Refuse to begin until complete written instructions are received for all aspects.",
+      "C. Ask a colleague who previously did it and follow their advice without confirming with the manager.",
+      "D. Clarify the goals, ask for missing information, and confirm deliverables and timeline.",
     ],
+    scores: [1, 0, 2, 3],
+    bestChoice: 3,
+    ans: 3,
+    reason: "ตรวจสอบความเข้าใจร่วมก่อนลงแรงทำงานที่อาจคลาดเคลื่อน (คำถามสัมภาษณ์ต่อ: ขอให้สาธิตประโยคทวนงานเมื่อคำสั่งยังไม่ชัดเจน)",
+    reasonEn: "Align shared understanding before investing effort into misaligned work. (Follow-up: Request a demonstration of how they clarify requirements when instructions are vague).",
+  },
+  {
+    category: "ร่วมงานและรับผิดชอบผลกระทบ",
+    categoryEn: "Collaboration & Accountability",
+    q: "7. คุณกับเพื่อนเสนอวิธีทำงานคนละแบบ ทั้งคู่ต้องการให้งานสำเร็จและยังมีเวลาตกลงกัน คุณควรทำอย่างไร?",
+    qEn: "7. You and a colleague propose different approaches to a task. Both want the project to succeed and there is still time to reach an agreement. What should you do?",
+    options: [
+      "ก. ให้ทีมโหวตเลือกวิธีหนึ่งทันที โดยไม่ต้องคุยเหตุผลเพิ่มเติม",
+      "ข. เปรียบเทียบข้อมูลตามเกณฑ์เดียวกัน แล้วตกลงวิธีหรือทดลองสั้น ๆ",
+      "ค. สรุปทางเลือกและเหตุผลให้หัวหน้าช่วยตัดสินแทนทั้งสองฝ่าย",
+      "ง. ยืนยันใช้วิธีของคุณต่อไป เพราะคุณเป็นคนเริ่มงานชิ้นนี้",
+    ],
+    optionsEn: [
+      "A. Have the team vote immediately to choose one method without further discussing rationale.",
+      "B. Compare data against shared criteria, then agree on a method or run a brief trial.",
+      "C. Summarize options and rationale for the manager to decide on behalf of both sides.",
+      "D. Insist on using your method because you initiated this task.",
+    ],
+    scores: [1, 3, 2, 0],
+    bestChoice: 1,
     ans: 1,
-    reason: "วัดแรงจูงใจภายในตนเองและวุฒิภาวะทางอารมณ์ (Intrinsic Motivation & Maturity)",
-    reasonEn: "Measures intrinsic motivation, maturity, and genuine team spirit over ego gratification.",
+    reason: "ใช้เกณฑ์งานร่วมกันแทนการเอาชนะ และเปิดพื้นที่ให้ตรวจสอบวิธี (คำถามสัมภาษณ์ต่อ: ถามว่าจะทำอย่างไรหากข้อมูลทดลองสนับสนุนวิธีของเพื่อน)",
+    reasonEn: "Use objective work criteria rather than competing to win, allowing methods to be tested. (Follow-up: Ask what they would do if trial data supported their colleague's method).",
+  },
+  {
+    category: "ร่วมงานและรับผิดชอบผลกระทบ",
+    categoryEn: "Collaboration & Accountability",
+    q: "8. คุณรับช่วงงานที่ข้อมูลไม่ครบ ต้องส่งให้ลูกค้าในอีก 2 ชั่วโมง และเจ้าของงานเดิมยังติดต่อได้ คุณควรเริ่มอย่างไร?",
+    qEn: "8. You take over a task with incomplete information that must be delivered to a client in 2 hours, and the original owner is still reachable. How should you begin?",
+    options: [
+      "ก. รับไปทำให้เสร็จคนเดียวโดยไม่แจ้งข้อมูลที่ขาดหรือความเสี่ยง",
+      "ข. ส่งงานกลับทันที แล้วรอเจ้าของเดิมแก้ทั้งหมดก่อนจึงเริ่ม",
+      "ค. ระบุข้อมูลที่ขาด ติดต่อเจ้าของเดิม และตกลงผู้รับผิดชอบกับเวลา",
+      "ง. สรุปข้อมูลที่ขาดให้หัวหน้าช่วยประสาน โดยยังไม่คุยกับเจ้าของเดิม",
+    ],
+    optionsEn: [
+      "A. Take on completing it alone without highlighting missing details or risks.",
+      "B. Reject and send the task back immediately, waiting for the original owner to fix everything before starting.",
+      "C. Identify missing information, contact the original owner, and agree on responsibilities and timeline.",
+      "D. Summarize missing information for the manager to coordinate without speaking to the original owner first.",
+    ],
+    scores: [1, 0, 3, 2],
+    bestChoice: 2,
+    ans: 2,
+    reason: "ประสานกับผู้มีข้อมูลโดยตรงและกำหนดการส่งต่องานให้ชัด (คำถามสัมภาษณ์ต่อ: ถามถึงวิธีส่งต่องานที่ทำให้ผู้รับคนถัดไปเริ่มต่อได้จริง)",
+    reasonEn: "Coordinate directly with the source of information and establish clear handover agreements. (Follow-up: Ask how they ensure work handovers enable the next recipient to execute smoothly).",
+  },
+  {
+    category: "ร่วมงานและรับผิดชอบผลกระทบ",
+    categoryEn: "Collaboration & Accountability",
+    q: "9. คุณประเมินแล้วว่างานที่ครบกำหนดพรุ่งนี้มีโอกาสไม่ทัน และจะกระทบทีมอื่น คุณควรทำอย่างไร?",
+    qEn: "9. You evaluate that a task due tomorrow is likely to miss the deadline and will impact other teams. What should you do?",
+    options: [
+      "ก. ทำต่อก่อนจนใกล้กำหนด แล้วค่อยแจ้งหากยังไม่เสร็จ",
+      "ข. บอกว่าทีมอื่นส่งข้อมูลช้า ทั้งที่ยังไม่ได้ตรวจสอบสาเหตุ",
+      "ค. แจ้งหัวหน้าถึงความเสี่ยงและขอความช่วยเหลือ แต่ยังไม่เสนอทางเลือก",
+      "ง. แจ้งล่วงหน้า อธิบายผลกระทบ เสนอทางเลือก และตกลงจุดติดตาม",
+    ],
+    optionsEn: [
+      "A. Continue working until close to the deadline, and only notify if it is not done.",
+      "B. Claim that other teams provided delayed inputs without having verified the cause.",
+      "C. Alert the manager to the risk and ask for help, but without proposing any alternatives.",
+      "D. Give advance notice, explain impacts, propose solution options, and agree on checkpoints.",
+    ],
+    scores: [1, 0, 2, 3],
+    bestChoice: 3,
+    ans: 3,
+    reason: "รับผิดชอบต่อผลกระทบและช่วยให้ทีมเลือกทางแก้ได้ทัน (คำถามสัมภาษณ์ต่อ: ถามว่าตอนแจ้งความล่าช้าจะนำข้อมูลและทางเลือกใดไปด้วย)",
+    reasonEn: "Take ownership of consequences and enable the team to select viable recovery plans in time. (Follow-up: Ask what specific data and alternatives they would bring when flagging a delay).",
+  },
+  {
+    category: "ปรับตัวและรับข้อเสนอแนะ",
+    categoryEn: "Adaptability & Feedback Receptiveness",
+    q: "10. หน่วยงานเปลี่ยนขั้นตอนทำงานและกำหนดให้เริ่มใช้สัปดาห์นี้ คุณยังไม่เข้าใจบางจุด และมีผู้สอนพร้อมช่วย คุณควรทำอย่างไร?",
+    qEn: "10. The company introduces new operating procedures effective this week. You don't understand certain steps, and a trainer is available to assist. What should you do?",
+    options: [
+      "ก. ทำตามที่พอจำได้โดยไม่ถาม เพื่อไม่ให้ดูว่าเรียนรู้ช้า",
+      "ข. ถามจุดที่ไม่เข้าใจ ฝึกกับตัวอย่าง และตรวจความถูกต้องก่อนใช้จริง",
+      "ค. ใช้ขั้นตอนเดิมต่อไป โดยยังไม่แจ้งว่าคุณทำขั้นตอนใหม่ไม่ได้",
+      "ง. ขอเพื่อนช่วยทำครั้งแรกให้เสร็จก่อน แล้วค่อยเรียนรู้ภายหลัง",
+    ],
+    optionsEn: [
+      "A. Follow what you remember without asking to avoid looking like a slow learner.",
+      "B. Ask about unclear points, practice with examples, and verify accuracy before live execution.",
+      "C. Continue using the legacy workflow without notifying anyone that you cannot perform the new one.",
+      "D. Ask a colleague to do it for you the first time and learn later.",
+    ],
+    scores: [1, 3, 0, 2],
+    bestChoice: 1,
+    ans: 1,
+    reason: "เรียนรู้เชิงรุกและตรวจความเข้าใจให้ใช้ขั้นตอนใหม่ได้ถูกต้อง (คำถามสัมภาษณ์ต่อ: ถามถึงตัวอย่างการเรียนรู้งานหรือระบบใหม่และวิธีตรวจว่าทำถูก)",
+    reasonEn: "Learn proactively and validate comprehension to execute new workflows accurately. (Follow-up: Ask for an example of learning a new system and how they verified they did it correctly).",
+  },
+  {
+    category: "ปรับตัวและรับข้อเสนอแนะ",
+    categoryEn: "Adaptability & Feedback Receptiveness",
+    q: "11. หัวหน้าให้ข้อเสนอแนะว่ารายงานของคุณอ่านยาก และพร้อมอธิบายเพิ่มเติม คุณควรตอบอย่างไร?",
+    qEn: "11. Your manager feedback states that your report is difficult to read and is ready to explain further. How should you respond?",
+    options: [
+      "ก. รีบปรับรูปแบบตามที่คาดว่าหัวหน้าชอบ โดยยังไม่ถามจุดที่มีปัญหา",
+      "ข. โต้แย้งว่ารูปแบบเดิมดีอยู่แล้ว โดยไม่อ่านข้อเสนอแนะให้ครบ",
+      "ค. ขอตัวอย่างจุดที่ควรแก้ ทวนความเข้าใจ แล้วปรับและตรวจผล",
+      "ง. รับฟังและขอบคุณ แต่ยังไม่วางแผนว่าจะเปลี่ยนส่วนใดของงาน",
+    ],
+    optionsEn: [
+      "A. Quickly adjust formatting to what you guess the manager likes without asking where the issues are.",
+      "B. Argue that the existing format is already good without reading the full feedback.",
+      "C. Request examples of areas needing improvement, clarify understanding, adjust, and review results.",
+      "D. Listen and say thank you, but without planning which parts of the report to change.",
+    ],
+    scores: [2, 0, 3, 1],
+    bestChoice: 2,
+    ans: 2,
+    reason: "เปลี่ยนข้อเสนอแนะเป็นการปรับงานที่ตรวจสอบผลได้ (คำถามสัมภาษณ์ต่อ: ถามถึงข้อเสนอแนะที่เคยนำไปใช้และหลักฐานว่างานดีขึ้น)",
+    reasonEn: "Transform constructive feedback into measurable work enhancements. (Follow-up: Ask about feedback they incorporated in the past and evidence that work improved).",
+  },
+  {
+    category: "ปรับตัวและรับข้อเสนอแนะ",
+    categoryEn: "Adaptability & Feedback Receptiveness",
+    q: "12. หัวหน้าสองคนมอบหมายงานที่ต้องเสร็จเวลาเดียวกัน คุณตรวจแล้วว่าทำทั้งสองงานไม่ทัน และยังติดต่อหัวหน้าทั้งคู่ได้ คุณควรทำอย่างไร?",
+    qEn: "12. Two managers assign tasks due at the same time. You assess that you cannot complete both simultaneously, and both managers are reachable. What should you do?",
+    options: [
+      "ก. สรุปเวลาและผลกระทบ ขอให้ตกลงลำดับความสำคัญ แล้วแจ้งแผนร่วมกัน",
+      "ข. เลือกงานของหัวหน้าที่อาวุโสกว่า โดยยังไม่แจ้งอีกคน",
+      "ค. รับปากว่าทำทันทั้งคู่ แล้วพยายามเร่งโดยไม่แจ้งข้อจำกัด",
+      "ง. แจ้งทั้งคู่ว่าทำไม่ทันและรอคำสั่ง โดยยังไม่เสนอทางเลือก",
+    ],
+    optionsEn: [
+      "A. Summarize time constraints and impacts, request alignment on priority, and communicate the shared plan.",
+      "B. Prioritize the senior manager's task without informing the other manager.",
+      "C. Promise to finish both on time and rush without disclosing limitations.",
+      "D. Tell both you cannot finish on time and wait for orders without offering options.",
+    ],
+    scores: [3, 1, 0, 2],
+    bestChoice: 0,
+    ans: 0,
+    reason: "ทำข้อจำกัดให้ชัดและร่วมจัดลำดับงานแทนการรับปากเกินจริง (คำถามสัมภาษณ์ต่อ: ขอให้ยกตัวอย่างทางเลือกเมื่องานเร่งสองงานชนกัน)",
+    reasonEn: "Clarify constraints and collaboratively prioritize rather than making unrealistic promises. (Follow-up: Ask for an example of alternatives proposed when two urgent tasks conflicted).",
   },
 ];
 
@@ -870,7 +1044,7 @@ function renderIqQuestion() {
   if (catPill) catPill.textContent = isEn ? (q.categoryEn || q.category) : q.category;
 
   const qText = $("iqQuestionText");
-  if (qText) qText.textContent = isEn ? (q.qEn || q.q) : q.q;
+  if (qText) qText.innerHTML = formatQuestionText_(isEn ? (q.qEn || q.q) : q.q);
 
   const box = $("iqOptionsContainer");
   if (!box) return;
@@ -929,13 +1103,13 @@ function finishIqAssessment() {
     sessionStorage.setItem("tera_iqScore", String(totalIq));
   } catch (e) {}
 
-  let hrStatus = "ต้องพัฒนา";
-  if (totalIq >= 8) {
-    hrStatus = "ยอดเยี่ยม (เชาวน์ปัญญาและตรรกะระดับสูง)";
-  } else if (totalIq >= 6) {
-    hrStatus = "ดีมาก (ทักษะตรรกะและการวิเคราะห์ดี)";
-  } else if (totalIq >= 4) {
-    hrStatus = "ปานกลาง (พอใช้)";
+  let hrStatus = "ต้องพัฒนา (คะแนนต่ำกว่า 8 ข้อ)";
+  if (totalIq >= 16) {
+    hrStatus = "ยอดเยี่ยม (16-20 ข้อ - ตรรกะและเหตุผลระดับสูง)";
+  } else if (totalIq >= 12) {
+    hrStatus = "ดีมาก (12-15 ข้อ - ทักษะตรรกะและการคำนวณดี)";
+  } else if (totalIq >= 8) {
+    hrStatus = "ปานกลาง (8-11 ข้อ - พอใช้)";
   }
 
   // ส่งผลทดสอบ IQ เข้าสู่ Google Sheets (แท็บ "IQ")
@@ -967,7 +1141,7 @@ function renderEqQuestion() {
   if (catPill) catPill.textContent = isEn ? (q.categoryEn || q.category) : q.category;
 
   const qText = $("eqQuestionText");
-  if (qText) qText.textContent = isEn ? (q.qEn || q.q) : q.q;
+  if (qText) qText.innerHTML = formatQuestionText_(isEn ? (q.qEn || q.q) : q.q);
 
   const box = $("eqOptionsContainer");
   if (!box) return;
@@ -993,7 +1167,8 @@ function pickEqAnswer(idx) {
   const buttons = [...box.querySelectorAll(".option")];
   if (buttons.some((b) => b.disabled)) return;
 
-  const isCorrect = (idx === q.ans);
+  const score = Array.isArray(q.scores) ? (q.scores[idx] ?? 0) : (idx === q.ans ? 1 : 0);
+  const isBest = (q.bestChoice !== undefined) ? (idx === q.bestChoice) : (idx === q.ans);
   const isEn = currentLang === "en";
   const selectedText = isEn ? (q.optionsEn[idx] || q.options[idx]) : q.options[idx];
 
@@ -1002,7 +1177,8 @@ function pickEqAnswer(idx) {
     question: q.q,
     selectedIndex: idx,
     text: selectedText,
-    isCorrect: isCorrect,
+    score: score,
+    isCorrect: isBest,
   });
 
   buttons.forEach((b) => (b.disabled = true));
@@ -1019,18 +1195,20 @@ function pickEqAnswer(idx) {
 }
 
 function finishEqAssessment() {
-  const totalEq = appData.eqAnswers.filter((a) => a.isCorrect).length;
+  const totalEq = appData.eqAnswers.reduce((sum, a) => sum + Number(a.score || 0), 0);
   appData.eqScore = totalEq;
 
   try {
     sessionStorage.setItem("tera_eqScore", String(totalEq));
   } catch (e) {}
 
-  let hrStatus = "ต่ำกว่า 5 คะแนน (ควรสัมภาษณ์เชิงลึกเพิ่มเติม)";
-  if (totalEq >= 8) {
-    hrStatus = "8-10 คะแนน (ความฉลาดทางอารมณ์สูงมาก มีวุฒิภาวะในการทำงานเป็นทีม)";
-  } else if (totalEq >= 5) {
-    hrStatus = "5-7 คะแนน (ความฉลาดทางอารมณ์ปานกลาง ทำงานร่วมกับผู้อื่นได้ตามปกติ)";
+  let hrStatus = "ต่ำกว่า 18 คะแนน (ควรสอบถามพฤติกรรมเพิ่มเติมในการสัมภาษณ์)";
+  if (totalEq >= 30) {
+    hrStatus = "30-36 คะแนน (จัดการปัญหาและผลกระทบได้ดี วุฒิภาวะการทำงานสูง)";
+  } else if (totalEq >= 24) {
+    hrStatus = "24-29 คะแนน (ตอบสนองเหมาะสม มีวุฒิภาวะ มีบางด้านที่พัฒนาต่อได้)";
+  } else if (totalEq >= 18) {
+    hrStatus = "18-23 คะแนน (ระดับปานกลาง มีแนวทางแก้เฉพาะหน้า)";
   }
 
   // ส่งผลทดสอบ EQ เข้าสู่ Google Sheets (แท็บ "EQ")
@@ -1084,6 +1262,13 @@ function renderExamPicker_(preScore, iqScore, eqScore) {
   const eqIconSvg = `<span class="status-icon blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span>`;
   const docIconSvg = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f1c40f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:10px; flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
 
+  const doneBadge = `
+    <span class="status-badge-done">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>${currentLang === "en" ? "Completed" : "เรียบร้อย"}</span>
+    </span>
+  `;
+
   const buttonsHtml = EXAM_CHOICES.map((x) => {
     const displayLabel = (currentLang === "en" && x.labelEn) ? x.labelEn : x.label;
     return `
@@ -1101,26 +1286,37 @@ function renderExamPicker_(preScore, iqScore, eqScore) {
           ${checkIconSvg}
           <span style="color:#2ecc71;">${t.examSaved}</span>
         </div>
+        ${doneBadge}
       </div>
       <div class="status-row">
         <div class="status-left">
           ${brainIconSvg}
           <span style="color:#f1c40f;">${t.iqSaved}</span>
         </div>
-        <span style="color:#fff; background:rgba(241, 196, 15, 0.2); border:1px solid rgba(241, 196, 15, 0.4); padding:2px 10px; border-radius:8px; font-weight:bold; font-size:0.9rem;">${finalIqScore}/10</span>
+        ${doneBadge}
       </div>
       <div class="status-row">
         <div class="status-left">
           ${eqIconSvg}
           <span style="color:#5dade2;">${t.eqSaved}</span>
         </div>
-        <span style="color:#fff; background:rgba(52, 152, 219, 0.2); border:1px solid rgba(52, 152, 219, 0.4); padding:2px 10px; border-radius:8px; font-weight:bold; font-size:0.9rem;">${finalEqScore}/10</span>
+        ${doneBadge}
       </div>
     </div>
-    <div style="line-height:1.65; margin-bottom:14px; text-align:center;">
-      <strong style="font-size:1.1rem; color:#fff;">${t.examPickTitle}</strong><br/>
-      <span style="opacity:.85; font-size:0.92rem;">${t.examPickDesc}</span>
+
+    <div style="margin: 22px 0 16px 0; text-align: center;">
+      <div class="next-step-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span>${currentLang === "en" ? "Next Step" : "ขั้นตอนถัดไป"}</span>
+      </div>
+      <h3 style="font-size:1.25rem; font-weight:700; color:#fff; margin:4px 0 6px 0; letter-spacing:-0.2px;">
+        ${t.examPickTitle}
+      </h3>
+      <p style="opacity:.85; font-size:0.92rem; margin:0; color:#cbd5e1; line-height:1.5;">
+        ${t.examPickDesc}
+      </p>
     </div>
+
     <div id="examPickerBox" style="display:grid; gap:10px;">
       ${buttonsHtml}
     </div>
@@ -1157,6 +1353,18 @@ function escapeHtml_(s) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+function formatQuestionText_(raw) {
+  if (!raw) return "";
+  const parts = String(raw).split("\n");
+  if (parts.length <= 1) {
+    return escapeHtml_(raw);
+  }
+  const main = escapeHtml_(parts[0]);
+  const sub = escapeHtml_(parts.slice(1).join("\n"));
+  return `${main}<span class="question-subdata">${sub}</span>`;
+}
+
 
 /* ---------- Sheet Submissions ---------- */
 async function submitToSheet(totalScore, hrStatus) {
@@ -1209,12 +1417,12 @@ async function submitIqToSheet(totalScore, hrStatus) {
       channel: appData.profile.channel || "",
       totalScore: String(totalScore),
       hrStatus: hrStatus,
-      answersCount: "10",
+      answersCount: String(iqQuestions.length),
       userAgent: navigator.userAgent,
       pageUrl: window.location.href,
     };
 
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= iqQuestions.length; i++) {
       const ans = appData.iqAnswers[i - 1];
       const q = iqQuestions[i - 1];
       payload[`q${i}_title`] = q ? q.q : "";
@@ -1247,18 +1455,18 @@ async function submitEqToSheet(totalScore, hrStatus) {
       channel: appData.profile.channel || "",
       totalScore: String(totalScore),
       hrStatus: hrStatus,
-      answersCount: "10",
+      answersCount: String(eqQuestions.length),
       userAgent: navigator.userAgent,
       pageUrl: window.location.href,
     };
 
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= eqQuestions.length; i++) {
       const ans = appData.eqAnswers[i - 1];
       const q = eqQuestions[i - 1];
       payload[`q${i}_title`] = q ? q.q : "";
       payload[`q${i}_category`] = q ? q.category : "";
       payload[`q${i}_text`] = ans ? ans.text : "";
-      payload[`q${i}_score`] = ans ? (ans.isCorrect ? "1" : "0") : "0";
+      payload[`q${i}_score`] = ans ? String(ans.score !== undefined ? ans.score : (ans.isCorrect ? "1" : "0")) : "0";
     }
 
     const body = new URLSearchParams();
@@ -1318,7 +1526,21 @@ window.goHome = function () {
 /* ---------- Initialization on load ---------- */
 const params = new URLSearchParams(window.location.search);
 const uuidParam = params.get("uuid");
-if (uuidParam) {
+const pageParam = params.get("page");
+const iqQuestionParam = params.get("iqQuestion") || params.get("q");
+const eqQuestionParam = params.get("eqQuestion");
+
+if (pageParam === "iqAssessment" || iqQuestionParam) {
+  const qNum = parseInt(iqQuestionParam || "18", 10);
+  appData.currentIqQuestion = Math.max(0, Math.min(iqQuestions.length - 1, (isNaN(qNum) ? 18 : qNum) - 1));
+  showPage("iqAssessment");
+  renderIqQuestion();
+} else if (pageParam === "eqAssessment" || eqQuestionParam) {
+  const qNum = parseInt(eqQuestionParam || "1", 10);
+  appData.currentEqQuestion = Math.max(0, Math.min(eqQuestions.length - 1, (isNaN(qNum) ? 1 : qNum) - 1));
+  showPage("eqAssessment");
+  renderEqQuestion();
+} else if (uuidParam) {
   appData.uuid = uuidParam;
   appData.profile.name = params.get("name") || sessionStorage.getItem("tera_name") || "";
   const preScore = Number(params.get("preScore") || sessionStorage.getItem("tera_preScore") || 0);
@@ -1332,3 +1554,4 @@ if (uuidParam) {
 } else {
   showPage("landing");
 }
+

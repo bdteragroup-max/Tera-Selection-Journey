@@ -120,11 +120,15 @@
             <path d="M12 2v20"/>
           </svg>
         </div>
-        <h2 id="iqIntroTitle" style="color: #f1c40f; margin: 14px 0 28px; font-size: clamp(20px, 2.2vw, 28px);">
-          ส่วนที่ 2: แบบทดสอบความฉลาดทางเชาวน์ปัญญา (IQ Test)
+        <h2 id="iqIntroTitle" style="color: #f1c40f; margin: 14px 0 14px; font-size: clamp(20px, 2.2vw, 28px);">
+          ส่วนที่ 2: การคิดเชิงเหตุผล (IQ Test)
         </h2>
+        <p id="iqIntroDesc" style="color: rgba(255,255,255,0.85); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px;">
+          จำนวน 20 ข้อ (เวลา 25 นาที) • วัดทักษะรูปแบบตัวเลข การคำนวณ ตรรกะ และการวิเคราะห์เงื่อนไขข้อมูล<br/>
+          <span style="font-size: 0.85rem; opacity: 0.8;">* ทำด้วยตนเอง สามารถใช้กระดาษทดได้ (ไม่ใช้เครื่องคิดเลข)</span>
+        </p>
         <button class="btn btn-red btn-full" id="btnStartIq" type="button" style="font-size: 1.15rem;">
-          เริ่มทำแบบทดสอบ IQ
+          เริ่มทำแบบทดสอบ IQ (20 ข้อ)
         </button>
       </div>
     </div>
@@ -134,8 +138,8 @@
     <div class="bg-overlay dark"></div>
     <div class="page-inner">
       <div class="assess-top between">
-        <div class="pill pill-gold" id="iqCategoryPill">อนุกรมตัวเลข</div>
-        <div class="pill" id="iqProgressPill">1/10</div>
+        <div class="pill pill-gold" id="iqCategoryPill">รูปแบบตัวเลข</div>
+        <div class="pill" id="iqProgressPill">1/20</div>
       </div>
       <div class="assess-card">
         <h2 id="iqQuestionText" style="text-align: left; font-size: clamp(18px, 1.8vw, 24px); line-height: 1.6; color: #fff; margin-bottom: 20px;"></h2>
@@ -153,11 +157,15 @@
             <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
           </svg>
         </div>
-        <h2 id="eqIntroTitle" style="color: #f1c40f; margin: 14px 0 28px; font-size: clamp(20px, 2.2vw, 28px);">
-          ส่วนที่ 3: แบบทดสอบความฉลาดทางอารมณ์ในการทำงาน (EQ Test)
+        <h2 id="eqIntroTitle" style="color: #f1c40f; margin: 14px 0 14px; font-size: clamp(20px, 2.2vw, 28px);">
+          ส่วนที่ 3: สถานการณ์ EQ ในที่ทำงาน (EQ Test)
         </h2>
+        <p id="eqIntroDesc" style="color: rgba(255,255,255,0.85); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px;">
+          จำนวน 12 ข้อ (เวลา 20 นาที) • ประเมินการตัดสินใจ วุฒิภาวะทางอารมณ์ และการทำงานร่วมกับผู้อื่น<br/>
+          <span style="font-size: 0.85rem; opacity: 0.8;">* เลือกวิธีตอบสนองที่เหมาะสมที่สุดตามข้อมูลที่ให้ในแต่ละสถานการณ์</span>
+        </p>
         <button class="btn btn-red btn-full" id="btnStartEq" type="button" style="font-size: 1.15rem;">
-          เริ่มทำแบบทดสอบ EQ
+          เริ่มทำแบบทดสอบ EQ (12 ข้อ)
         </button>
       </div>
     </div>
@@ -167,8 +175,8 @@
     <div class="bg-overlay dark"></div>
     <div class="page-inner">
       <div class="assess-top between">
-        <div class="pill pill-gold" id="eqCategoryPill">Self-Regulation</div>
-        <div class="pill" id="eqProgressPill">1/10</div>
+        <div class="pill pill-gold" id="eqCategoryPill">ควบคุมอารมณ์และจัดการความกังวล</div>
+        <div class="pill" id="eqProgressPill">1/12</div>
       </div>
       <div class="assess-card">
         <h2 id="eqQuestionText" style="text-align: left; font-size: clamp(18px, 1.8vw, 24px); line-height: 1.6; color: #fff; margin-bottom: 20px;"></h2>
