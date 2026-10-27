@@ -1221,38 +1221,49 @@ function finishEqAssessment() {
 
 /* ---------- Departmental Exam Choices ---------- */
 const EXAM_CHOICES = [
+  /* 1. บัญชีและการเงิน (Accounting & Finance) */
   { label: "บัญชีทั่วไป", labelEn: "General Accounting", url: "exam-accounting.html" },
   { label: "บัญชีระดับหัวหน้า/ผู้จัดการ", labelEn: "Accounting Manager", url: "exam-accounting-manager.html" },
+  { label: "เจ้าหน้าที่การเงิน", labelEn: "Finance Officer", url: "exam-finance-officer.html" },
+
+  /* 2. งานบริหารทั่วไป และธุรการ (Admin & Operations) */
   { label: "เจ้าหน้าที่ธุรการทั่วไป", labelEn: "General Admin Officer", url: "exam-general-admin.html" },
+  { label: "ธุรการประสานงานโครงการ", labelEn: "Project Coordinator", url: "exam_coordinator.html" },
   { label: "แอดมินสาขา/ธุรการต่างจังหวัด", labelEn: "Upcountry Branch Admin", url: "exam-branch-admin.html" },
   { label: "ผู้จัดการสาขา", labelEn: "Branch Manager", url: "exam-branch-manager.html" },
-  { label: "BD / Developer", labelEn: "BD / Developer", url: "exam-bd.html" },
+
+  /* 3. ฝ่ายขาย พัฒนาธุรกิจ และการตลาด (Sales, BD & Marketing) */
+  { label: "Sales / AE / ฝ่ายขาย", labelEn: "Sales / AE", url: "exam-sales.html" },
   { label: "Telesales / โทรขาย", labelEn: "Telesales", url: "exam-telesales.html" },
   { label: "หัวหน้าทีม Telesales", labelEn: "Telesales Team Leader", url: "exam-telesales-team-leader.html" },
-  { label: "Sales / AE / ฝ่ายขาย", labelEn: "Sales / AE", url: "exam-sales.html" },
-  { label: "จัดซื้อ", labelEn: "Purchasing", url: "exam-purchasing.html" },
-  { label: "หัวหน้าฝ่ายจัดซื้อต่างประเทศ", labelEn: "International Procurement Manager", url: "exam-international-procurement-manager.html" },
-  { label: "ธุรการประสานงานโครงการ", labelEn: "Project Coordinator", url: "exam_coordinator.html" },
-  { label: "วิศวกรไฟฟ้า", labelEn: "Electrical Engineer", url: "exam_electrical_engineer.html" },
-  { label: "วิศวกรเครื่องกล", labelEn: "Mechanical Engineer", url: "exam_Mechanical_engineer.html" },
-  { label: "ช่างไฟฟ้า", labelEn: "Electrician", url: "exam-electrician.html" },
-  { label: "ผู้ช่วยช่างไฟฟ้า", labelEn: "Assistant Electrician", url: "exam-assistant-electrician.html" },
-  { label: "วิศวกร", labelEn: "Engineer", url: "exam-engineer.html" },
-  { label: "บริการ / Service", labelEn: "Service", url: "exam-service.html" },
-  { label: "คลังสินค้า / Logistic", labelEn: "Warehouse / Logistics", url: "exam-warehouse-logistics.html" },
-  { label: "หัวหน้าคลังสินค้าและขนส่ง", labelEn: "Warehouse & Logistics Manager", url: "exam-warehouse-logistics-manager.html" },
-  { label: "โฟร์แมน / หัวหน้างาน", labelEn: "Foreman / Site Supervisor", url: "exam_foreman.html" },
-  { label: "เจ้าหน้าที่การเงิน", labelEn: "Finance Officer", url: "exam-finance-officer.html" },
+  { label: "BD / Developer", labelEn: "BD / Developer", url: "exam-bd.html" },
+  { label: "ผู้ช่วยผู้จัดการฝ่ายขาย (Automation & Inverter)", labelEn: "Asst. Sales Manager (Automation & Inverter)", url: "exam-asst-sales-manager-automation.html" },
   { label: "ผู้จัดการฝ่ายขาย (Solar Roof)", labelEn: "Sales Manager (Solar Roof)", url: "exam-sales-solar-roof.html" },
   { label: "ผู้จัดการฝ่ายขาย (Solar Pump)", labelEn: "Sales Manager (Solar Pump)", url: "exam-sales-solar-pump.html" },
-  { label: "ผู้ช่วยผู้จัดการฝ่ายขาย (Automation & Inverter)", labelEn: "Asst. Sales Manager (Automation & Inverter)", url: "exam-asst-sales-manager-automation.html" },
-  { label: "พนักงานขับรถผู้บริหาร", labelEn: "Executive Driver", url: "exam_executive_driver.html" },
-  { label: "ผู้จัดการฝ่ายบุคคล", labelEn: "HR Manager", url: "exam_hr_manager.html" },
-  { label: "เจ้าหน้าที่ HR", labelEn: "HR Officer", url: "exam_hr_officer.html" },
-  { label: "ผู้จัดการฝ่ายการตลาด", labelEn: "Marketing Manager", url: "exam-marketing-manager.html" },
   { label: "เจ้าหน้าที่การตลาด", labelEn: "Marketing Officer", url: "exam-marketing-officer.html" },
+  { label: "ผู้จัดการฝ่ายการตลาด", labelEn: "Marketing Manager", url: "exam-marketing-manager.html" },
+
+  /* 4. จัดซื้อ คลังสินค้า และขนส่ง (Procurement, Warehouse & Logistics) */
+  { label: "จัดซื้อ", labelEn: "Purchasing", url: "exam-purchasing.html" },
+  { label: "หัวหน้าฝ่ายจัดซื้อต่างประเทศ", labelEn: "International Procurement Manager", url: "exam-international-procurement-manager.html" },
+  { label: "คลังสินค้า / Logistic", labelEn: "Warehouse / Logistics", url: "exam-warehouse-logistics.html" },
+  { label: "หัวหน้าคลังสินค้าและขนส่ง", labelEn: "Warehouse & Logistics Manager", url: "exam-warehouse-logistics-manager.html" },
+
+  /* 5. วิศวกรรม ช่างเทคนิค และบริการ (Engineering, Technical & Service) */
+  { label: "วิศวกร", labelEn: "Engineer", url: "exam-engineer.html" },
+  { label: "วิศวกรไฟฟ้า", labelEn: "Electrical Engineer", url: "exam_electrical_engineer.html" },
+  { label: "วิศวกรเครื่องกล", labelEn: "Mechanical Engineer", url: "exam_Mechanical_engineer.html" },
+  { label: "โฟร์แมน / หัวหน้างาน", labelEn: "Foreman / Site Supervisor", url: "exam_foreman.html" },
+  { label: "ช่างไฟฟ้า", labelEn: "Electrician", url: "exam-electrician.html" },
+  { label: "ผู้ช่วยช่างไฟฟ้า", labelEn: "Assistant Electrician", url: "exam-assistant-electrician.html" },
+  { label: "บริการ / Service", labelEn: "Service", url: "exam-service.html" },
+
+  /* 6. ทรัพยากรบุคคล กฎหมาย ความปลอดภัย และยานพาหนะ (HR, Legal, Safety & Administration) */
+  { label: "เจ้าหน้าที่ HR", labelEn: "HR Officer", url: "exam_hr_officer.html" },
+  { label: "ผู้จัดการฝ่ายบุคคล", labelEn: "HR Manager", url: "exam_hr_manager.html" },
   { label: "เจ้าหน้าที่กฎหมาย (In-house Legal)", labelEn: "In-house Legal", url: "exam_inhouse_legal.html" },
   { label: "จป.วิชาชีพ — งานสำนักงานและงานโครงการ", labelEn: "Safety Officer", url: "exam-safety-officer.html" },
+  { label: "พนักงานขับรถผู้บริหาร", labelEn: "Executive Driver", url: "exam_executive_driver.html" },
 ];
 
 function renderExamPicker_(preScore, iqScore, eqScore) {
