@@ -4,23 +4,38 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Branch Admin Assessment - TERA</title>
+    <title>Assessment: Upcountry Branch Administrator - TERA</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
         .exam-container {
-            max-width: 850px;
+            max-width: 860px;
             margin: 2rem auto;
             padding: 1.5rem;
         }
 
+        .category-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.18);
+            border: 1px solid rgba(241, 196, 15, 0.45);
+            color: #f1c40f;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
         .q-card {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             padding: 2.2rem;
-            border-radius: 15px;
+            border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
             animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
         }
 
         @keyframes fadeIn {
@@ -28,7 +43,6 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -45,61 +59,43 @@
 
         .options-grid {
             display: grid;
-            gap: 0.8rem;
+            gap: 0.85rem;
         }
 
         .opt-btn {
             display: block;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1.1rem;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.15rem 1.3rem;
+            border-radius: 12px;
             cursor: pointer;
-            transition: 0.2s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: white;
             text-align: left;
-            font-size: 1.05rem;
+            font-size: 1.02rem;
+            line-height: 1.55;
             width: 100%;
         }
 
         .opt-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.16);
             border-color: #f1c40f;
+            transform: translateX(4px);
         }
 
         .progress-text {
             color: #fff;
-            opacity: 0.6;
+            opacity: 0.7;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: right;
+            font-size: 0.95rem;
         }
 
-        #langToggle {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            z-index: 9000;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            color: #fff;
-            padding: 7px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            backdrop-filter: blur(8px);
-            transition: background 0.2s;
-        }
-
-        #langToggle:hover {
-            background: rgba(255, 255, 255, 0.28);
-        }
-    
+        #langToggle,
         #backBtn {
             position: fixed;
             top: 16px;
-            left: 16px;
             z-index: 9000;
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.35);
@@ -111,47 +107,62 @@
             font-weight: 600;
             backdrop-filter: blur(8px);
             transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
+        #langToggle {
+            right: 16px;
+        }
+
+        #backBtn {
+            left: 16px;
+        }
+
+        #langToggle:hover,
         #backBtn:hover {
             background: rgba(255, 255, 255, 0.28);
         }
-
     </style>
 </head>
 
 <body class="page-bg">
     <div class="bg-overlay"></div>
 
-        <button id="backBtn" onclick="goBack()" style="display:inline-flex; align-items:center; gap:6px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    <button id="backBtn" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
         <span>Back</span>
     </button>
-    <button id="langToggle" style="display:inline-flex; align-items:center; gap:6px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <button id="langToggle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
         <span id="langBtnText">EN</span>
     </button>
 
     <div class="exam-container">
         <header style="text-align: center; margin-bottom: 35px; color: white;">
             <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
-            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.8rem;">แบบทดสอบตำแหน่ง Branch Admin</h1>
-            <p id="userInfo" style="opacity: 0.8; font-size: 1.1rem;"></p>
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.75rem; letter-spacing: -0.3px;">แบบทดสอบตำแหน่ง เจ้าหน้าที่ธุรการสาขาต่างจังหวัด (Upcountry Branch Administrator)</h1>
+            <p id="userInfo" style="opacity: 0.85; font-size: 1.05rem;"></p>
         </header>
 
         <div id="questionsContainer"></div>
     </div>
 
     <script>
-        /* ============================================================
-           i18n
-        ============================================================ */
         let currentLang = "th";
 
         const ui = {
             th: {
                 langBtn: "EN",
-                pageTitle: "แบบทดสอบตำแหน่ง Branch Admin",
+                pageTitle: "แบบทดสอบตำแหน่ง เจ้าหน้าที่ธุรการสาขาต่างจังหวัด (Upcountry Branch Administrator)",
                 userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
                 progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
                 saving: "กำลังบันทึกข้อมูล...",
@@ -162,7 +173,7 @@
             },
             en: {
                 langBtn: "TH",
-                pageTitle: "Assessment: Branch Admin",
+                pageTitle: "Assessment: Upcountry Branch Administrator",
                 userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
                 progress: (cur, total) => `Question ${cur} of ${total}`,
                 saving: "Submitting your responses...",
@@ -173,155 +184,396 @@
             }
         };
 
-        /* ============================================================
-           Bilingual Questions
-        ============================================================ */
         const questions = [
+            // หมวดที่ 1: การควบคุมภายใน เงินสดย่อย และการบริหารคลังสินค้าสาขา (Internal Control & Petty Cash)
             {
-                q: "1. หน้าที่หลักของพนักงานธุรการสาขาคือข้อใด?",
-                qEn: "1. Which of the following best describes the primary responsibility of a Branch Admin?",
-                options: ["ก. การกำหนดกลยุทธ์ระดับมหาภาค", "ข. การซ่อมแซมโครงสร้างพื้นฐานด้วยตนเอง", "ค. การบริหารจัดการงานเอกสาร ข้อมูล และประสานงานสนับสนุน", "ง. การปฏิบัติหน้าที่ขายเพื่อปิดยอดเพียงอย่างเดียว"],
-                optionsEn: ["A. Defining macro-level business strategy.", "B. Personally carrying out infrastructure repairs.", "C. Managing documents, data, and coordination support.", "D. Performing sales duties solely to close targets."],
+                category: "หมวดที่ 1: การควบคุมภายใน เงินสดย่อย และคลังสินค้าสาขา",
+                categoryEn: "Category 1: Internal Control & Petty Cash",
+                q: "1. ในฐานะธุรการสาขา คุณตรวจนับยอดเงินสดย่อย (Petty Cash) ประจำสัปดาห์แล้วพบว่าเงินสดขาดบัญชีไป 500 บาท เมื่อตรวจสอบย้อนหลังพบว่าเป็นเงินที่ผู้จัดการสาขายืมไปจ่ายค่าน้ำมันรถกะทันหันแต่ยังไม่ได้นำใบเสร็จมาให้ และตอนนี้ผู้จัดการลากิจติดต่อไม่ได้ 3 วัน ในขณะที่วันพรุ่งนี้สำนักงานใหญ่จะเข้าสุ่มตรวจสเตตัสการเงิน คุณจะจัดการอย่างไร?",
+                qEn: "1. During weekly petty cash reconciliation, you discover a 500 THB shortage borrowed by the branch manager for fuel, but no receipt was submitted and the manager is on leave unreachable for 3 days. Headquarters auditors arrive tomorrow. How do you handle this?",
+                options: [
+                    "ก. ควักเงินตัวเองใส่แทนไปก่อนเพื่อไม่ให้เกิดเรื่อง",
+                    "ข. จัดทำรายงานเงินสดย่อยตามข้อเท็จจริง โดยบันทึกยอดเงินขาดเป็น \"เงินยืมทดรองจ่ายรอใบสำคัญ\" พร้อมแนบใบบันทึกข้อความสั้นที่ระบุวันที่ผู้จัดการยึดเงินไป เพื่อให้ระบบโปร่งใสและตรวจสอบได้ตรงตามเกณฑ์ Audit",
+                    "ค. ปลอมเอกสารใบเสร็จค่าน้ำมันขึ้นมาเองเพื่อให้ยอดเงินตรง",
+                    "ง. แจ้งสำนักงานใหญ่ว่าเงินถูกพนักงานคนอื่นขโมยไป"
+                ],
+                optionsEn: [
+                    "A. Cover the 500 THB deficit out of personal pocket to hide the discrepancy.",
+                    "B. File the petty cash statement accurately, logging the deficit as 'Advance Receivable Pending Voucher' with a factual timestamped memo for complete audit transparency.",
+                    "C. Fabricate a fictitious fuel receipt to balance cash on hand.",
+                    "D. Report to headquarters auditors that a coworker stole the missing cash."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การควบคุมภายใน เงินสดย่อย และคลังสินค้าสาขา",
+                categoryEn: "Category 1: Internal Control & Petty Cash",
+                q: "2. ในวันสิ้นเดือน คุณต้องทำการตรวจนับสินค้าคงคลัง (Stock Physical Count) ร่วมกับทีมคลังสินค้าสาขา และพบว่า \"สินค้ามูลค่าสูง\" ชิ้นหนึ่งมียอดในระบบมากกว่าสินค้าจริง 1 ชิ้น ซึ่งหากปล่อยไว้จะส่งผลต่อการปิดงบสาขา ขั้นตอนแรกที่คุณต้องทำในฐานะธุรการที่กำกับดูแลคืออะไร?",
+                qEn: "2. At month-end physical stock count, a high-value item has a system balance 1 unit greater than actual count, impacting branch closing. What is your required first procedural step?",
+                options: [
+                    "ก. กดปรับลดสเปรดชีตในระบบคอมพิวเตอร์ให้ยอดลดลงตามจำนวนจริงทันทีโดยไม่แจ้งใคร",
+                    "ข. ระงับการคีย์สเตตัสปิดยอดชั่วคราว ทำการ Retrace เอกสารเข้า-ออก (Invoices/Delivery Orders) ของสินค้าชิ้นนั้นย้อนหลังทั้งเดือนเพื่อหาจุดดิสเครดิต หากไม่พบ ให้ทำบันทึกรายงานผลต่างสต็อก (Stock Variance Report) ส่งฝ่ายบัญชีกลางทันที",
+                    "ค. แอบไปสลับเอาสินค้าชิ้นอื่นที่ใกล้เคียงกันมาวางแทนที่เพื่อตบตา",
+                    "ง. บังคับให้หัวหน้าคลังสินค้าควักเงินซื้อชดเชยสินค้าที่หายไป"
+                ],
+                optionsEn: [
+                    "A. Quietly adjust downward the ERP inventory record without authorization.",
+                    "B. Suspend period-end closing entry, retrace all delivery orders and outbound invoices for the month to audit discrepancies, and file an official Stock Variance Report to central accounting.",
+                    "C. Substitute an adjacent lower-cost item in the storage bin to camouflage the gap.",
+                    "D. Coerce the warehouse supervisor into reimbursing the missing unit out-of-pocket."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การควบคุมภายใน เงินสดย่อย และคลังสินค้าสาขา",
+                categoryEn: "Category 1: Internal Control & Petty Cash",
+                q: "3. การควบคุมดูแลกุญแจสำนักงานสาขาและรหัสเปิด-ปิดระบบสัญญาณกันขโมย (Security System) ของสาขาต่างจังหวัด ข้อใดคือแนวปฏิบัติที่ธุรการควรจัดระเบียบให้ปลอดภัยและเป็นระบบสูงสุด?",
+                qEn: "3. Regarding branch office keys and alarm security system disarm codes, which operational policy ensures optimal security governance?",
+                options: [
+                    "ก. ปั๊มกุญแจแจกพนักงานทุกคนในสาขาเพื่อความสะดวกในการเข้า-ออกงาน",
+                    "ข. เขียนรหัสผ่านตัวใหญ่ๆ แปะไว้ที่หน้าเคาน์เตอร์ต้อนรับ",
+                    "ค. กำหนดสิทธิ์ให้ผู้ถือกุญแจหลักและรหัสเฉพาะบุคคล (ผู้จัดการและธุรการ) พร้อมทำสมุดบันทึกการเบิก-คืนกุญแจสำรองอย่างเข้มงวด โดยห้ามส่งต่อรหัสผ่านให้บุคคลภายนอกเด็ดขาด",
+                    "ง. ฝากกุญแจไว้กับร้านขายของชำข้างๆ สาขาเพื่อให้ใครมาเอาไปเปิดก็ได้"
+                ],
+                optionsEn: [
+                    "A. Duplicate master keys for all staff members to facilitate convenience.",
+                    "B. Write the alarm bypass code prominently on the reception counter.",
+                    "C. Restrict master keys and unique alarm codes to designated personnel (Manager and Admin), maintain a strict key custody log, and prohibit sharing credentials.",
+                    "D. Entrust branch keys with the adjacent neighborhood grocery store."
+                ],
                 ans: 2
             },
             {
-                q: "2. หากคุณต้องจัดเก็บเอกสารสำคัญจำนวนมาก คุณควรมีหลักการอย่างไร?",
-                qEn: "2. If you need to file a large volume of important documents, what is the correct principle to follow?",
-                options: ["ก. คัดแยกหมวดหมู่ ติดฉลาก และเรียงตามดัชนีเพื่อการสืบค้น", "ข. วางซ้อนกันตามลำดับบนโต๊ะทำงาน", "ค. จัดเก็บรวมกันเน้นประหยัดเนื้อที่เป็นหลัก", "ง. ทำลายเอกสารทันทีหลังประมวลผล"],
-                optionsEn: ["A. Categorise, label, and index documents for easy retrieval.", "B. Stack them in order on the work desk.", "C. Store everything together to save space.", "D. Destroy documents immediately after processing."],
-                ans: 0
-            },
-            {
-                q: "3. เมื่อมีผู้โทรหาผู้จัดการที่ติดประชุมอยู่ คุณควรปฏิบัติอย่างไร?",
-                qEn: "3. When someone calls for the manager who is currently in a meeting, what should you do?",
-                options: ["ก. ตัดสายทันทีหากไม่เร่งด่วน", "ข. ให้ผู้โทรติดต่อกลับมาใหม่เรื่อยๆ", "ค. ยุติการประชุมทันทีเพื่อแจ้งผู้จัดการ", "ง. บันทึกข้อมูลผู้ติดต่อ (Call Log) และวัตถุประสงค์เพื่อประสานงานภายหลัง"],
-                optionsEn: ["A. Hang up immediately if it is not urgent.", "B. Ask the caller to keep trying back.", "C. Interrupt the meeting immediately to inform the manager.", "D. Record the caller's details and purpose in a call log and follow up afterwards."],
-                ans: 3
-            },
-            {
-                q: "4. ทักษะโปรแกรมคอมพิวเตอร์ใดที่จำเป็นที่สุดสำหรับงานธุรการ?",
-                qEn: "4. Which computer skills are most essential for administrative work?",
-                options: ["ก. ชุดโปรแกรมสำนักงาน (Microsoft Office) และ Email", "ข. โปรแกรมตัดต่อวิดีโอความละเอียดสูง", "ค. โปรแกรมออกแบบวิศวกรรม 3 มิติ", "ง. โปรแกรมเขียนชุดคำสั่ง (Coding)"],
-                optionsEn: ["A. Microsoft Office suite and email.", "B. High-definition video editing software.", "C. 3D engineering design software.", "D. Programming and coding software."],
-                ans: 0
-            },
-            {
-                q: "5. หากพบว่ารายงานมีตัวเลขผิดพลาดเล็กน้อยก่อนส่งสำนักงานใหญ่ คุณจะทำอย่างไร?",
-                qEn: "5. If you notice a minor numerical error in a report before submitting it to headquarters, what should you do?",
-                options: ["ก. ปล่อยผ่านหากไม่มีนัยสำคัญ", "ข. ตรวจสอบ Data Integrity และแก้ไขให้ถูกต้องก่อนนำเสนอ", "ค. รายงานว่าเป็นความผิดพลาดของระบบ", "ง. เว้นว่างไว้ให้ผู้อื่นตรวจสอบ"],
-                optionsEn: ["A. Let it pass if it seems insignificant.", "B. Verify data integrity and correct the error before submission.", "C. Report it as a system error.", "D. Leave it blank for someone else to check."],
+                category: "หมวดที่ 1: การควบคุมภายใน เงินสดย่อย และคลังสินค้าสาขา",
+                categoryEn: "Category 1: Internal Control & Petty Cash",
+                q: "4. มีซัพพลายเออร์ท้องถิ่นนำน้ำดื่มมาส่งที่สาขาตามรอบจัดซื้อ แต่นำใบส่งของมาให้เซ็นรับโดยไม่มีใบกำกับภาษี (Tax Invoice) และระบุว่าถ้าจะเอาใบกำกับภาษีต้องจ่ายเงินเพิ่มอีก 7% แยกต่างหาก นอกเหนือจากราคาที่ตกลงกันไว้ใน PO สำนักงานใหญ่ คุณจะดำเนินการอย่างไร?",
+                qEn: "4. A local drinking water vendor delivers supplies with a delivery slip lacking a Tax Invoice, demanding an extra 7% surcharge to issue tax documentation contrary to HQ purchase order terms. How do you respond?",
+                options: [
+                    "ก. ยอมจ่ายเงินสดเพิ่มส่วนตัวเพื่อให้ได้เอกสารครบ",
+                    "ข. ปฏิเสธการจ่ายเงินสดเพิ่ม เซ็นรับเฉพาะตัวสินค้าตามยอดจริงในใบส่งของล่วงหน้า แล้วรีบส่งเรื่องประสานงานกับฝ่ายจัดซื้อกลาง (Procurement) ของสำนักงานใหญ่เพื่อดำเนินการตรวจสอบเงื่อนไขสัญญากับซัพพลายเออร์รายนี้",
+                    "ค. ไม่ยอมรับสินค้านั้นและไล่ซัพพลายเออร์กลับไปทันที",
+                    "ง. ยอมทำตามที่ซัพพลายเออร์บอกและเบิกเงินสดย่อยสาขาจ่ายไปก่อน"
+                ],
+                optionsEn: [
+                    "A. Pay the 7% surcharge from personal funds to secure the receipt.",
+                    "B. Refuse additional cash disbursement, acknowledge receipt solely for verified physical goods on the delivery note, and escalate immediately to Central Procurement to enforce contract terms.",
+                    "C. Turn away the delivery truck and dismiss the vendor immediately.",
+                    "D. Comply with the vendor's surcharge and expense it via branch petty cash."
+                ],
                 ans: 1
             },
             {
-                q: "6. 'Minute of Meeting' คือเอกสารเกี่ยวกับอะไร?",
-                qEn: "6. What is a 'Minute of Meeting'?",
-                options: ["ก. เอกสารเรียกเก็บเงินคู่ค้า", "ข. รายงานบันทึกมติที่ประชุม และ Action Plan", "ค. แบบฟอร์มการลางาน", "ง. คู่มือเทคนิคอุปกรณ์ไฟฟ้า"],
-                optionsEn: ["A. A billing document sent to business partners.", "B. A record of meeting resolutions and action plans.", "C. A leave request form.", "D. A technical manual for electrical equipment."],
+                category: "หมวดที่ 1: การควบคุมภายใน เงินสดย่อย และคลังสินค้าสาขา",
+                categoryEn: "Category 1: Internal Control & Petty Cash",
+                q: "5. เอกสารรับ-ส่งเงินและใบเสร็จรับเงินชั่วคราว (Temporary Receipt) ที่ธุรการสาขาออกให้ลูกค้าที่มาจ่ายเงินหน้าร้าน จะต้องถูกรวบรวมและจัดส่งไปยังสำนักงานใหญ่ตามกำหนดเวลาอย่างไรจึงจะถูกต้องตามมาตรฐานการบัญชี?",
+                qEn: "5. When issuing temporary payment receipts to counter customers, how must branch administrators consolidate and dispatch original vouchers to HQ per accounting standards?",
+                options: [
+                    "ก. รอให้สะสมครบ 1 กล่องใหญ่หรือรอสิ้นปีค่อยส่งไปทีเดียว",
+                    "ข. ลงบันทึกคีย์เข้าระบบ ERP ประจำวัน และจัดส่งตัวจริงทางไปรษณีย์ด่วนตามรอบสัปดาห์ (Weekly EMS) ที่บริษัทกำหนด โดยต้องสแกนไฟล์สำรองเก็บไว้ที่สาขา 1 ชุดเสมอ",
+                    "ค. ถ่ายรูปส่งทางไลน์กลุ่มแล้วทำลายเอกสารตัวจริงทิ้งได้เลย",
+                    "ง. ฝากไปกับรถขนส่งของบริษัทที่วิ่งเข้ากรุงเทพฯ โดยไม่ต้องใส่ซองปิดผนึก"
+                ],
+                optionsEn: [
+                    "A. Accumulate receipts until an entire storage carton is filled or at year-end.",
+                    "B. Record transactions in ERP daily, archive local digital scan copies, and dispatch physical originals weekly via tracked courier (EMS) in accordance with accounting policy.",
+                    "C. Post smartphone photos in chat groups and shred original receipts immediately.",
+                    "D. Hand unsealed loose receipts to passing corporate transit drivers."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 2: การประสานงานระหว่างสำนักงานใหญ่และปัญหาระยะไกล (Headquarters Liaison & Remote Operations)
+            {
+                category: "หมวดที่ 2: การประสานงานสำนักงานใหญ่และปัญหาระยะไกล",
+                categoryEn: "Category 2: Headquarters Liaison & Remote Operations",
+                q: "6. สำนักงานใหญ่ปรับเปลี่ยนระบบซอฟต์แวร์การเคลมค่าใช้จ่ายใหม่ทั้งหมด (E-Expense) แต่พนักงานขาย (Sales) ประจำสาขาต่างจังหวัดส่วนใหญ่เป็นผู้สูงอายุและทำไม่เป็น ส่งผลให้ยอดเคลมค่าน้ำมันของสาขาตกค้างและพนักงานเริ่มประท้วงไม่ยอมออกไปพบลูกค้า คุณควรแก้ปัญหานี้อย่างไร?",
+                qEn: "6. HQ rolls out a new digital E-Expense claim portal, but older regional field sales reps struggle with the interface, stalling fuel reimbursements and triggering client-visit resistance. How do you resolve this?",
+                options: [
+                    "ก. พิมพ์ไลน์ไปต่อว่าสำนักงานใหญ่ว่าออกระบบที่ใช้งานยากเกินไป",
+                    "ข. จัดเซสชันสอนการใช้งานสั้นๆ (Mini-Workshop) หลังเลิกงาน ช่วยทำคู่มือสรุปเป็นภาพกราฟิกเข้าใจง่าย และเป็นพี่เลี้ยงช่วยคีย์ระบบให้ในระยะแรก เพื่อให้พนักงานเข้าใจและระบบเดินหน้าได้",
+                    "ค. ปล่อยให้พนักงานเคลมไม่ได้ต่อไป เพื่อช่วยบริษัทประหยัดค่าใช้จ่าย",
+                    "ง. รับหน้าที่คีย์เอกสารเคลมแทนพนักงานทุกคนตลอดไปโดยไม่สอน"
+                ],
+                optionsEn: [
+                    "A. Post complaints to HQ IT stating that the new system is unviable.",
+                    "B. Host practical mini-workshops, produce a visual step-by-step one-pager, and mentor senior reps through their initial submissions until they achieve digital self-sufficiency.",
+                    "C. Block claims indefinitely to trim corporate travel expenditures.",
+                    "D. Assume permanent clerical duty of submitting all salesmen's claims indefinitely without coaching."
+                ],
                 ans: 1
             },
             {
-                q: "7. ในการจัดการ 'Petty Cash' (เงินสดย่อย) สิ่งที่สำคัญที่สุดคือข้อใด?",
-                qEn: "7. When managing petty cash, what is the most important practice?",
-                options: ["ก. ใช้จ่ายส่วนตัวได้หากจำเป็น", "ข. บันทึกบัญชีคุมยอด (Daily Log) พร้อมหลักฐานใบเสร็จครบถ้วน", "ค. จัดสรรตามความพึงพอใจส่วนตัว", "ง. วางเงินไว้ในที่เปิดให้ทุกคนหยิบใช้"],
-                optionsEn: ["A. Personal use is acceptable when necessary.", "B. Maintain a daily log with complete receipt documentation.", "C. Allocate funds based on personal preference.", "D. Keep the cash in an open place accessible to everyone."],
+                category: "หมวดที่ 2: การประสานงานสำนักงานใหญ่และปัญหาระยะไกล",
+                categoryEn: "Category 2: Headquarters Liaison & Remote Operations",
+                q: "7. เกิดพายุเข้าในพื้นที่ ส่งผลให้หลังคาคลังสินค้าของสาขาชำรุดและน้ำฝนเริ่มรั่วซึมลงมาตรงบริเวณที่จัดเก็บสินค้ารอส่งมอบ ในขณะที่ผู้จัดการสาขาไปอบรมที่กรุงเทพฯ และระบบโทรศัพท์พื้นฐานของสาขาใช้การไม่ได้ ขั้นตอนการจัดการวิกฤต (Crisis Logistics) ของคุณคืออะไร?",
+                qEn: "7. A storm damages branch warehouse roofing, causing rainwater leaks over customer goods awaiting dispatch while the branch manager is traveling and landlines are dead. What is your crisis mitigation response?",
+                options: [
+                    "ก. นั่งรอจนกว่าผู้จัดการสาขาจะกลับมาในสัปดาห์หน้า",
+                    "ข. สั่งการทีมคลังสินค้าเคลื่อนย้ายสินค้าเข้าจุดแห้งทันที นำผ้าใบมาคลุมป้องกัน ใช้โทรศัพท์มือถือส่วนตัวถ่ายภาพความเสียหายส่งอีเมล/ไลน์รายงานผู้จัดการและฝ่ายอาคารสำนักงานใหญ่ เพื่อขออนุมัติจัดหาช่างท้องถิ่นมาซ่อมแซมด่วน",
+                    "ค. แจ้งลูกค้าให้มารับสินค้าที่ชำรุดไปเลยโดยไม่ต้องซ่อม",
+                    "ง. วิ่งหนีออกจากสาขาเพื่อความปลอดภัยของตัวเอง"
+                ],
+                optionsEn: [
+                    "A. Wait idly until the branch manager returns next week.",
+                    "B. Mobilize warehouse crews to move inventory to dry zones, tarp exposed stocks, record photo evidence via mobile, and report to HQ Facilities for urgent local contractor repair approval.",
+                    "C. Demand that customers pick up water-damaged goods immediately as-is.",
+                    "D. Evacuate the premises unilaterally."
+                ],
                 ans: 1
             },
             {
-                q: "8. หากพัสดุเร่งด่วนส่งถึงพนักงานที่ลางานอยู่ คุณควรทำอย่างไร?",
-                qEn: "8. If an urgent parcel arrives for an employee who is on leave, what should you do?",
-                options: ["ก. ส่งพัสดุคืนผู้ส่งทันที", "ข. เปิดอ่านเนื้อหาภายในทันที", "ค. ประสานงานหัวหน้างานเพื่อพิจารณาความเร่งด่วนตามระเบียบ", "ง. วางทิ้งไว้บนโต๊ะจนกว่าพนักงานจะกลับมา"],
-                optionsEn: ["A. Return the parcel to the sender immediately.", "B. Open it and read the contents right away.", "C. Coordinate with the supervisor to assess urgency in accordance with procedures.", "D. Leave it on the employee's desk until they return."],
-                ans: 2
-            },
-            {
-                q: "9. ทักษะ 'Prioritization' ช่วยงานแอดมินอย่างไร?",
-                qEn: "9. How does 'Prioritization' benefit an admin's work?",
-                options: ["ก. ช่วยให้ทำ Multitasking โดยไม่เรียงลำดับ", "ข. วิเคราะห์ความสำคัญ/เร่งด่วน (Eisenhower Matrix) เพื่อลดปัญหาคอขวด", "ค. หาเหตุผลในการปฏิเสธงานที่ซับซ้อน", "ง. สร้างอำนาจต่อรองในการสั่งงานต่อ"],
-                optionsEn: ["A. It allows multitasking without any particular order.", "B. It helps analyse importance and urgency (Eisenhower Matrix) to reduce bottlenecks.", "C. It provides justification for declining complex tasks.", "D. It creates negotiating power when delegating work."],
+                category: "หมวดที่ 2: การประสานงานสำนักงานใหญ่และปัญหาระยะไกล",
+                categoryEn: "Category 2: Headquarters Liaison & Remote Operations",
+                q: "8. สำนักงานใหญ่แจ้งว่ารายงานสรุปเวลาเข้า-ออกงาน (Time Attendance) ของพนักงานสาขาที่คุณส่งไป มีข้อมูลขาดหายไป 2 วัน เนื่องจากเครื่องสแกนนิ้วมือที่สาขาเสียและคุณไม่ได้แจ้งซ่อม ส่งผลให้เงินเดือนพนักงานในสาขาอาจจะออกล่าช้า คุณจะแก้ไขความบกพร่องนี้อย่างไร?",
+                qEn: "8. HQ HR notifies that branch biometric timesheets lack 2 days of records due to an unreported fingerprint reader breakdown, risking payroll delays. How do you rectify this operational lapse?",
+                options: [
+                    "ก. ดึงดันว่าส่งเอกสารไปครบแล้ว และให้สำนักงานใหญ่ไปหาเอาเอง",
+                    "ข. กล่าวขออภัยในความล่าช้า ดำเนินการทำใบบันทึกเวลาทำงานด้วยมือ (Manual Time Sheet) ให้พนักงานที่เข้างานใน 2 วันนั้นลงนามรับรองร่วมกับผู้จัดการสาขา แล้วสแกนส่งด่วนให้ฝ่ายบุคคล พร้อมเปิดใบแจ้งซ่อมเครื่องสแกนทันที",
+                    "ค. ปลอมแปลงข้อมูลเวลาเข้างานของทุกคนให้เป็นเวลา 08.00 น. ตรงทั้งหมด",
+                    "ง. บอกพนักงานในสาขาว่าเดือนนี้ไม่ต้องรับเงินเดือนเนื่องจากระบบล่ม"
+                ],
+                optionsEn: [
+                    "A. Argue that documents were complete and demand HR find missing timestamps.",
+                    "B. Apologize for the omission, generate manual time attendance sign-off sheets verified by the branch manager, expedite scans to HR, and issue an urgent IT hardware maintenance ticket.",
+                    "C. Forge identical 08:00 AM clock-ins arbitrarily across the roster.",
+                    "D. Advise regional staff that payroll is canceled this month due to hardware failure."
+                ],
                 ans: 1
             },
             {
-                q: "10. การประสานงาน (Coordination) ที่ดีควรเริ่มจากอะไร?",
-                qEn: "10. What is the foundation of effective coordination?",
-                options: ["ก. การสื่อสารที่มีประสิทธิภาพ (Effective Communication)", "ข. การใช้อำนาจบังคับบัญชาสั่งการ", "ค. การใช้อีเมลเพียงทางเดียวเพื่อเป็นหลักฐาน", "ง. การคุยเรื่องส่วนตัวก่อนเข้าเรื่องงานทุกครั้ง"],
-                optionsEn: ["A. Effective communication.", "B. Using authoritative command.", "C. Relying solely on email for documentation.", "D. Discussing personal matters before every work conversation."],
-                ans: 0
-            },
-            {
-                q: "11. เมื่อต้องจัดเตรียมห้องประชุม สิ่งใดคือหน้าที่ของแอดมิน?",
-                qEn: "11. When preparing a meeting room, which of the following is the admin's responsibility?",
-                options: ["ก. ตัดสินใจประเด็นสำคัญแทนผู้จัดการ", "ข. บริหารจัดการทรัพยากร (อุปกรณ์โสตฯ, เอกสาร, อาหารว่าง) ให้พร้อม", "ค. จัดเตรียมอาหารมื้อหลักให้ทุกคนในสาขา", "ง. ทำหน้าที่เป็นประธานในที่ประชุม"],
-                optionsEn: ["A. Making key decisions on behalf of the manager.", "B. Ensuring all resources (AV equipment, documents, refreshments) are ready.", "C. Preparing full meals for everyone in the branch.", "D. Acting as the chairperson of the meeting."],
+                category: "หมวดที่ 2: การประสานงานสำนักงานใหญ่และปัญหาระยะไกล",
+                categoryEn: "Category 2: Headquarters Liaison & Remote Operations",
+                q: "9. หากคุณพบว่ามีการส่งสินค้าผิดสเปกจากคลังสินค้ากลาง (สำนักงานใหญ่) มาถึงสาขาต่างจังหวัดของคุณ และลูกค้ากำลังจะมารับสินค้าในอีก 2 ชั่วโมงข้างหน้า คุณจะจัดการแก้ไขสถานการณ์ตรงหน้านี้อย่างไรให้มืออาชีพที่สุด?",
+                qEn: "9. Central warehouse delivers an incorrect specification item to your branch, and the client arrives to pick it up in 2 hours. How do you handle this professionally?",
+                options: [
+                    "ก. ปล่อยให้ลูกค้าอารมณ์เสียเมื่อมาถึงแล้วค่อยให้ไปเคลมกับสำนักงานใหญ่เอง",
+                    "ข. โทรศัพท์ติดต่อแจ้งลูกค้าล่วงหน้าทันทีเพื่อขออภัยในความผิดพลาดอธิบายสถานการณ์ เสนอแนวทางแก้ไข (เช่น จัดส่งด่วนชดเชยให้ถึงบ้านในวันถัดไป) พร้อมประสานคลังกลางเพื่อตัดสต็อกตัวที่ถูกต้องส่งมาด่วนที่สุด",
+                    "ค. แอบแกะป้ายสลากสินค้าออกแล้วแปะสลากรุ่นที่ถูกต้องทับลงไป",
+                    "ง. โทรไปต่อว่าพนักงานคลังสินค้ากลางด้วยถ้อยคำรุนแรงและปฏิเสธไม่คุยกับลูกค้า"
+                ],
+                optionsEn: [
+                    "A. Say nothing and instruct the client upon arrival to lodge an HQ claim.",
+                    "B. Proactively phone the client before arrival, apologize, transparently explain the error, offer free expedited home delivery of the correct unit tomorrow, and dispatch an urgent replenishment order.",
+                    "C. Tamper with barcode labels to mask the discrepancy.",
+                    "D. Vent anger verbally at central warehouse dispatchers while refusing client contact."
+                ],
                 ans: 1
             },
             {
-                q: "12. หากมีลูกค้าเดินเข้ามาขณะคุณกำลังทำงานติดพันอยู่ คุณควรทำอย่างไร?",
-                qEn: "12. If a customer walks in while you are occupied with a task, what should you do?",
-                options: ["ก. ทำงานเอกสารให้เสร็จก่อนค่อยคุย", "ข. ไล่ให้ไปหาพนักงานคนอื่น", "ค. แสดงการรับรู้ (Acknowledgment) ทักทาย และประสานผู้เกี่ยวข้องมาดูแล", "ง. ปลีกตัวหนีไปที่อื่น"],
-                optionsEn: ["A. Finish the document work first before engaging.", "B. Direct them to another staff member.", "C. Acknowledge and greet the customer, then coordinate with the appropriate person to assist them.", "D. Quietly move away to another area."],
-                ans: 2
+                category: "หมวดที่ 2: การประสานงานสำนักงานใหญ่และปัญหาระยะไกล",
+                categoryEn: "Category 2: Headquarters Liaison & Remote Operations",
+                q: "10. ในการจัดเก็บเอกสารทางกฎหมาย เช่น ใบอนุญาตประกอบกิจการของสาขา ใบทะเบียนพาณิชย์ และใบอนุญาตสิ่งแวดล้อมในพื้นที่ แนวปฏิบัติใดที่ธุรการสาขาต้องทำเพื่อป้องกันการถูกเจ้าหน้าที่รัฐตรวจปรับ?",
+                qEn: "10. For statutory business licenses (Branch Commercial Registration, Environmental Permits), what administrative governance prevents municipal fines during surprise regulatory inspections?",
+                options: [
+                    "ก. ใส่ซองพลาสติกแล้วเก็บไว้ใต้โต๊ะทำงานของธุรการ",
+                    "ข. ใส่กรอบจัดแสดงไว้ในบริเวณที่เปิดเผยและมองเห็นได้ชัดเจนหน้าร้านตามที่กฎหมายกำหนด พร้อมทำตารางแจ้งเตือนวันหมดอายุ (Expiry Alert) ส่งต่อสำนักงานใหญ่เพื่อต่ออายุล่วงหน้า 3 เดือน",
+                    "ค. ถ่ายเอกสารแจกให้ชาวบ้านแถวนั้นช่วยเก็บรักษาไว้",
+                    "ง. นำใบจริงส่งคืนสำนักงานใหญ่ทั้งหมดและไม่ต้องเก็บอะไรไว้ที่สาขาเลย"
+                ],
+                optionsEn: [
+                    "A. Keep original certificates folded in plastic pouches under personal desks.",
+                    "B. Prominently display framed originals/authorized copies in conspicuous public front-office areas as mandated by law, and maintain an Expiry Calendar alerting HQ 3 months in advance.",
+                    "C. Distribute photocopies to local neighbors for safekeeping.",
+                    "D. Return all original licenses to HQ and maintain zero documentation on-site."
+                ],
+                ans: 1
             },
+
+            // หมวดที่ 3: การแก้ไขปัญหาหน้างาน ทัศนคติ และการบริการลูกค้าในท้องถิ่น (Local Problem Solving & Service Mind)
             {
-                q: "13. การเก็บรักษาความลับของบริษัท (Confidentiality) หมายถึงข้อใด?",
-                qEn: "13. What does maintaining company 'Confidentiality' mean?",
-                options: ["ก. บอกเฉพาะเพื่อนร่วมงานที่สนิท", "ข. เก็บกุญแจและรหัสไว้กับตัวคนเดียว", "ค. คุ้มครองข้อมูลส่วนบุคคลและองค์กรไม่ให้รั่วไหลโดยไม่ได้รับอนุญาต", "ง. ทำลายรหัสผ่านทิ้งทันทีเมื่อย้ายตำแหน่ง"],
-                optionsEn: ["A. Sharing information only with close colleagues.", "B. Keeping all keys and passwords to yourself.", "C. Protecting personal and organisational data from unauthorised disclosure.", "D. Destroying all passwords immediately upon a role change."],
-                ans: 2
-            },
-            {
-                q: "14. เครื่องมือ 'Mail Merge' ใน Microsoft Word มีประโยชน์อย่างไร?",
-                qEn: "14. What is the benefit of the 'Mail Merge' feature in Microsoft Word?",
-                options: ["ก. ป้องกันไวรัสในอีเมล", "ข. ผลิตเอกสารจำนวนมากโดยดึงข้อมูลจากฐานข้อมูล", "ค. สร้างระบบตอบกลับอัตโนมัติ", "ง. แปลภาษาเอกสารอัตโนมัติ"],
-                optionsEn: ["A. It protects emails from viruses.", "B. It produces large volumes of documents by pulling data from a database.", "C. It creates an automated reply system.", "D. It automatically translates documents into another language."],
+                category: "หมวดที่ 3: การแก้ไขปัญหาหน้างาน ทัศนคติ และบริการลูกค้า",
+                categoryEn: "Category 3: Local Problem Solving & Service Mind",
+                q: "11. ลูกค้าท้องถิ่นรายหนึ่งเข้ามาติดต่อที่สาขาด้วยท่าทางโมโหรุนแรง ดุด่าพนักงานหน้าร้านด้วยคำหยาบคาย เนื่องจากสินค้าที่ซื้อไปใช้งานไม่ได้ และขู่ว่าจะไปแจ้งความกับตำรวจในพื้นที่ทันที ในฐานะธุรการประจำสาขาคุณจะเข้าไกล่เกลี่ยอย่างไร?",
+                qEn: "11. An irate local customer storms into the branch shouting profanities over malfunctioning equipment and threatening police reports. As branch administrator, how do you de-escalate?",
+                options: [
+                    "ก. ตะโกนด่าสวนกลับไปเพื่อปกป้องศักดิ์ศรีของพนักงานในสาขา",
+                    "ข. เชิญลูกค้าเข้าห้องรับรองอย่างสุภาพ เสิร์ฟน้ำดื่มเพื่อลดอุณหภูมิอารมณ์ รับฟังปัญหาโดยไม่โต้เถียง ตรวจสอบประวัติการซื้อขาย และเสนอแนวทางเปลี่ยนเครื่องใหม่หรือส่งช่างเทคนิคสาขาเข้าเช็กหน้างานด่วนที่สุดเพื่อระงับเหตุ",
+                    "ค. วิ่งไปล็อกประตูหน้าร้านไม่ให้ลูกค้าออกไปแจ้งตำรวจ",
+                    "ง. เดินหนีไปหลังร้านและปล่อยให้พนักงานหน้าร้านเผชิญหน้าคนเดียว"
+                ],
+                optionsEn: [
+                    "A. Shout back defensively to uphold staff dignity.",
+                    "B. Courteously usher the customer into a private consultation room, offer drinking water, listen attentively without interrupting, inspect purchase history, and propose an immediate replacement or urgent technician inspection.",
+                    "C. Lock front doors to prevent the customer from reaching police.",
+                    "D. Walk away to back storage and leave front-desk juniors to absorb abuse alone."
+                ],
                 ans: 1
             },
             {
-                q: "15. หากอุปกรณ์สำนักงานชำรุด คุณควรจัดการอย่างไร?",
-                qEn: "15. If a piece of office equipment breaks down, what is the correct course of action?",
-                options: ["ก. ซ่อมเองตามความเข้าใจ", "ข. ติดป้ายแจ้งสถานะ (Out of Service) และแจ้งซ่อมตาม SOP", "ค. ปล่อยไว้ให้คนอื่นมาเจอเอง", "ง. จัดซื้อเครื่องใหม่มาแทนทันที"],
-                optionsEn: ["A. Repair it yourself based on your own understanding.", "B. Label it 'Out of Service' and report it for repair following the SOP.", "C. Leave it for someone else to discover.", "D. Immediately purchase a replacement unit."],
+                category: "หมวดที่ 3: การแก้ไขปัญหาหน้างาน ทัศนคติ และบริการลูกค้า",
+                categoryEn: "Category 3: Local Problem Solving & Service Mind",
+                q: "12. ขนส่งท้องถิ่น (Outsource Logistics) ที่สาขาจ้างวิ่งงานประจำแจ้งยกเลิกเคสส่งสินค้าให้ลูกค้ารายใหญ่กะทันหันในเช้าวันเสาร์ เนื่องจากรถเสีย และไม่มีรถทดแทน ในขณะที่ผู้จัดการสาขาไปทำธุระส่วนตัว คุณจะแก้ปัญหานี้อย่างไร?",
+                qEn: "12. A third-party local logistics driver cancels an urgent Saturday key account delivery due to mechanical breakdown with no backup truck, while the branch manager is on personal leave. How do you resolve this?",
+                options: [
+                    "ก. โทรไปแจ้งยกเลิกเคสกับลูกค้าตรงๆ และบอกให้ลูกค้ารอไปจนถึงวันจันทร์",
+                    "ข. ค้นหารายชื่อผู้ให้บริการขนส่งเอกสารหรือรถกระบะรับจ้างทั่วไปในพื้นที่ (Localด่วน) เปรียบเทียบราคาและตรวจสอบประวัติเบื้องต้น นำเสนอผู้จัดการสาขาทางโทรศัพท์เพื่อขออนุมัติงบด่วนในการจัดส่งแทนเพื่อรักษาเครดิตลูกค้า",
+                    "ค. บังคับให้พนักงานขายในสาขาขับรถจักรยานยนต์ส่วนตัวขนสินค้าไปส่งแทน",
+                    "ง. ปล่อยทิ้งไว้เฉยๆ รอให้ถึงวันจันทร์ค่อยเปิดอ่านไลน์"
+                ],
+                optionsEn: [
+                    "A. Inform the customer curtly to await delivery on Monday.",
+                    "B. Screen vetted local on-demand freight carriers, compare rates, phone the branch manager for emergency contingency funding approval, and safeguard corporate delivery commitments.",
+                    "C. Order sales reps to transport commercial freight on personal motorbikes.",
+                    "D. Ignore messages until Monday morning."
+                ],
                 ans: 1
             },
             {
-                q: "16. การตรวจสอบ 'Stationery Stock' ควรทำเมื่อใด?",
-                qEn: "16. When should 'Stationery Stock' be checked?",
-                options: ["ก. ตรวจเมื่อมีคนมาแจ้งว่าของหมด", "ข. ตรวจตามรอบที่กำหนด (Cyclic Count) เพื่อวางแผนจัดซื้อ", "ค. ตรวจทุกครั้งที่จะเบิกใช้เอง", "ง. ตรวจเพียงปีละครั้งตอนปิดงบ"],
-                optionsEn: ["A. Only when someone reports that items have run out.", "B. On a scheduled cycle (cyclic count) to plan purchasing in advance.", "C. Every time you personally need to take something.", "D. Only once a year during the financial year-end closing."],
+                category: "หมวดที่ 3: การแก้ไขปัญหาหน้างาน ทัศนคติ และบริการลูกค้า",
+                categoryEn: "Category 3: Local Problem Solving & Service Mind",
+                q: "13. พนักงานทำความสะอาด (แม่บ้าน) และพนักงานรักษาความปลอดภัย (รปภ.) ประจำสาขาต่างจังหวัด ทะเลาะเบาะแว้งกันเรื่องสิทธิ์การใช้ตู้เย็นส่วนกลางในออฟฟิศ จนทำให้งานบริการความสะอาดหน้าร้านบกพร่อง คุณจะจัดการความขัดแย้งนี้อย่างไร?",
+                qEn: "13. Branch outsourced janitorial and security personnel argue fiercely over refrigerator compartment space, degrading front-lobby cleanliness standards. How do you arbitrate?",
+                options: [
+                    "ก. ยกตู้เย็นส่วนกลางไปทิ้งเพื่อตัดปัญหาการแย่งชิง",
+                    "ข. เรียกทั้งสองฝ่ายมาพูดคุยร่วมกันอย่างเป็นกันเอง รับฟังปัญหา และจัดทำข้อตกลงร่วมกัน (เช่น การแบ่งชั้นวางในตู้เย็นชัดเจนและกำหนดการล้างตู้เย็นประจำสัปดาห์) เพื่อคืนความสามัคคีและสมาธิในการทำงาน",
+                    "ค. เลือกเข้าข้างแม่บ้านเพราะสนิทสนมกันมากกว่าและสั่งลงโทษ รปภ.",
+                    "ง. เขียนป้ายคำสั่งห้ามทั้งสองคนใช้ตู้เย็นตลอดไป"
+                ],
+                optionsEn: [
+                    "A. Throw the breakroom refrigerator away entirely.",
+                    "B. Convene both parties calmly, hear grievances, establish structured shelf allocations and weekly cleaning rotations, restoring workplace harmony and operational discipline.",
+                    "C. Favor the cleaner due to personal familiarity while reprimanding security.",
+                    "D. Ban both contracted workers from using workplace refrigeration permanently."
+                ],
                 ans: 1
             },
             {
-                q: "17. อีเมลที่เป็นทางการ (Professional Email) ควรประกอบด้วยส่วนใด?",
-                qEn: "17. What should a professional email contain?",
-                options: ["ก. ตัวอักษรหลากสีและภาษาที่เป็นกันเอง", "ข. แนบรูปกิจกรรมส่วนตัว", "ค. หัวข้อชัดเจน คำขึ้นต้นเหมาะสม เนื้อหากระชับ และข้อมูลติดต่อกลับ", "ง. เน้นตัวหนาทั้งอีเมล"],
-                optionsEn: ["A. Multiple text colours and casual language.", "B. Attachments of personal activity photos.", "C. A clear subject line, appropriate salutation, concise content, and contact details.", "D. Bold text applied throughout the entire email."],
-                ans: 2
-            },
-            {
-                q: "18. หากคุณทำงานผิดพลาดจนส่งผลกระทบต่อผู้อื่น คุณควรจัดการอย่างไร?",
-                qEn: "18. If you make a mistake that impacts others, how should you handle it?",
-                options: ["ก. หลีกเลี่ยงการเผชิญหน้า", "ข. แสดงความรับผิดชอบ (Accountability) และร่วมเสนอทางแก้ไข", "ค. โยนความผิดให้คนในขั้นตอนก่อนหน้า", "ง. ลาออกทันที"],
-                optionsEn: ["A. Avoid confrontation.", "B. Take accountability and actively propose a solution.", "C. Shift the blame to whoever handled the previous step.", "D. Resign immediately."],
+                category: "หมวดที่ 3: การแก้ไขปัญหาหน้างาน ทัศนคติ และบริการลูกค้า",
+                categoryEn: "Category 3: Local Problem Solving & Service Mind",
+                q: "14. หากหน่วยงานราชการในท้องถิ่น (เช่น เทศบาล หรือ อบต.) ส่งเจ้าหน้าที่เข้ามาติดต่อที่สาขาเพื่อขอความร่วมมือสนับสนุนงบประมาณจัดงานประเพณีประจำปีอย่างกะทันหัน โดยไม่มีหนังสือขอความอนุเคราะห์เป็นทางการ คุณควรตอบรับอย่างไร?",
+                qEn: "14. Municipal officials visit the branch requesting immediate discretionary cash donations for local festivals without an official government solicitation letter. How do you respond?",
+                options: [
+                    "ก. ปฏิเสธเสียงแข็งและไล่เจ้าหน้าที่กลับไปเพราะไม่มีหนังสือราชการ",
+                    "ข. ต้อนรับเจ้าหน้าที่อย่างสุภาพ แจ้งนโยบายบริษัทว่าการสนับสนุนต้องผ่านการอนุมัติจากส่วนกลาง พร้อมขอความกรุณาให้เจ้าหน้าที่ออกหนังสือขอความอนุเคราะห์เป็นทางการเพื่อที่คุณจะได้ประสานงานส่งต่อสำนักงานใหญ่พิจารณาตามขั้นตอน",
+                    "ค. ควักเงินสดย่อยของสาขาจ่ายให้เจ้าหน้าที่ไปทันทีเพื่อตัดปัญหา",
+                    "ง. เซ็นเอกสารอนุมัติจ่ายเงินให้ในนามของบริษัททันทีด้วยตนเอง"
+                ],
+                optionsEn: [
+                    "A. Harshly reject and expel the officers from the branch.",
+                    "B. Welcome officials courteously, clarify corporate governance requiring formal sponsorship approval, and request an official municipal letter so you can route the request to HQ for budget review.",
+                    "C. Hand over branch petty cash arbitrarily to avoid local friction.",
+                    "D. Sign off on company corporate sponsorship donations independently."
+                ],
                 ans: 1
             },
             {
-                q: "19. ในงานธุรการ 'Attention to Detail' หมายถึงอะไร?",
-                qEn: "19. In administrative work, what does 'Attention to Detail' mean?",
-                options: ["ก. มุ่งเน้นงานเสร็จตามเวลาโดยไม่ดูความถูกต้อง", "ข. ความละเอียดลออในการตรวจทานความถูกต้องในทุกขั้นตอน", "ค. การจับผิดเพื่อนร่วมงานเพื่อรายงานหัวหน้า", "ง. การจดจำความลับส่วนตัวของทุกคนในสาขา"],
-                optionsEn: ["A. Focusing solely on finishing work on time without checking accuracy.", "B. Being meticulous in verifying correctness at every step.", "C. Finding colleagues' mistakes in order to report them to management.", "D. Memorising everyone's personal secrets in the branch."],
+                category: "หมวดที่ 3: การแก้ไขปัญหาหน้างาน ทัศนคติ และบริการลูกค้า",
+                categoryEn: "Category 3: Local Problem Solving & Service Mind",
+                q: "15. ในช่วงหน้าแล้ง มีกลุ่มเกษตรกรในพื้นที่รวมตัวกันมาที่สาขาเพื่อขอคำปรึกษาและต้องการซื้ออุปกรณ์แบบแบ่งจ่าย (ผ่อนชำระแบบไม่มีดอกเบี้ย) ซึ่งสาขาไม่มีนโยบายนี้รองรับ ทัศนคติและการจัดการของคุณควรเป็นอย่างไร?",
+                qEn: "15. During drought season, local agricultural cooperatives visit seeking 0% installment purchase options which the company policy currently does not offer. What service mindset and action should you adopt?",
+                options: [
+                    "ก. ไล่กลุ่มเกษตรกรออกไปและบอกว่าถ้าไม่มีเงินสดก็ไม่ต้องมาซื้อ",
+                    "ข. ต้อนรับและให้ข้อมูลสินค้าอย่างละเอียด ประสานงานกับสถาบันการเงินหรือสหกรณ์การเกษตรในพื้นที่ที่เป็นพันธมิตรเพื่อแนะนำสินเชื่อดอกเบี้ยต่ำให้แก่ลูกค้า พร้อมรายงานสถิติความต้องการนี้ให้ฝ่ายการตลาดส่วนกลางทราบเพื่อพัฒนาโปรโมชั่น",
+                    "ค. แอบให้ลูกค้ากู้ยืมเงินส่วนตัวของคุณเองโดยคิดดอกเบี้ยร้อยละ 20",
+                    "ง. รับปากว่าจะให้ผ่อนชำระได้เองเพื่อเอาใจลูกค้าไว้ก่อน โดยค่อยไปหาวิธีแก้ตัวกับฝ่ายบัญชีทีหลัง"
+                ],
+                optionsEn: [
+                    "A. Dismiss the farmers, stating cash-only transactions are accepted.",
+                    "B. Warmly consult on product specs, link them with partnered agricultural micro-finance/cooperative institutions, and feed commercial demand insights to central marketing for campaign development.",
+                    "C. Offer private shadow personal loans with 20% interest charges.",
+                    "D. Verbally promise unauthorized installment plans and fabricate explanations later."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 4: การบริหารงานทั่วไป ยานพาหนะ และงานระบบส่วนกลางสาขา (Branch Fleet & Facilities Management)
+            {
+                category: "หมวดที่ 4: ยานพาหนะและงานระบบส่วนกลางสาขา",
+                categoryEn: "Category 4: Branch Fleet & Facilities Management",
+                q: "16. รถกระบะส่งของของสาขาต่างจังหวัดถึงกำหนดต้องต่อภาษีรถยนต์ประจำปีและตรวจสภาพรถ (ทระ.) แต่ใบสำคัญและเล่มทะเบียนตัวจริงทั้งหมดเก็บอยู่ที่สำนักงานใหญ่กรุงเทพฯ คุณต้องวางแผนบริหารจัดการอย่างไรไม่ให้รถขาดต่อภาษี?",
+                qEn: "16. A branch transport truck approaches statutory annual registration and emissions inspection deadlines, but original vehicle logbooks are held at Bangkok HQ. How do you prevent registration lapse?",
+                options: [
+                    "ก. ปล่อยให้รถขาดต่อภาษีไปเรื่อยๆ จนกว่าสำนักงานใหญ่จะส่งเล่มมาให้เอง",
+                    "ข. ประสานงานขอสำเนาหน้าเล่มทะเบียนรถยนต์จากฝ่ายธุรการกลางล่วงหน้า 1 เดือน นำรถเข้าตรวจสภาพที่ ตรอ. ท้องถิ่น และดำเนินการต่อภาษีผ่านระบบออนไลน์ของกรมการขนส่งทางบก หรือประสานงานส่งเอกสารกลับส่วนกลางเพื่อดำเนินการให้ทันกำหนด",
+                    "ค. นำรถไปวิ่งส่งของตามปกติโดยไม่ต้องต่อภาษี และคอยจ่ายเงินค่าปรับให้ตำรวจเมื่อโดนจับ",
+                    "ง. ไปแจ้งความที่สถานีตำรวจท้องถิ่นว่าเล่มทะเบียนรถหายเพื่อขอออกเล่มใหม่เอง"
+                ],
+                optionsEn: [
+                    "A. Allow vehicle registration to expire until HQ forwards documents spontaneously.",
+                    "B. Requisition certified copy of registration 1 month ahead, pass local private inspection (Tor-Ror-Or), and process renewal online through DLT or forward inspection records to HQ Admin expeditiously.",
+                    "C. Operate unregistered vehicles continually and absorb traffic fines.",
+                    "D. File a false police report claiming lost vehicle registration papers."
+                ],
                 ans: 1
             },
             {
-                q: "20. พฤติกรรมใดที่แสดงถึง 'Service Mind' ในงานธุรการ?",
-                qEn: "20. Which behaviour best demonstrates 'Service Mind' in administrative work?",
-                options: ["ก. ปฏิเสธงานทุกอย่างที่ไม่อยู่ใน JD", "ข. กระตือรือร้นในการอำนวยความสะดวกและแก้ไขอุปสรรคให้ผู้อื่น", "ค. บริการดีเฉพาะกับผู้บริหาร", "ง. ยิ้มแย้มแต่ไม่ยอมทำงานสนับสนุน"],
-                optionsEn: ["A. Refusing any task that falls outside the job description.", "B. Being proactive in facilitating and removing obstacles for others.", "C. Providing good service only to executives.", "D. Being friendly but unwilling to carry out support tasks."],
+                category: "หมวดที่ 4: ยานพาหนะและงานระบบส่วนกลางสาขา",
+                categoryEn: "Category 4: Branch Fleet & Facilities Management",
+                q: "17. บิลค่าน้ำและค่าไฟฟ้าของสำนักงานสาขาต่างจังหวัด ส่งมาที่สาขาล่าช้าจนเลยกำหนดวันชำระเงิน และเสี่ยงต่อการถูกตัดน้ำตัดไฟในวันพรุ่งนี้ ในฐานะธุรการคุณจะใช้ช่องทางใดในการแก้ไขปัญหานี้ด่วนที่สุด?",
+                qEn: "17. Delayed utility invoices reach the branch past due date, facing immediate disconnection tomorrow morning. How do you prevent utility cutoff immediately?",
+                options: [
+                    "ก. นั่งรอให้น้ำไฟโดนตัดก่อนแล้วค่อยทำเรื่องแจ้งสำนักงานใหญ่ส่งช่างมาดู",
+                    "ข. นำบิลเอกสารหรือรหัสผู้ใช้ไฟฟ้าไปชำระเงินด่วนผ่านแอปพลิเคชันมือถือ (Mobile Banking) ของบัญชีบริษัท หรือใช้เงินสดย่อยสำรองจ่ายล่วงหน้าแล้วทำเรื่องหักล้างบัญชีด่วนกับฝ่ายการเงินส่วนกลางทันทีเพื่อป้องกันการหยุดชะงักของสาขา",
+                    "ค. โทรศัพท์ไปข่มขู่เจ้าหน้าที่การไฟฟ้าว่าห้ามตัดไฟเด็ดขาดเพราะเป็นบริษัทใหญ่",
+                    "ง. เขียนป้ายบอกพนักงานในออฟฟิศให้ช่วยกันประหยัดน้ำและจุดเทียนทำงานแทน"
+                ],
+                optionsEn: [
+                    "A. Await disconnection before requesting HQ facility intervention.",
+                    "B. Utilize customer account reference codes to execute immediate electronic payment via corporate mobile banking or advance petty cash, reconciling promptly with Central Treasury to preserve operations.",
+                    "C. Intimidate utility linemen over the telephone citing corporate clout.",
+                    "D. Post notices asking staff to light candles and ration water."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: ยานพาหนะและงานระบบส่วนกลางสาขา",
+                categoryEn: "Category 4: Branch Fleet & Facilities Management",
+                q: "18. ระบบคอมพิวเตอร์และเครื่องพิมพ์บาร์โค้ดหน้าร้านสาขาเกิดขัดข้องในเช้าวันจันทร์ ซึ่งเป็นวันที่ลูกค้าสั่งซื้อสินค้าหนาแน่นที่สุด ทำให้ไม่สามารถออกใบกำกับภาษีอย่างย่อได้ คุณจะสั่งการให้ทีมงานหน้าร้านปฏิบัติงานอย่างไร?",
+                qEn: "18. POS terminals and barcode printers crash on a high-traffic Monday morning, disabling automated invoice printing. How do you direct front-desk personnel?",
+                options: [
+                    "ก. ปิดร้านหยุดขายชั่วคราวจนกว่าคอมพิวเตอร์จะซ่อมเสร็จ",
+                    "ข. เปิดระบบใช้งานใบเสร็จรับเงิน/ใบกำกับภาษีแบบเขียนมือสำรอง (Manual Invoice Book) ที่ผ่านการลงทะเบียนถูกต้องคีย์ขายล่วงหน้า พร้อมบันทึกข้อมูลลูกค้าไว้เพื่อคีย์เข้าระบบย้อนหลังเมื่อคอมพิวเตอร์กลับมาใช้งานได้ปกติ และแจ้งไอทีด่วน",
+                    "ค. บอกลูกค้าให้กลับบ้านไปก่อนและค่อยมาซื้อใหม่วันพุธ",
+                    "ง. ให้ลูกค้าหยิบสินค้าไปได้เลยโดยไม่ต้องออกหลักฐานการจ่ายเงินใดๆ"
+                ],
+                optionsEn: [
+                    "A. Shut down the storefront until computer systems are repaired.",
+                    "B. Activate registered manual paper receipt books, log customer data for retrospective ERP posting upon system recovery, and submit high-priority IT escalation tickets.",
+                    "C. Tell prospective buyers to return midweek.",
+                    "D. Allow goods disbursement without financial receipt documentation."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: ยานพาหนะและงานระบบส่วนกลางสาขา",
+                categoryEn: "Category 4: Branch Fleet & Facilities Management",
+                q: "19. ในการดูแลควบคุมพฤติกรรมการใช้รถยนต์ส่วนกลางของสาขา (Branch Fleet Management) มาตรฐานปฏิบัติข้อใดที่ธุรการสาขาต้องบังคับใช้กับพนักงานขับรถทุกคนอย่างเคร่งครัดเพื่อป้องกันการทุจริตน้ำมัน?",
+                qEn: "19. In branch fleet management, which protocol must the administrator mandate across all drivers to combat fuel fraud and vehicle misuse?",
+                options: [
+                    "ก. ให้พนักงานขับรถเซ็นชื่อในกระดาษเปล่าทิ้งไว้ตอนสิ้นเดือน",
+                    "ข. กำหนดให้พนักงานต้องจดบันทึกประวัติการใช้รถ (Logbook) ทุกครั้ง: ระบุเลขไมล์เริ่มต้น-สิ้นสุด, วัตถุประสงค์การเดินทาง, ปริมาณน้ำมันที่เติม พร้อมแนบใบเสร็จจากปั๊มน้ำมันที่ระบุเลขทะเบียนรถตรงตามจริงเพื่อทำระบบตรวจสอบยอด",
+                    "ค. อนุญาตให้พนักงานขับรถนำรถยนต์ของบริษัทกลับไปใช้ส่วนตัวที่บ้านได้ตามสบาย",
+                    "ง. ไม่ต้องทำอะไรเลยเพราะเชื่อใจว่าทุกคนเป็นคนดี"
+                ],
+                optionsEn: [
+                    "A. Have drivers sign blank sheets at month-end.",
+                    "B. Require mandatory vehicle trip logbooks recording odometer start/end readings, purpose of dispatch, liters fueled, accompanied by stamped gas receipts matching license plates.",
+                    "C. Permit unmonitored off-hours personal vehicle usage at home.",
+                    "D. Rely entirely on verbal assurances without audit records."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: ยานพาหนะและงานระบบส่วนกลางสาขา",
+                categoryEn: "Category 4: Branch Fleet & Facilities Management",
+                q: "20. เอกสารสัญญาจ้างบริการพนักงานรักษาความปลอดภัย (รปภ.) ของสาขากำลังจะหมดอายุในอีก 2 สัปดาห์ และคุณตรวจสอบพบว่า รปภ. คนปัจจุบันมักแอบนอนหลับในเวลากลางคืน คุณควรดำเนินการอย่างไรตามลำดับขั้นตอนบริหารจัดการ?",
+                qEn: "20. The branch third-party security guarding contract expires in 2 weeks, and the guard is repeatedly caught sleeping on night shifts. How do you proceed through formal management channels?",
+                options: [
+                    "ก. ไล่ รภป. ออกทันทีในคืนนั้นโดยไม่ต้องแจ้งบริษัทต้นสังกัดของเขา",
+                    "ข. จัดทำรายงานบันทึกประวัติความบกพร่อง (ภาพถ่าย/เวลา) เสนอผู้จัดการสาขาและส่งต่อฝ่ายธุรการกลางเพื่อทำหนังสือแจ้งเตือนไปยังบริษัทรักษาความปลอดภัยคู่สัญญา พร้อมขอให้เปลี่ยนตัวบุคคลหรือพิจารณาเปิดประมูลรายใหม่ล่วงหน้า",
+                    "ค. ซื้อกาแฟไปให้ รปภ. กินทุกคืนเพื่อจะได้ไม่หลับอีก",
+                    "ง. แกล้งทำเป็นมองไม่เห็นเพื่อรักษาความสัมพันธ์อันดีในท้องถิ่น"
+                ],
+                optionsEn: [
+                    "A. Expel the guard off-premises unilaterally in the middle of the night.",
+                    "B. Compile verified breach logs (timestamps/photos), notify the branch manager and HQ Admin to issue formal default notices to the security agency, requesting staff replacement or vendor retendering.",
+                    "C. Provide nightly complimentary coffee out-of-pocket.",
+                    "D. Overlook negligence to avoid local community friction."
+                ],
                 ans: 1
             }
         ];
 
-        /* ============================================================
-           App State
-        ============================================================ */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
         const urlParams = new URLSearchParams(window.location.search);
         const userName = urlParams.get('name') || 'ผู้สมัคร';
@@ -331,15 +583,22 @@
         let currentStep = 0;
         const userAnswers = [];
 
-        /* ============================================================
-           Language helpers
-        ============================================================ */
         function applyLang(lang) {
             currentLang = lang;
             const t = ui[lang];
-            const _lBtn = document.getElementById('langToggle'); if (_lBtn) _lBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> <span>' + t.langBtn + '</span>';
+            const _lBtn = document.getElementById('langToggle');
+            if (_lBtn) {
+                _lBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>${t.langBtn}</span>
+                `;
+            }
             document.getElementById('pageTitle').textContent = t.pageTitle;
-            document.getElementById('userInfo').textContent = t.userInfo(userName, userPos);
+            document.getElementById('userInfo').textContent = t.userInfo(userName, "เจ้าหน้าที่ธุรการสาขาต่างจังหวัด");
             renderQuestion();
         }
 
@@ -347,11 +606,8 @@
             applyLang(currentLang === 'th' ? 'en' : 'th');
         });
 
-        /* ============================================================
-           Render
-        ============================================================ */
         window.onload = () => {
-            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, userPos);
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, "เจ้าหน้าที่ธุรการสาขาต่างจังหวัด");
             renderQuestion();
         };
 
@@ -361,13 +617,17 @@
             const item = questions[currentStep];
             const t = ui[currentLang];
 
+            const catText = (currentLang === 'en' && item.categoryEn) ? item.categoryEn : item.category;
             const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
             const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
 
             const card = document.createElement('div');
             card.className = 'q-card';
             card.innerHTML = `
-                <div class="progress-text">${t.progress(currentStep + 1, questions.length)}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span class="category-badge">${catText}</span>
+                    <span class="progress-text" style="margin-bottom:0;">${t.progress(currentStep + 1, questions.length)}</span>
+                </div>
                 <p class="q-text">${questionText}</p>
                 <div class="options-grid">
                     ${opts.map((opt, i) => `
@@ -377,18 +637,15 @@
             container.appendChild(card);
         }
 
-        /* ============================================================
-           Logic
-        ============================================================ */
         async function selectOption(choiceIndex) {
             const item = questions[currentStep];
             userAnswers.push({
-                text: item.options[choiceIndex],   // always store Thai for Sheet
+                text: item.options[choiceIndex],
                 isCorrect: choiceIndex === item.ans
             });
 
-            if (currentStep < questions.length - 1) {
-                currentStep++;
+            currentStep++;
+            if (currentStep < questions.length) {
                 renderQuestion();
             } else {
                 await finishExam();
@@ -404,36 +661,14 @@
                     <h2 style="color:#f1c40f;">${t.saving}</h2>
                     <p style="opacity:0.8;">${t.savingDesc}</p>
                 </div>
-                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
-        #backBtn {
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            z-index: 9000;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            color: #fff;
-            padding: 7px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            backdrop-filter: blur(8px);
-            transition: background 0.2s;
-        }
-
-        #backBtn:hover {
-            background: rgba(255, 255, 255, 0.28);
-        }
-
-    </style>`;
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
 
             let score = 0;
             const payload = {
-                targetTab: userPos,
+                targetTab: "Branch_Admin",
                 uuid: uuid,
                 name: userName,
-                position: userPos,
+                position: "เจ้าหน้าที่ธุรการสาขาต่างจังหวัด",
                 answersCount: questions.length,
                 userAgent: navigator.userAgent
             };
@@ -441,13 +676,14 @@
             userAnswers.forEach((ans, i) => {
                 if (ans.isCorrect) score++;
                 payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_category`] = questions[i].category;
                 payload[`q${i + 1}_text`] = ans.text;
                 payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
             });
 
             payload.totalScore = String(score);
-            payload.hrStatus = score >= 14 ? "ผ่าน (เรียกสัมภาษณ์)" : (score >= 10 ? "พิจารณาพิเศษ" : "ไม่ผ่าน");
-            payload.decisionNote = score >= 14 ? "เรียกสัมภาษณ์" : (score >= 10 ? "พิจารณา Resume เพิ่มเติม" : "ไม่แนะนำ");
+            payload.hrStatus = score >= 16 ? "ผ่านเกณฑ์โดดเด่น (เรียกสัมภาษณ์)" : (score >= 12 ? "ผ่านเกณฑ์มาตรฐาน (พิจารณาเพิ่มเติม)" : "ไม่ผ่านเกณฑ์");
+            payload.decisionNote = score >= 16 ? "เรียกสัมภาษณ์ มีทักษะการตัดสินใจอิสระ ควบคุมภายใน และแก้ปัญหาหน้างานสาขาดีเยี่ยม" : (score >= 12 ? "พิจารณาประวัติการทำงานและสัมภาษณ์เชิงลึกเพิ่มเติม" : "ไม่แนะนำ");
 
             document.getElementById('modalTitle').textContent = t.modalTitle;
             document.getElementById('modalDesc').textContent = t.modalDesc;
@@ -464,10 +700,11 @@
             }
         }
 
-        
         function goBack() {
             const preScore = urlParams.get('preScore') || '0';
-            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}`;
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
         }
 
         function goHome() {
@@ -485,13 +722,12 @@
                 text-align: center; border: 1px solid rgba(255,255,255,0.2);
                 box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
             <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-        </div>
-            <h2 id="modalTitle"
-                style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
                 ขอบคุณสำหรับคำตอบ!</h2>
             <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
                 ขอให้คุณโชคดีในการสัมภาษณ์</p>

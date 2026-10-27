@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assessment: General Admin Officer - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 860px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.18);
+            border: 1px solid rgba(241, 196, 15, 0.45);
+            color: #f1c40f;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 2.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.15rem 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            text-align: left;
+            font-size: 1.02rem;
+            line-height: 1.55;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: #f1c40f;
+            transform: translateX(4px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        #langToggle,
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #langToggle {
+            right: 16px;
+        }
+
+        #backBtn {
+            left: 16px;
+        }
+
+        #langToggle:hover,
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="backBtn" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back</span>
+    </button>
+    <button id="langToggle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="langBtnText">EN</span>
+    </button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.75rem; letter-spacing: -0.3px;">แบบทดสอบตำแหน่ง เจ้าหน้าที่ธุรการทั่วไป</h1>
+            <p id="userInfo" style="opacity: 0.85; font-size: 1.05rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "EN",
+                pageTitle: "แบบทดสอบตำแหน่ง เจ้าหน้าที่ธุรการทั่วไป",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "TH",
+                pageTitle: "Assessment: General Admin Officer",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            // หมวดที่ 1: การบริหารจัดการเอกสาร ข้อมูล และกฎหมายที่เกี่ยวข้อง (Data, Document & Compliance)
+            {
+                category: "หมวดที่ 1: การบริหารจัดการเอกสาร ข้อมูล และกฎหมายที่เกี่ยวข้อง",
+                categoryEn: "Category 1: Data, Document & Compliance",
+                q: "1. ในฐานะธุรการที่ดูแลเอกสารสัญญาสำคัญของบริษัท คุณตรวจพบว่าเอกสารสัญญาเช่าอาคารสำนักงานต้นฉบับสูญหายไป 1 ชุด ในขณะที่สัญญากำลังจะหมดอายุในอีก 2 เดือน และต้องใช้ในการต่อภาษีป้าย/โรงเรือน ขั้นตอนแรกที่คุณควรดำเนินการอย่างถูกต้องและปลอดภัยที่สุดคืออะไร?",
+                qEn: "1. As the admin custodian of official contracts, you discover that the original office lease contract is missing with 2 months until expiry, needed for municipal signage/property tax renewal. What is your correct first course of action?",
+                options: [
+                    "ก. เงียบไว้ก่อนแล้วลองทำสัญญาปลอมขึ้นมาใหม่โดยเลียนแบบลายเซ็นผู้บริหาร",
+                    "ข. รีบสืบค้นสำเนาสแกน (Digital Copy) ในระบบคลาวด์เพื่อตรวจสอบเงื่อนไข ทำบันทึกข้อความ (Memo) แจ้งผู้บังคับบัญชาตามลำดับชั้น และประสานงานกับคู่สัญญาฝั่งตรงข้ามอย่างเป็นทางการเพื่อขอคัดลอกพร้อมประทับตราสั่งสำเนาถูกต้อง",
+                    "ค. โยนความผิดให้แม่บ้านหรือพนักงานฝึกงานว่าเป็นคนทำหาย",
+                    "ง. ปล่อยให้หมดสัญญาไปเลยแล้วค่อยไปทำสัญญาใหม่ตอนเริ่มปีหน้า"
+                ],
+                optionsEn: [
+                    "A. Stay silent and forge a replacement contract by imitating management signatures.",
+                    "B. Retrieve the digital copy from cloud records, submit a formal memo to management, and coordinate formally with the landlord to obtain a certified true copy.",
+                    "C. Blame the custodial staff or interns for misplacing the document.",
+                    "D. Allow the lease to lapse and negotiate a new contract next fiscal year."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การบริหารจัดการเอกสาร ข้อมูล และกฎหมายที่เกี่ยวข้อง",
+                categoryEn: "Category 1: Data, Document & Compliance",
+                q: "2. ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล (PDPA) ของไทย ข้อใดคือแนวปฏิบัติที่เจ้าหน้าที่ธุรการ \"ต้อง\" ปฏิบัติตามอย่างเคร่งครัดที่สุดในการจัดการเอกสารใบสมัครงานของผู้สมัครที่เข้ามาเขียนทิ้งไว้ที่สำนักงาน?",
+                qEn: "2. Under Thailand's PDPA, what mandatory compliance must administrative officers enforce regarding physical job application forms left at the office?",
+                options: [
+                    "ก. ถ่ายรูปใบสมัครแชร์ลงในกลุ่มไลน์บริษัทเพื่อให้หัวหน้างานทุกคนช่วยกันดู",
+                    "ข. จัดเก็บเอกสารในตู้ที่ล็อกกุญแจอย่างมิดชิด หรือหากเก็บเป็นไฟล์ต้องจำกัดสิทธิ์การเข้าถึง (Access Control) และต้องทำลายเอกสารทิ้งทันทีด้วยการย่อยทำลาย (Shredding) เมื่อพ้นกำหนดระยะเวลาการจัดเก็บที่แจ้งไว้ในนโยบาย (Privacy Notice)",
+                    "ค. เมื่อไม่ใช้งานแล้วให้นำกระดาษด้านหลังที่เหลือว่างอยู่ไปรีไซเคิลเป็นกระดาษหน้าสามสำหรับพิมพ์งานภายใน",
+                    "ง. นำไปชั่งกิโลขายร่วมกับเศษกระดาษอื่นๆ เพื่อนำเงินมาเป็นกองกลางของแผนก"
+                ],
+                optionsEn: [
+                    "A. Photograph resumes and distribute them across internal group chats for informal review.",
+                    "B. Secure forms in locked cabinets (or restricted access digital storage) and cross-shred documents promptly once the retention period specified in the Privacy Notice expires.",
+                    "C. Reuse blank backs of discarded application forms as scratch paper for office printing.",
+                    "D. Sell obsolete candidate resumes as scrap paper to fund departmental snacks."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การบริหารจัดการเอกสาร ข้อมูล และกฎหมายที่เกี่ยวข้อง",
+                categoryEn: "Category 1: Data, Document & Compliance",
+                q: "3. หากคุณได้รับมอบหมายให้จัดระบบการจัดเก็บเอกสาร (Filing System) ขององค์กรที่มีเอกสารเข้า-ออกมากกว่า 5,000 ฉบับต่อเดือน วิธีการจัดหมวดหมู่แบบใดที่จะช่วยลดเวลาในการสืบค้น (Retrieval Time) ของพนักงานในองค์กรได้ดีที่สุด?",
+                qEn: "3. When organizing an archive processing over 5,000 documents monthly, which filing taxonomy minimizes retrieval time across the organization?",
+                options: [
+                    "ก. จัดเก็บตามใจชอบของเจ้าหน้าที่ธุรการแต่ละคน",
+                    "ข. ใช้ระบบจัดเก็บแบบผสมผสาน (Hybrid System) โดยรหัสเอกสารอ้างอิงตามโครงสร้างแผนก (Department Code) บวกปี พ.ศ. และประเภทเอกสาร พร้อมทำดัชนีสืบค้นบนระบบ Digital (ระบบ Search Tag) ควบคู่กับการเก็บเอกสารจริง (Hard Copy) ตามรหัสตำแหน่งตู้",
+                    "ค. เก็บรวมกันในกล่องใบใหญ่โดยเรียงตามวันที่ได้รับเอกสารเพียงอย่างเดียว",
+                    "ง. สแกนเอกสารทุกอย่างเป็นไฟล์ภาพโดยไม่ต้องตั้งชื่อไฟล์ แล้วเก็บไว้ในโฟลเดอร์รวม"
+                ],
+                optionsEn: [
+                    "A. Allow each administrative staff member to store files according to personal habit.",
+                    "B. Implement a Hybrid System using structured metadata (Department Code + Year + Doc Type) indexed via digital search tags coupled with standardized physical shelf/cabinet coordinates.",
+                    "C. Consolidate all papers into large generic cartons ordered solely by receipt date.",
+                    "D. Bulk-scan records as unindexed image files into a single root folder."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การบริหารจัดการเอกสาร ข้อมูล และกฎหมายที่เกี่ยวข้อง",
+                categoryEn: "Category 1: Data, Document & Compliance",
+                q: "4. ในการจัดทำรายงานการประชุม (Minutes of Meeting) สำหรับการประชุมระดับผู้บริหารที่มีข้อถกเถียงและยังไม่ได้ข้อสรุปในวาระสำคัญ ธุรการทั่วไปควรบันทึกเนื้อหาในวาระนั้นอย่างไรให้ถูกต้องตามหลักสากล?",
+                qEn: "4. When drafting executive meeting minutes where a contentious agenda item reaches no final resolution, how should you record the discussion?",
+                options: [
+                    "ก. ไม่ต้องบันทึกวาระนั้นลงไปเลยเพราะยังไม่มีมติที่ประชุม",
+                    "ข. บันทึกสรุปประเด็นสำคัญที่มีการอภิปราย ความเห็นของทั้งสองฝ่ายโดยไม่ใส่ความคิดเห็นส่วนตัว พร้อมระบุสถานะว่า \"ที่ประชุมรับทราบ และมอบหมายให้...ไปศึกษาข้อมูลเพิ่มเติมเพื่อนำเสนอในการประชุมครั้งถัดไป\"",
+                    "ค. เลือกบันทึกเฉพาะความเห็นของผู้บริหารระดับสูงสุดในห้องเท่านั้น",
+                    "ง. เขียนอธิบายอย่างละเอียดว่าใครทะเลาะกับใครและใช้คำพูดรุนแรงแค่ไหน"
+                ],
+                optionsEn: [
+                    "A. Omit the agenda item entirely since no vote or binding consensus was reached.",
+                    "B. Objectively summarize arguments from both perspectives without bias, stating: 'The committee acknowledged the discussion and assigned [Person/Dept] to explore further data for the next session.'",
+                    "C. Record solely the opinion expressed by the highest-ranking executive present.",
+                    "D. Transcribe verbatim heated exchanges and emotional friction between participants."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การบริหารจัดการเอกสาร ข้อมูล และกฎหมายที่เกี่ยวข้อง",
+                categoryEn: "Category 1: Data, Document & Compliance",
+                q: "5. เอกสารประเภทใดต่อไปนี้ตามกฎหมายแพ่งและพาณิชย์และกฎหมายภาษีอากร ที่บริษัทมีหน้าที่ต้องจัดเก็บรักษาไว้ที่สำนักงานอย่างน้อย 5 ปี ถึง 10 ปี ซึ่งธุรการห้ามนำไปทำลายก่อนกำหนดเด็ดขาด?",
+                qEn: "5. Under Thai Civil, Commercial, and Revenue Codes, which category of records must businesses retain for at least 5 to 10 years without premature destruction?",
+                options: [
+                    "ก. ใบสมัครงานและประวัติพนักงานที่ลาออกไปแล้ว",
+                    "ข. สมุดบัญชี เอกสารประกอบการลงบัญชี และงบการเงิน รวมถึงใบกำกับภาษีซื้อ-ขาย",
+                    "ค. ใบเสนอราคาจากซัพพลายเออร์ที่ปิดโครงการไปแล้ว",
+                    "ง. สมุดบันทึกเวลาเข้า-ออกงานรายวันของพนักงาน"
+                ],
+                optionsEn: [
+                    "A. Resumes and exit interview notes of former staff.",
+                    "B. Accounting ledgers, supporting transaction vouchers, financial statements, and official Tax Invoices (Input/Output).",
+                    "C. Expired supplier quotations for concluded tenders.",
+                    "D. Daily visitor and employee sign-in sheets."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 2: การบริหารจัดการทรัพยากรและต้นทุนส่วนกลาง (Office & Asset Management)
+            {
+                category: "หมวดที่ 2: การบริหารจัดการทรัพยากรและต้นทุนส่วนกลาง",
+                categoryEn: "Category 2: Office & Asset Management",
+                q: "6. ฝ่ายบริหารสั่งการให้คุณลดค่าใช้จ่ายสิ้นเปลืองภายในสำนักงาน (Office Utilities & Supplies) ลง 20% ภายในไตรมาสนี้ โดยห้ามส่งผลกระทบต่อประสิทธิภาพการทำงานของพนักงาน โครงการใดต่อไปนี้ที่คุณควรริเริ่มทำเป็นอันดับแรก?",
+                qEn: "6. Management mandates cutting office utility & consumable expenses by 20% this quarter without degrading staff productivity. Which initiative should you launch first?",
+                options: [
+                    "ก. งดสั่งซื้อกระดาษทิชชูในห้องน้ำทั้งหมดเพื่อให้พนักงานพกมาเอง",
+                    "ข. ดำเนินการเปลี่ยนระบบเอกสารเป็นแบบ Paperless (E-Document/E-Approval) ปรับอุณหภูมิเครื่องปรับอากาศส่วนกลางเป็นมาตรฐาน 25°C คู่กับการล้างฟิลเตอร์ทุกเดือน และตั้งระบบโควตาการพิมพ์เอกสารรายแผนก (Print Quota)",
+                    "ค. ปิดไฟทางเดินและลิ้นชักทำงานของพนักงานทุกคนในเวลาบ่ายโมง",
+                    "ง. ยกเลิกสวัสดิการกาแฟและน้ำดื่มของพนักงานทั้งหมด"
+                ],
+                optionsEn: [
+                    "A. Cease purchasing restroom paper towels and mandate employees supply their own.",
+                    "B. Drive Paperless workflows (E-Approval), standardize central AC at 25°C with monthly filter maintenance, and enforce departmental print quotas.",
+                    "C. Switch off corridor lights and lock individual employee desk drawers at 1:00 PM.",
+                    "D. Terminate all complimentary drinking water and coffee provisions."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การบริหารจัดการทรัพยากรและต้นทุนส่วนกลาง",
+                categoryEn: "Category 2: Office & Asset Management",
+                q: "7. ในการคัดเลือกซัพพลายเออร์ (Supplier Selection) เพื่อเข้ามาทำสัญญาจ้างบริการดูแลรักษาความสะอาด (Cleaning Service) ของอาคารสำนักงาน เกณฑ์ข้อใดที่ธุรการมืออาชีพควรให้น้ำหนักความสำคัญมากที่สุดนอกเหนือจากเรื่องราคา?",
+                qEn: "7. When vetting contracted office cleaning vendors, which criterion should a professional administrator prioritize above price alone?",
+                options: [
+                    "ก. ความสนิทสนมส่วนตัวกับตัวแทนของบริษัทนั้น",
+                    "ข. ขอบเขตการทำงาน (SLA/Scope of Work) ที่ชัดเจน, แผนการส่งคนมาทดแทนกรณีพนักงานลา, ประกันความเสียหายต่อทรัพย์สิน และประวัติการประเมินผลงาน (Track Record) จากผู้เชี่ยวชาญรายอื่น",
+                    "ค. ทุนจดทะเบียนของบริษัทที่ต้องสูงที่สุดในประเทศ",
+                    "ง. การที่บริษัทนั้นแถมชุดน้ำยาย่อยสลายขยะฟรีให้ 1 ขวด"
+                ],
+                optionsEn: [
+                    "A. Personal friendship with the sales representative.",
+                    "B. Clear Scope of Work (SLA), guaranteed replacement relief protocols during absence, liability insurance coverage, and verifiable enterprise track record.",
+                    "C. Highest registered corporate capital nationally.",
+                    "D. A complimentary promotional cleaning spray bundle."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การบริหารจัดการทรัพยากรและต้นทุนส่วนกลาง",
+                categoryEn: "Category 2: Office & Asset Management",
+                q: "8. ระบบการควบคุมสต็อกสินค้าคงคลังสำหรับอุปกรณ์สำนักงาน (Stationery Stock Control) แบบใดที่จะช่วยป้องกันปัญหา \"ของขาดมือ\" (Stockout) และ \"ของเสื่อมสภาพคาสต็อก\" (Dead Stock) ได้ดีที่สุด?",
+                qEn: "8. Which stationery stock control framework best prevents both stockouts and expired/dead stock?",
+                options: [
+                    "ก. ระบบสั่งซื้อตามอารมณ์เมื่อเห็นว่าตู้โล่ง",
+                    "ข. การกำหนดจุดสั่งซื้อซ้ำ (Re-order Point) โดยคำนวณจากอัตราการใช้เฉลี่ยและเวลาในการจัดส่ง (Lead Time) ควบคู่กับการเช็กสต็อกจริงทุกสิ้นเดือน และใช้หลักการ FIFO (First-In, First-Out) ในการจ่ายของ",
+                    "ค. การสั่งซื้อมาเก็บไว้คราวละมากๆ สำหรับการใช้งาน 3 ปี เพื่อจะได้ส่วนลดปริมาณ",
+                    "ง. การปล่อยให้พนักงานเดินหยิบของในคลังสินค้าได้เองโดยไม่ต้องจดบันทึก"
+                ],
+                optionsEn: [
+                    "A. Ad-hoc ordering whenever supply shelves visually appear empty.",
+                    "B. Establishing Re-order Points based on burn rate and lead times, paired with monthly physical inventory counts and FIFO disbursement.",
+                    "C. Purchasing 3-year stockpiles in bulk to capture maximum volume discounts.",
+                    "D. Allowing unmonitored self-service withdrawals from storage rooms."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การบริหารจัดการทรัพยากรและต้นทุนส่วนกลาง",
+                categoryEn: "Category 2: Office & Asset Management",
+                q: "9. หากมีเจ้าหน้าที่ตรวจสอบจากหน่วยงานภายนอก (เช่น สรรพากร หรือ ผู้ตรวจสอบภายใน) เข้ามาขอสุ่มตรวจนับ \"สินทรัพย์ถาวร\" (Fixed Assets) ของสำนักงาน เช่น คอมพิวเตอร์ เก้าอี้ เครื่องพิมพ์ เอกสารสำคัญใดที่ธุรการต้องนำมาแสดงคู่กับสินทรัพย์เพื่อความถูกต้อง?",
+                qEn: "9. During external or internal audits of company Fixed Assets (PCs, ergonomic chairs, printers), which registry must the admin present for physical verification?",
+                options: [
+                    "ก. ทะเบียนคุมสินทรัพย์ (Fixed Asset Register) ที่ระบุรหัสสินทรัพย์ (Asset Tag) วันที่ซื้อ และตำแหน่งที่ตั้งปัจจุบัน",
+                    "ข. แผ่นพับโฆษณาของสินค้าชิ้นนั้น",
+                    "ค. นามบัตรของพนักงานขายที่ขายสินทรัพย์ให้เรา",
+                    "ง. ใบเสร็จรับเงินค่าซ่อมแซมครั้งล่าสุด"
+                ],
+                optionsEn: [
+                    "A. The official Fixed Asset Register itemizing Asset Tag barcode, acquisition date, cost center, and designated physical location.",
+                    "B. Commercial product brochures and marketing leaflets.",
+                    "C. Business cards of vendor account managers.",
+                    "D. Invoices from recent routine repair tickets."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 2: การบริหารจัดการทรัพยากรและต้นทุนส่วนกลาง",
+                categoryEn: "Category 2: Office & Asset Management",
+                q: "10. ในกรณีที่เครื่องถ่ายเอกสารส่วนกลางที่เช่ามาเกิดชำรุดเสียหายใช้งานไม่ได้ในวันที่มีการจัดอบรมใหญ่ของบริษัท และช่างจากบริษัทเช่าแจ้งว่าจะเข้าได้ในวันถัดไป ในฐานะธุรการทั่วไป คุณจะแก้ปัญหาเฉพาะหน้านี้อย่างไร?",
+                qEn: "10. The leased multifunction printer breaks down on the morning of a major company-wide training, and the technician cannot arrive until tomorrow. How do you resolve this immediate roadblock?",
+                options: [
+                    "ก. โทรไปยกเลิกงานอบรมทั้งหมดทันที",
+                    "ข. ประสานงานขอความช่วยเหลือไปยังแผนกอื่นที่มีเครื่องพิมพ์สำรอง หรือติดต่อร้านถ่ายเอกสารใกล้เคียงเพื่อส่งไฟล์ไปจัดพิมพ์เร่งด่วน พร้อมทั้งทำป้ายแจ้งพนักงานในออฟฟิศชั่วคราวให้ทราบถึงจุดเปลี่ยนไปใช้เครื่องพิมพ์สำรอง",
+                    "ค. นั่งร้องไห้และรอจนกว่าช่างจะมาในวันรุ่งขึ้น",
+                    "ง. ลองแกะเครื่องถ่ายเอกสารออกมาซ่อมแซมระบบวงจรภายในด้วยตัวเอง"
+                ],
+                optionsEn: [
+                    "A. Cancel the executive training symposium immediately.",
+                    "B. Reroute print queues to auxiliary departmental printers or engage a nearby print shop for urgent runouts, posting detour signage in the lobby.",
+                    "C. Wait passively for next-day technician dispatch.",
+                    "D. Disassemble internal electrical logic boards personally."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 3: การประสานงาน การแก้ไขปัญหาเฉพาะหน้า และมนุษยสัมพันธ์ (Coordination & Crisis Resolution)
+            {
+                category: "หมวดที่ 3: การประสานงาน การแก้ไขปัญหาเฉพาะหน้า และมนุษยสัมพันธ์",
+                categoryEn: "Category 3: Coordination & Crisis Resolution",
+                q: "11. ผู้บริหารระดับสูงเรียกคุณเข้าพบด้วยความโมโห เนื่องจากคุณจัดตารางเวลารถตู้ส่วนกลางของบริษัททับซ้อนกัน (Overbooking) ระหว่างงานด่วนของท่าน กับงานออกบูธของฝ่ายขายที่จองไว้ล่วงหน้า 1 เดือน คุณควรแก้ปัญหานี้อย่างไร?",
+                qEn: "11. An executive reprimands you over an overbooked corporate van between their urgent trip and a sales booth scheduled a month ago. How do you resolve this conflict?",
+                options: [
+                    "ก. บอกผู้บริหารว่าฝ่ายขายจองก่อน ดังนั้นท่านต้องยอมหลีกทางให้ฝ่ายขาย",
+                    "ข. กล่าวขออภัยผู้บริหารและยอมรับความผิดพลาดในระบบจัดตาราง จากนั้นรีบจัดหารถตู้ VIP จากบริการภายนอก (Outsource/Car Rental) มารองรับผู้บริหารทันทีโดยใช้งบกลางของธุรการ เพื่อให้ทั้งสองงานเดินหน้าได้โดยไม่สะดุด",
+                    "ค. ไปบังคับให้ฝ่ายขายยกเลิกงานออกบูธและขนของขึ้นรถเมล์ไปเอง",
+                    "ง. ลาป่วยกะทันหันในวันนั้นเพื่อเลี่ยงการเผชิญหน้า"
+                ],
+                optionsEn: [
+                    "A. Tell the executive that sales booked first, so executive leadership must yield.",
+                    "B. Acknowledge the scheduling lapse calmly, apologize, and urgently charter a replacement VIP van from corporate rental partners so both agendas proceed seamlessly.",
+                    "C. Force the sales team to cancel their expo and carry demo equipment via city buses.",
+                    "D. Take unplanned sick leave to evade confrontation."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การประสานงาน การแก้ไขปัญหาเฉพาะหน้า และมนุษยสัมพันธ์",
+                categoryEn: "Category 3: Coordination & Crisis Resolution",
+                q: "12. พนักงานสองแผนกเปิดศึกทะเลาะกันรุนแรงที่หน้าเคาน์เตอร์ธุรการ เนื่องจากแย่งกันใช้ห้องประชุมใหญ่ที่ต่างฝ่ายต่างอ้างว่าตนเองมีสิทธิ์ใช้ ในฐานะคนที่ดูแลห้องประชุมกลาง คุณจะมีวิธีระงับข้อพิพาทนี้อย่างไร?",
+                qEn: "12. Two departmental heads clash aggressively at the admin counter over simultaneous claims to the boardroom. As facility coordinator, how do you defuse this dispute?",
+                options: [
+                    "ก. เชิญทั้งสองฝ่ายออกจากห้องประชุม ตรวจสอบระบบบันทึกการจองห้องกลาง (Booking System) เพื่อดูว่าตามสิทธิ์ระบุชื่อใคร จากนั้นเสนอทางเลือกห้องประชุมย่อยอื่นหรือระดมเปิดห้องประชุมระบบออนไลน์ (Virtual Meeting) ให้แผนกที่ไม่ได้สิทธิ์ใช้งานเพื่อคลี่คลายสถานการณ์",
+                    "ข. ให้พนักงานทั้งสองแกล้งเป่ายิ้งฉุบกัน ใครชนะได้ห้องไป",
+                    "ค. เดินหนีเข้าไปในห้องน้ำเพื่อไม่ให้ตนเองต้องไปพัวพันกับความขัดแย้ง",
+                    "ง. เรียกพนักงานรักษาความปลอดภัยมาลากตัวพนักงานทั้งสองฝ่ายออกไปนอกบริษัท"
+                ],
+                optionsEn: [
+                    "A. Escort both parties to a neutral zone, inspect the official digital booking timestamp, confirm legitimate entitlement, and facilitate an alternative break-out room or virtual bridge for the other team.",
+                    "B. Suggest a rock-paper-scissors game to determine boardroom access.",
+                    "C. Retreat into the restroom to avoid entanglement.",
+                    "D. Instruct security guards to physically drag both employees off corporate premises."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 3: การประสานงาน การแก้ไขปัญหาเฉพาะหน้า และมนุษยสัมพันธ์",
+                categoryEn: "Category 3: Coordination & Crisis Resolution",
+                q: "13. มีบุคคลภายนอกที่ไม่ยอมแจ้งชื่อและไม่มีนัดหมายล่วงหน้า เดินดุ่มๆ เข้ามาในสำนักงานและอ้างว่าเป็นญาติสนิทของผู้บริหาร ต้องการขอเข้าไปนั่งรอในห้องทำงานส่วนตัวของผู้บริหาร พฤติกรรมใดของธุรการต้อนรับที่ถูกต้องตามมาตรฐานความปลอดภัย?",
+                qEn: "13. An unannounced visitor refuses to state their full name, claiming to be an executive's close relative and demanding entry into the executive's private office. What protocol must you enforce?",
+                options: [
+                    "ก. เปิดประตูห้องทำงานผู้บริหารให้เข้าไปนั่งรอเพื่อความสะดวกสบายของแขก",
+                    "ข. เชิญบุคคลนั้นนั่งรอที่พื้นที่ส่วนต้อนรับ (Reception Area) ด้านนอกอย่างสุภาพ ปฏิเสธการให้เข้าพื้นที่ภายในโดยเด็ดขาดหากไม่มีการยืนยัน จากนั้นโทรศัพท์แจ้งเลขาฯ หรือติดต่อผู้บริหารโดยตรงเพื่อยืนยันตัวตนก่อนดำเนินการขั้นต่อไป",
+                    "ค. เดินไปบอกพนักงานทุกคนในออฟฟิศให้ระวังขโมย",
+                    "ง. ปล่อยให้บุคคลนั้นเดินสำรวจออฟฟิศได้ตามสบาย"
+                ],
+                optionsEn: [
+                    "A. Unlock the executive suite immediately to maximize guest comfort.",
+                    "B. Politely invite the individual to remain seated in the public reception lobby, restrict internal access, and verify identity via the executive secretary before permitting entry.",
+                    "C. Announce across the office floor that an intruder is present.",
+                    "D. Permit unescorted wandering across corporate workspaces."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การประสานงาน การแก้ไขปัญหาเฉพาะหน้า และมนุษยสัมพันธ์",
+                categoryEn: "Category 3: Coordination & Crisis Resolution",
+                q: "14. ในเช้าวันจันทร์ที่คุณมีงานล้นมือ แต่หัวหน้างานส่งไลน์มาสั่งงานด่วนพร้อมกัน 3 งาน ได้แก่ จองตั๋วเครื่องบินให้ผู้บริหาร, สั่งซื้อหมึกพิมพ์ที่หมด, และส่งเอกสารบัญชีให้สรรพากรภายในเที่ยงวันนี้ คุณมีหลักการจัดลำดับความสำคัญ (Prioritization) อย่างไร?",
+                qEn: "14. On a packed Monday morning, your supervisor assigns three urgent tasks: booking executive flights, ordering depleted printer toner, and submitting tax records to the Revenue Dept by 12:00 PM. How do you prioritize?",
+                options: [
+                    "ก. ทำงานที่ง่ายที่สุดอย่างสั่งซื้อหมึกพิมพ์ก่อนเพื่อให้เสร็จไปทีละงาน",
+                    "ข. จัดลำดับตามผลกระทบ (Impact) และกำหนดเวลา (Deadline): 1) ส่งเอกสารสรรพากร (เพราะมีเส้นตายเที่ยงและมีโทษปรับ) 2) จองตั๋วเครื่องบิน (ตรวจสอบเวลาเดินทางของผู้บริหาร) 3) สั่งซื้อหมึกพิมพ์ (หากยังมีสต็อกสำรองเหลืออยู่บ้าง)",
+                    "ค. เลือกทำตามอารมณ์และแจ้งหัวหน้าว่าทำไม่ทันเพราะงานเยอะเกินไป",
+                    "ง. นั่งทำพร้อมกันทั้ง 3 งานในเวลาเดียวกันเพื่อความรวดเร็ว"
+                ],
+                optionsEn: [
+                    "A. Complete the easiest task first (ordering toner) to clear visual clutter.",
+                    "B. Rank by impact and strict deadline: 1) Revenue Dept submission (noon deadline with statutory financial penalties), 2) Executive flight booking, 3) Toner requisition.",
+                    "C. Refuse tasks arbitrarily citing cognitive workload overload.",
+                    "D. Juggle all three simultaneously on a single screen without sequencing."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การประสานงาน การแก้ไขปัญหาเฉพาะหน้า และมนุษยสัมพันธ์",
+                categoryEn: "Category 3: Coordination & Crisis Resolution",
+                q: "15. ข้อใดคือทักษะการสื่อสาร (Communication Skill) ที่เจ้าหน้าที่ธุรการควรใช้มากที่สุด เมื่อต้องโทรไปติดตามใบวางบิล/ใบแจ้งหนี้จากซัพพลายเออร์ที่ส่งเอกสารล่าช้าจนระบบบัญชีของบริษัทจะปิดรอบ?",
+                qEn: "15. Which communication approach is most effective when following up overdue supplier billing statements before accounting cycle cutoff?",
+                options: [
+                    "ก. พูดจาข่มขู่ว่าจะไม่ยอมจ่ายเงินให้ตลอดไปหากส่งช้าอีก",
+                    "ข. สื่อสารด้วยน้ำเสียงสุภาพแต่หนักแน่น แจ้งเหตุผลและผลกระทบเชิงระบบอย่างชัดเจน (หากส่งไม่ทันรอบนี้ เงินจะออกล่าช้าไปอีก 1 เดือน) พร้อมระบุวันเวลาเส้นตายที่ชัดเจน และเสนอช่องทางการส่งทางอีเมล/ไลน์ล่วงหน้าเพื่อความรวดเร็ว",
+                    "ค. โทรไปร้องไห้เพื่อขอความเห็นใจจากซัพพลายเออร์",
+                    "ง. ปล่อยให้ระบบบัญชีปิดไปโดยไม่ตาม เพราะไม่ใช่หน้าที่โดยตรงของธุรการ"
+                ],
+                optionsEn: [
+                    "A. Threaten perpetual payment suspension if future deliveries are late.",
+                    "B. Speak with polite assertiveness, articulating systemic impact (delayed payment runs by a full month), establishing an explicit cutoff, and offering digital pre-transmission.",
+                    "C. Plead emotionally on the phone for supplier sympathy.",
+                    "D. Ignore the billing cutoff since accounting reconciliation is not purely administrative."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 4: การบริหารงานพิธีการ การจัดซื้อ และงานซัพพอร์ตองค์กร (Admin Logistics & Procurement)
+            {
+                category: "หมวดที่ 4: การบริหารงานพิธีการ การจัดซื้อ และงานซัพพอร์ตองค์กร",
+                categoryEn: "Category 4: Admin Logistics & Procurement",
+                q: "16. ในการจัดเตรียมอาหารว่างและเครื่องดื่มสำหรับต้อนรับคณะกรรมการตรวจประเมินมาตรฐานสากล (เช่น ISO) ที่จะมาอยู่ที่บริษัทเต็มวัน ปัจจัยใดที่ธุรการระดับสูงต้องตรวจสอบล่วงหน้าเพื่อแสดงความใส่ใจระดับมืออาชีพ?",
+                qEn: "16. When arranging catering for visiting ISO audit evaluators conducting full-day assessments, what detail demonstrates top-tier professional diligence?",
+                options: [
+                    "ก. ยี่ห้อของจานชามที่ต้องแพงที่สุด",
+                    "ข. การเช็กข้อมูลข้อจำกัดด้านอาหาร (Dietary Restrictions) ของคณะผู้ตรวจ เช่น มีใครแพ้อาหาร ทานมังสวิรัติ หรือทานฮาลาลหรือไม่ พร้อมจัดเวลาเสิร์ฟที่ไม่ขัดจังหวะการตรวจประเมิน",
+                    "ค. การเลือกอาหารที่มีกลิ่นฉุนรุนแรงเพื่อให้ห้องประชุมมีชีวิตชีวา",
+                    "ง. การเตรียมเครื่องดื่มแอลกอฮอล์ไว้ต้อนรับตั้งแต่ช่วงเช้า"
+                ],
+                optionsEn: [
+                    "A. Selecting the most expensive porcelain china brand available.",
+                    "B. Pre-verifying dietary restrictions (allergies, vegan, Halal) and coordinating unobtrusive refreshment service synchronized with audit milestones.",
+                    "C. Serving pungent foods to keep the conference room energetic.",
+                    "D. Preparing alcoholic cocktails during morning audit sessions."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารงานพิธีการ การจัดซื้อ และงานซัพพอร์ตองค์กร",
+                categoryEn: "Category 4: Admin Logistics & Procurement",
+                q: "17. การเดินทางไปปฏิบัติงานต่างจังหวัดของผู้บริหารระดับสูง (Business Trip Logistics) ข้อใดคือหน้าที่ในการเตรียมข้อมูลของธุรการที่ \"ครบถ้วน\" และช่วยลดความผิดพลาดได้ดีที่สุด?",
+                qEn: "17. When organizing an executive's multi-day regional business trip, which administrative package ensures seamless execution?",
+                options: [
+                    "ก. การบอกแค่ชื่อโรงแรมและเวลากระชั้นชิดให้ผู้บริหารไปหาทางไปเอง",
+                    "ข. การจัดทำ \"กำหนดการเดินทาง (Itinerary)\" ที่ระบุเวลา เที่ยวบิน รายละเอียดที่พัก แผนที่ จุดนัดพบ เบอร์ติดต่อบุคคลสำคัญในพื้นที่ และเตรียมเอกสาร/สไลด์ที่ต้องใช้ในการประชุมใส่โฟลเดอร์ให้พร้อม",
+                    "ค. การจองตั๋วเครื่องบินเที่ยวที่ราคาถูกที่สุดโดยไม่สนใจเวลาประชุมของผู้บริหาร",
+                    "ง. การให้ผู้บริหารเป็นคนขับรถและเปิด GPS หาเส้นทางด้วยตนเอง"
+                ],
+                optionsEn: [
+                    "A. Texting the hotel name minutes before departure.",
+                    "B. Compiling a comprehensive Travel Itinerary detailing flight gates, hotel confirmations, meeting GPS points, regional liaison contacts, and briefing slide decks in a bound folder.",
+                    "C. Booking red-eye flights regardless of scheduled presentation hours.",
+                    "D. Expecting the executive to navigate unknown terrain unassisted."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารงานพิธีการ การจัดซื้อ และงานซัพพอร์ตองค์กร",
+                categoryEn: "Category 4: Admin Logistics & Procurement",
+                q: "18. หากระบบปรับอากาศส่วนกลางของอาคารสำนักงานเกิดชำรุดพร้อมกัน 3 ชั้น ในช่วงเวลาบ่ายโมงที่มีพนักงานทำงานอยู่หนาแน่น ขั้นตอนการจัดการเหตุฉุกเฉิน (Emergency Response) ของธุรการควรเป็นอย่างไร?",
+                qEn: "18. Central AC units fail across 3 floors at 1:00 PM during peak occupancy. What is the administrator's proper emergency protocol?",
+                options: [
+                    "ก. แจ้งพนักงานให้หยุดงานและกลับบ้านทันทีโดยไม่ขออนุมัติจากผู้บริหาร",
+                    "ข. รีบแจ้งทีมซ่อมบำรุงอาคาร (Technician) เข้าตรวจสอบทันที ทำบันทึกแจ้งผู้บริหารเพื่อทราบสถานการณ์ และประสานงานจัดหาพัดลมไอเย็น/พัดลมเคลื่อนที่สำรองมาตั้งกระจายตามจุดวิกฤตชั่วคราว พร้อมประสานเปิดหน้าต่างระบายอากาศหากทำได้",
+                    "ค. นิ่งเฉยและบอกพนักงานว่าให้ช่วยกันอดทนเพื่อบริษัท",
+                    "ง. เดินไปปรับอุณหภูมิที่หน้าจอตู้ควบคุมซ้ำๆ เผยระบบจะหายเสียเอง"
+                ],
+                optionsEn: [
+                    "A. Announce immediate unauthorized building evacuation.",
+                    "B. Dispatch building facility engineers immediately, notify executive management, mobilize portable cooling/fans to dense workstations, and optimize ventilation.",
+                    "C. Advise staff to endure the heat silently for corporate endurance.",
+                    "D. Repeatedly press control panel buttons hoping automated recovery occurs."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารงานพิธีการ การจัดซื้อ และงานซัพพอร์ตองค์กร",
+                categoryEn: "Category 4: Admin Logistics & Procurement",
+                q: "19. ในกระบวนการจัดซื้อจัดจ้างสินค้าทั่วไป (Procurement) ของฝ่ายธุรการ ข้อใดคือเหตุผลสำคัญที่สุดที่ต้องมีการขอใบเสนอราคา (Quotation) จากซัพพลายเออร์อย่างน้อย 3 รายขึ้นไปก่อนออกใบสั่งซื้อ (PO)?",
+                qEn: "19. In general corporate procurement, why is obtaining at least 3 vendor quotations mandatory prior to issuing a Purchase Order (PO)?",
+                options: [
+                    "ก. เพื่อนำมาใช้เป็นข้ออ้างในการดึงเวลาการจัดซื้อให้ช้าลง",
+                    "ข. เพื่อให้เกิดการเปรียบเทียบราคา คุณสมบัติสินค้า เงื่อนไขการรับประกัน และเครดิตเทอม (Credit Term) ที่คุ้มค่าและโปร่งใสที่สุดตามหลักธรรมาภิบาลของบริษัท",
+                    "ค. เพื่อให้ซัพพลายเออร์ทั้ง 3 รายมาร่วมกันแจกของแถมให้ธุรการ",
+                    "ง. เป็นกฎระเบียบที่ตั้งไว้เฉยๆ ไม่มีผลในทางปฏิบัติ"
+                ],
+                optionsEn: [
+                    "A. To deliberately stall administrative requisition timelines.",
+                    "B. To ensure objective evaluation of pricing, specifications, warranty covenants, and commercial credit terms under corporate governance standards.",
+                    "C. To solicit promotional gifts from bidding vendors.",
+                    "D. It is a nominal formality with zero practical utility."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารงานพิธีการ การจัดซื้อ และงานซัพพอร์ตองค์กร",
+                categoryEn: "Category 4: Admin Logistics & Procurement",
+                q: "20. เอกสารสัญญาจ้างบริการแม่บ้านประจำสำนักงานกำลังจะหมดอายุในอีก 1 เดือนข้างหน้า และผลการประเมินงานที่ผ่านมาพบว่าแม่บ้านชุดเดิมทำงานต่ำกว่ามาตรฐาน (KPI ไม่ผ่าน) ในฐานะธุรการทั่วไปที่กำกับดูแล คุณควรวางแผนอย่างไร?",
+                qEn: "20. The office janitorial service contract expires in one month, and current vendor KPIs have repeatedly failed. As supervising admin, what is your strategic roadmap?",
+                options: [
+                    "ก. ปล่อยให้สัญญาหมดไปเฉยๆ โดยไม่ต้องแจ้งล่วงหน้าแล้วค่อยหาคนใหม่วันรุ่งขึ้น",
+                    "ข. จัดทำรายงานประเมินผลงานเสนอผู้บริหารเพื่อขออนุมัติไม่ต่อสัญญา จากนั้นทำหนังสือแจ้งเตือนล่วงหน้าตามเงื่อนไขในสัญญาเดิม พร้อมขนานคู่ไปกับการสรรหาและเปิดรับใบเสนอราคาจากบริษัทแม่บ้านรายใหม่มาเปรียบเทียบทันทีเพื่อไม่ให้งานสะดุด",
+                    "ค. เดินไปต่อว่าแม่บ้านด้วยถ้อยคำรุนแรงประชดประชันเพื่อให้ลาออกไปเอง",
+                    "ง. แกล้งทำเป็นลืมเรื่องหมดสัญญาเพื่อจะได้ไม่ต้องทำงานเพิ่ม"
+                ],
+                optionsEn: [
+                    "A. Let the contract lapse unannounced and recruit ad-hoc replacements the next morning.",
+                    "B. Present a KPI performance audit to leadership requesting non-renewal approval, issue contractual notice of termination, and simultaneously tender competitive RFP bids to ensure seamless service continuity.",
+                    "C. Berate cleaning staff with abrasive sarcasm to induce resignation.",
+                    "D. Feign ignorance of the expiration date to avoid RFP workload."
+                ],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'General_Admin';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            const _lBtn = document.getElementById('langToggle');
+            if (_lBtn) {
+                _lBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>${t.langBtn}</span>
+                `;
+            }
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, "เจ้าหน้าที่ธุรการทั่วไป");
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, "เจ้าหน้าที่ธุรการทั่วไป");
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const catText = (currentLang === 'en' && item.categoryEn) ? item.categoryEn : item.category;
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span class="category-badge">${catText}</span>
+                    <span class="progress-text" style="margin-bottom:0;">${t.progress(currentStep + 1, questions.length)}</span>
+                </div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: "General_Admin",
+                uuid: uuid,
+                name: userName,
+                position: "เจ้าหน้าที่ธุรการทั่วไป",
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_category`] = questions[i].category;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "ผ่านเกณฑ์โดดเด่น (เรียกสัมภาษณ์)" : (score >= 12 ? "ผ่านเกณฑ์มาตรฐาน (พิจารณาเพิ่มเติม)" : "ไม่ผ่านเกณฑ์");
+            payload.decisionNote = score >= 16 ? "เรียกสัมภาษณ์ มีความรู้ด้านเอกสาร กฎหมาย และการบริหารจัดการออฟฟิศดีเยี่ยม" : (score >= 12 ? "พิจารณาประวัติการทำงานและสัมภาษณ์เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>

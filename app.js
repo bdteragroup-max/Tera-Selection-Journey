@@ -1223,7 +1223,8 @@ function finishEqAssessment() {
 const EXAM_CHOICES = [
   { label: "บัญชีทั่วไป", labelEn: "General Accounting", url: "exam-accounting.html" },
   { label: "บัญชีระดับหัวหน้า/ผู้จัดการ", labelEn: "Accounting Manager", url: "exam-accounting-manager.html" },
-  { label: "แอดมินสาขา/ธุรการ", labelEn: "Branch Admin", url: "exam-branch-admin.html" },
+  { label: "เจ้าหน้าที่ธุรการทั่วไป", labelEn: "General Admin Officer", url: "exam-general-admin.html" },
+  { label: "แอดมินสาขา/ธุรการต่างจังหวัด", labelEn: "Upcountry Branch Admin", url: "exam-branch-admin.html" },
   { label: "ผู้จัดการสาขา", labelEn: "Branch Manager", url: "exam-branch-manager.html" },
   { label: "BD / Developer", labelEn: "BD / Developer", url: "exam-bd.html" },
   { label: "Telesales / โทรขาย", labelEn: "Telesales", url: "exam-telesales.html" },
