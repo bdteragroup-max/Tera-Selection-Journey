@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assessment: International Procurement Manager - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 860px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.18);
+            border: 1px solid rgba(241, 196, 15, 0.45);
+            color: #f1c40f;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 2.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.15rem 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            text-align: left;
+            font-size: 1.02rem;
+            line-height: 1.55;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: #f1c40f;
+            transform: translateX(4px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        #langToggle,
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #langToggle {
+            right: 16px;
+        }
+
+        #backBtn {
+            left: 16px;
+        }
+
+        #langToggle:hover,
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="backBtn" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back</span>
+    </button>
+    <button id="langToggle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="langBtnText">EN</span>
+    </button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.75rem; letter-spacing: -0.3px;">แบบทดสอบตำแหน่ง หัวหน้าฝ่ายจัดซื้อต่างประเทศ (International Procurement Manager)</h1>
+            <p id="userInfo" style="opacity: 0.85; font-size: 1.05rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "EN",
+                pageTitle: "แบบทดสอบตำแหน่ง หัวหน้าฝ่ายจัดซื้อต่างประเทศ (International Procurement Manager)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "TH",
+                pageTitle: "Assessment: International Procurement Manager",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            // หมวดที่ 1: กลยุทธ์การสรรหาซัพพลายเออร์โลกและการควบคุมต้นทุน (Global Sourcing Strategy & Total Cost of Ownership)
+            {
+                category: "หมวดที่ 1: กลยุทธ์การสรรหาซัพพลายเออร์โลกและการควบคุมต้นทุน",
+                categoryEn: "Category 1: Global Sourcing & Total Cost of Ownership",
+                q: "1. บริษัทของคุณมีแผนจะสั่งซื้อเครื่องจักรหลักมูลค่า 50 ล้านบาทจากซัพพลายเออร์ในยุโรป โดยมีระยะเวลาผลิตและส่งมอบนาน 9 เดือน ในฐานะหัวหน้าฝ่ายจัดซื้อต่างประเทศ คุณควรวางกลยุทธ์จัดการความเสี่ยงด้านอัตราแลกเปลี่ยน (FX Risk Management) ร่วมกับฝ่ายการเงินอย่างไรเพื่อป้องกันต้นทุนบานปลาย?",
+                qEn: "1. Procuring a 50M THB mission-critical machine from Europe with a 9-month lead time, how should you partner with Treasury to hedge FX volatility risk and prevent cost escalation?",
+                options: [
+                    "ก. รอจนกว่าเครื่องจักรจะผลิตเสร็จแล้วค่อยไปลุ้นอัตราแลกเปลี่ยนที่ธนาคารในวันโอนเงิน",
+                    "ข. แนะนำให้ทำสัญญาซื้อขายเงินตราต่างประเทศล่วงหน้า (Forward Contract) หรือสัญญาสิทธิที่จะซื้อเงินตราต่างประเทศ (FX Options) เพื่อล็อกอัตราแลกเปลี่ยน ณ วันที่เซ็นสัญญา รับประกันว่าต้นทุนสินค้าจะไม่ขยับขึ้นตามความผันผวนของตลาด",
+                    "ค. ขอยกเลิกออร์เดอร์หากค่าเงินบาทอ่อนค่าลงแม้เพียง 1% โดยไม่สนใจค่าปรับ",
+                    "ง. บังคับให้ซัพพลายเออร์ฝั่งยุโรปยอมรับการจ่ายเงินเป็นสกุลเงินบาทไทยในทุกกรณีโดยไม่มีข้อต่อรอง"
+                ],
+                optionsEn: [
+                    "A. Wait passively until delivery and convert spot currency on the wire transfer date.",
+                    "B. Execute a Forward Contract or FX Option collar to lock exchange rates on contract signing, eliminating margin erosion from foreign exchange volatility.",
+                    "C. Cancel the order unilaterally if THB depreciates by even 1% regardless of contract penalties.",
+                    "D. Demand the European vendor accept THB invoice denomination unconditionally."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: กลยุทธ์การสรรหาซัพพลายเออร์โลกและการควบคุมต้นทุน",
+                categoryEn: "Category 1: Global Sourcing & Total Cost of Ownership",
+                q: "2. ในการคำนวณ \"ต้นทุนรวมในการจัดหาผลิตภัณฑ์\" จากต่างประเทศ (Total Cost of Ownership: TCO) ข้อใดคือกลุ่มดัชนีต้นทุนที่ผู้จัดการจัดซื้อต้องนำมาคำนวณให้ครบถ้วนเพื่อไม่ให้เกิดค่าใช้จ่ายแฝง (Hidden Costs)?",
+                qEn: "2. When computing Total Cost of Ownership (TCO) for cross-border procurement, which comprehensive cost cluster must be synthesized to avoid hidden cost overruns?",
+                options: [
+                    "ก. คำนวณเฉพาะราคาหน้าโรงงาน (EXW Price) และค่าระวางเรือเท่านั้น ส่วนค่าใช้จ่ายอื่นให้ฝ่ายบัญชีไปตามล้างตามเช็ดภายหลัง",
+                    "ข. คำนวณราคาประเมินสินค้า, ค่าระวาง (Freight), ประกันภัย (Insurance), ภาษีนำเข้า (Customs Duty), ค่าธรรมเนียมพิธีการ (Clearance Fees), ต้นทุนการถือครองสต็อก (Holding Cost), รวมถึงต้นทุนความเสี่ยงด้านคุณภาพและการส่งมอบล่าช้า",
+                    "ค. นับเฉพาะค่าตั๋วเครื่องบินและค่าโรงแรมที่ใช้เดินทางไปตรวจโรงงานซัพพลายเออร์",
+                    "ง. การสุ่มเดาตัวเลขกลมๆ แล้วบวกเพิ่มไปอีก 5% จากราคาที่ซัพพลายเออร์เสนอมา"
+                ],
+                optionsEn: [
+                    "A. Factor only EXW unit price and ocean freight, leaving all other charges for accounting to absorb later.",
+                    "B. Calculate landed cost: baseline purchase price, freight, marine insurance, customs duty, port clearance, inventory carrying costs, along with quality failure and delay risk premiums.",
+                    "C. Tabulate only flight tickets and hotel accommodations incurred during supplier factory visits.",
+                    "D. Add an arbitrary 5% buffer on top of the supplier's initial quotation."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: กลยุทธ์การสรรหาซัพพลายเออร์โลกและการควบคุมต้นทุน",
+                categoryEn: "Category 1: Global Sourcing & Total Cost of Ownership",
+                q: "3. แหล่งวัตถุดิบหลักในประเทศจีนที่คุณพึ่งพาอยู่เพียงรายเดียว (Sole Sourcing) กำลังเผชิญปัญหามาตรการควบคุมสิ่งแวดล้อมจากรัฐบาลจีน ทำให้กำลังการผลิตลดลงและส่งมอบช้า ในฐานะผู้นำคุณควรปรับกลยุทธ์โครงสร้างห่วงโซ่อุปทาน (Supply Chain Resiliency) อย่างไร?",
+                qEn: "3. A sole-source Chinese raw material supplier faces environmental curtailments, restricting output and delaying shipments. How do you reinforce supply chain resilience?",
+                options: [
+                    "ก. ส่งพนักงานจัดซื้อบินไปนั่งประท้วงที่หน้าโรงงานในจีนเพื่อกดดันให้เขาเร่งผลิต",
+                    "ข. กระจายความเสี่ยงโดยเปลี่ยนมาใช้กลยุทธ์ \"China + 1\" หรือระบบ \"Multi-Sourcing\" เร่งสรรหาและพัฒนาซัพพลายเออร์สำรองในภูมิภาคอื่น เช่น อาเซียน หรืออินเดีย และทำสัญญาจับคู่ธุรกิจในระยะยาวเพื่อสร้างความมั่นคงเชิงวัตถุดิบ",
+                    "ค. สั่งปิดไลน์การผลิตในไทยชั่วคราวและนั่งรอจนกว่าซัพพลายเออร์จีนจะกลับมาผลิตได้ตามปกติ",
+                    "ง. พิมพ์อีเมลไปข่มขู่ซัพพลายเออร์ว่าจะฟ้องร้องต่อศาลโลกหากส่งสินค้าล่าช้ากว่ากำหนด"
+                ],
+                optionsEn: [
+                    "A. Fly procurement buyers to stage a sit-in protest at the supplier's factory gates.",
+                    "B. Execute a 'China + 1' / Multi-Sourcing strategy: rapidly qualify and develop alternate secondary vendors across ASEAN or India, securing raw material flow via long-term framework partnerships.",
+                    "C. Halt domestic manufacturing lines and passively await Chinese regulatory normalization.",
+                    "D. Threaten international court lawsuits via email for schedule slippage."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: กลยุทธ์การสรรหาซัพพลายเออร์โลกและการควบคุมต้นทุน",
+                categoryEn: "Category 1: Global Sourcing & Total Cost of Ownership",
+                q: "4. การประเมินความเสี่ยงและจริยธรรมของคู่ค้าในระดับสากล (Global Supplier Code of Conduct) ก่อนทำการขึ้นทะเบียน (Vendor Qualification) ข้อใดเป็นประเด็นวิกฤตที่จัดซื้อต่างประเทศต้องตรวจสอบอย่างเข้มงวดที่สุดตามมาตรฐาน ESG?",
+                qEn: "4. When qualifying international vendors under modern ESG criteria, which ethical and regulatory compliance pillar must be audited most stringently?",
+                options: [
+                    "ก. การตรวจสอบว่าโลโก้ของซัพพลายเออร์ใช้สีที่เป็นมงคลตามหลักฮวงจุ้ยหรือไม่",
+                    "ข. การตรวจสอบมาตรฐานแรงงาน (ไม่ใช้แรงงานทาสหรือแรงงานเด็ก), กระบวนการบำบัดมลพิษของโรงงาน, ความโปร่งใสทางการเงิน และมาตรการต่อต้านการทุจริตคอร์รัปชัน (Anti-Bribery)",
+                    "ค. การเช็กว่าผู้บริหารของซัพพลายเออร์ชอบตีกอล์ฟเหมือนกับ CEO ของเราหรือไม่",
+                    "ง. การดูว่าซัพพลายเออร์มีของที่ระลึกแจกให้ทีมจัดซื้อในวันปีใหม่มากน้อยเพียงใด"
+                ],
+                optionsEn: [
+                    "A. Verifying if the vendor logo follows auspicious feng shui color harmonies.",
+                    "B. Verifying labor standards (prohibition of forced/child labor), effluent/waste environmental treatment, audited financial disclosures, and robust anti-bribery governance.",
+                    "C. Checking whether vendor directors share golf hobbies with our CEO.",
+                    "D. Inspecting the quantity and extravagance of seasonal holiday gifts offered to buyers."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: กลยุทธ์การสรรหาซัพพลายเออร์โลกและการควบคุมต้นทุน",
+                categoryEn: "Category 1: Global Sourcing & Total Cost of Ownership",
+                q: "5. ซัพพลายเออร์เสนอขายสินค้าลดราคาพิเศษ 30% แต่มีเงื่อนไขว่าต้องสั่งซื้อในปริมาณขั้นต่ำ (MOQ) ที่สูงมาก ซึ่งจะทำให้บริษัทมีสต็อกวัตถุดิบนี้ใช้งานได้ยาวนานถึง 2 ปี ในฐานะหัวหน้าจัดซื้อ คุณจะวิเคราะห์ความคุ้มค่าอย่างไร?",
+                qEn: "5. A supplier offers a 30% discount tied to a huge MOQ representing 2 years of raw material inventory. How should the procurement manager evaluate this trade-off?",
+                options: [
+                    "ก. รีบกดสั่งซื้อทันทีเพราะส่วนลด 30% หาไม่ได้ง่ายๆ และจะช่วยให้ตัวเลขจัดซื้อดูดีในระยะสั้น",
+                    "ข. วิเคราะห์เปรียบเทียบระหว่าง \"เงินที่ประหยัดได้จากส่วนลด\" กับ \"ต้นทุนจมของกระแสเงินสด (Cash Tied Up), ค่าพื้นที่คลังสินค้า, ค่าประกันภัย, และความเสี่ยงที่วัตถุดิบจะเสื่อมสภาพหรือล้าสมัย (Obsolescence Risk) ก่อนจะใช้หมด\"",
+                    "ค. สั่งซื้อมาเก็บไว้ก่อน แล้วค่อยแอบนำไปขายต่อในตลาดมืดเพื่อเอาเงินเข้ากระเป๋าตัวเอง",
+                    "ง. ปฏิเสธข้อเสนอทันทีโดยไม่ทำการคำนวณใดๆ เพราะไม่ชอบทำงานกับซัพพลายเออร์ที่ตั้งเงื่อนไขเยอะ"
+                ],
+                optionsEn: [
+                    "A. Order immediately to showcase short-term purchasing price variances.",
+                    "B. Model discount savings against trapped working capital liquidity, warehousing storage, insurance fees, and the high risk of material degradation or engineering obsolescence over 24 months.",
+                    "C. Procure the lot and secretly arbitrage excess stock into secondary markets for personal gain.",
+                    "D. Reject the offer arbitrarily without quantitative review due to irritation with MOQ stipulations."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 2: กฎหมายศุลกากร เทอมการค้าระหว่างประเทศ และสิทธิประโยชน์ภาษี (Incoterms 2020, Customs & Free Trade Agreements)
+            {
+                category: "หมวดที่ 2: กฎหมายศุลกากร เทอมการค้าระหว่างประเทศ และสิทธิประโยชน์ภาษี",
+                categoryEn: "Category 2: Incoterms, Customs & Trade Agreements",
+                q: "6. หากคุณตกลงซื้อขายสินค้าภายใต้เงื่อนไข Incoterms 2020 เทอม FOB (Free On Board) ณ ท่าเรือต้นทาง ประเทศญี่ปุ่น ความรับผิดชอบใน \"ค่าใช้จ่ายและ ความเสี่ยง\" ของฝั่งคุณในฐานะผู้ซื้อจะเริ่มต้นขึ้นอย่างสมบูรณ์เมื่อใด?",
+                qEn: "6. Under Incoterms 2020 FOB (Free On Board, Port of Origin, Japan), precisely when do cost obligations and cargo loss risks transfer fully to you as the buyer?",
+                options: [
+                    "ก. เมื่อสินค้าถูกขนขึ้นไปวางอยู่บนเรือขนส่งสินค้า (Passed the Ship's Rail / Loaded on Board) ณ ท่าเรือต้นทางที่ระบุไว้ในประเทศญี่ปุ่น",
+                    "ข. เมื่อสินค้าวิ่งออกจากประตูโรงงานของซัพพลายเออร์ในญี่ปุ่น",
+                    "ค. เมื่อเรือขนส่งสินค้าเดินทางมาถึงท่าเรือแหลมฉบัง ประเทศไทย และทำพิธีการศุลกากรเสร็จสิ้น",
+                    "ง. เมื่อพนักงานขับรถของซัพพลายเออร์ญี่ปุ่นโทรมาแจ้งว่ากำลังแพ็กของใส่กล่อง"
+                ],
+                optionsEn: [
+                    "A. When the cargo is loaded fully on board the designated vessel at the named Japanese port of shipment.",
+                    "B. As soon as the cargo leaves the seller's factory loading dock in Japan.",
+                    "C. When the container vessel berths at Laem Chabang Port, Thailand and completes clearance.",
+                    "D. When the Japanese logistics trucker calls stating items are being boxed."
+                ],
+                ans: 0
+            },
+            {
+                category: "หมวดที่ 2: กฎหมายศุลกากร เทอมการค้าระหว่างประเทศ และสิทธิประโยชน์ภาษี",
+                categoryEn: "Category 2: Incoterms, Customs & Trade Agreements",
+                q: "7. บริษัทกำลังนำเข้าวัตถุดิบเคมีภัณฑ์จากเกาหลีใต้เพื่อนำมาผลิตเป็นสินค้าส่งออกไปยังอเมริกา สิทธิประโยชน์ทางภาษีศุลกากรข้อใดในประเทศไทยที่คุณควรประสานงานเพื่อขอลดหย่อนหรือคืนอากรเพื่อสร้างความได้เปรียบด้านต้นทุนสูงสุด?",
+                qEn: "7. Importing Korean chemicals to manufacture goods exported to the US, which Thai customs tax incentives should you utilize for duty drawback and maximum tariff efficiency?",
+                options: [
+                    "ก. การขอผ่อนชำระภาษีนำเข้าเป็นระยะเวลา 10 ปีโดยไม่มีดอกเบี้ย",
+                    "ข. การใช้สิทธิ์ตามมาตรา 29 แห่ง พ.ร.บ. ศุลกากร (การคืนอากรสำหรับวัตถุดิบที่นำเข้ามาผลิตเพื่อส่งออก) หรือการนำเข้าผ่านเขตปลอดอากร (Free Zone) / คลังสินค้าทัณฑ์บน (Bonded Warehouse) ควบคู่กับการใช้สิทธิ์ FTA ไทย-เกาหลี",
+                    "ค. การติดสินบนเจ้าหน้าที่ศุลกากรเพื่อสำแดงพิกัดอัตราศุลกากรให้ต่ำกว่าความเป็นจริง",
+                    "ง. การแจ้งว่าสินค้าดังกล่าวเป็นของขวัญส่วนตัวของกรรมการบริษัทเพื่อละเว้นการเสียภาษี"
+                ],
+                optionsEn: [
+                    "A. Requesting a 10-year interest-free customs duty payment installment plan.",
+                    "B. Leveraging Customs Act Section 29 duty drawback on export raw materials, Free Zone / Bonded Warehouse privileges, coupled with Thai-Korea FTA preferential tariff certifications.",
+                    "C. Offering bribes to misdeclare tariff classifications at artificially lowered duty tiers.",
+                    "D. Falsely designating cargo as personal director gifts to evade duties."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: กฎหมายศุลกากร เทอมการค้าระหว่างประเทศ และสิทธิประโยชน์ภาษี",
+                categoryEn: "Category 2: Incoterms, Customs & Trade Agreements",
+                q: "8. ในขั้นตอนพิธีการศุลกากร สินค้าของคุณโดนเจ้าหน้าที่กักไว้เนื่องจากเกิดข้อสงสัยเรื่อง \"การตีความพิกัดอัตราศุลกากร (HS Code Classification)\" ขัดแย้งกัน ซึ่งอาจทำให้โดนปรับและเสียภาษีย้อนหลังจำนวนมาก จัดซื้อควรแก้ปัญหานี้เชิงระบบอย่างไร?",
+                qEn: "8. Thai customs detains your shipment citing HS Code tariff classification disputes, risking heavy retroactive fines. How should procurement resolve this systematically?",
+                options: [
+                    "ก. โพสต์ด่าการทำงานของกรมศุลกากรลงบนโซเชียลมีเดียเพื่อสร้างแรงกดดันจากสังคม",
+                    "ข. ยื่นคำร้องขอ \"การวินิจฉัยพิกัดอัตราศุลกากรล่วงหน้า (Advance Ruling)\" ต่อกรมศุลกากรอย่างเป็นทางการ โดยแนบเอกสารข้อมูลทางเทคนิค (Technical Data Sheet) และใบรับรองจากสถาบันสากลเพื่อยืนยันพิกัดที่ถูกต้องตามหลักสากล",
+                    "ค. ปล่อยทิ้งสินค้าไว้ที่ท่าเรือให้เน่าเสียแล้วเคลมเงินประกันเต็มจำนวนจากบริษัทประกันภัย",
+                    "ง. สั่งให้ชิปปิ้ง (Customs Broker) บุกรุกเข้าไปในเขตหวงห้ามเพื่อขโมยสินค้าออกมากลางดึก"
+                ],
+                optionsEn: [
+                    "A. Blast the Customs Department on social media to generate public outrage.",
+                    "B. Lodge an official Advance Tariff Ruling petition with comprehensive technical data sheets (TDS), lab assays, and WCO international tariff rulings to establish compliant classification.",
+                    "C. Abandon cargo on the wharf to spoil and fraudulently claim marine insurance.",
+                    "D. Direct freight forwarders to trespass into secure customs yards to retrieve goods covertly."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: กฎหมายศุลกากร เทอมการค้าระหว่างประเทศ และสิทธิประโยชน์ภาษี",
+                categoryEn: "Category 2: Incoterms, Customs & Trade Agreements",
+                q: "9. การทำสัญญาการค้าระหว่างประเทศ (International Purchase Contract) ข้อกฎหมายใดที่จัดซื้อต่างประเทศห้ามละเลยและต้องระบุให้ชัดเจนกรณีเกิดข้อพิพาทด้านสัญญาเพื่อไม่ให้บริษัทเสียเปรียบในแง่คดีความ?",
+                qEn: "9. In cross-border purchase contracts, which legal clause is indispensable for protecting the company against cross-border jurisdictional disadvantages during disputes?",
+                options: [
+                    "ก. การกำหนดสีของกระดาษที่จะใช้พิมพ์สัญญาซื้อขาย",
+                    "ข. การระบุกฎหมายที่ใช้บังคับ (Governing Law) และขอบเขตอำนาจศาล (Jurisdiction) หรือการเลือกใช้กระบวนการอนุญาโตตุลาการระหว่างประเทศ (International Arbitration) เช่น ICC หรือ SIAC ในการระงับข้อพิพาท",
+                    "ค. การระบุรายชื่อร้านอาหารที่ทั้งสองฝ่ายต้องไปรับประทานร่วมกันปีละครั้ง",
+                    "ง. การลงชื่อพยานที่เป็นบุคคลต่างด้าวอย่างน้อย 50 คนเพื่อความน่าเชื่อถือ"
+                ],
+                optionsEn: [
+                    "A. Mandatory paper tint colors for printed contract execution.",
+                    "B. Governing Law and Jurisdiction provisions, or specifying international commercial arbitration seats (such as ICC or SIAC) for enforceable neutral dispute resolution.",
+                    "C. Contractual stipulations of restaurants where executives must dine annually.",
+                    "D. Requiring 50 foreign citizen co-witness signatures for credibility."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: กฎหมายศุลกากร เทอมการค้าระหว่างประเทศ และสิทธิประโยชน์ภาษี",
+                categoryEn: "Category 2: Incoterms, Customs & Trade Agreements",
+                q: "10. ในกรณีที่คุณสั่งซื้อสินค้าเทคโนโลยีที่มีข้อกำหนดควบคุมการส่งออก (Export Control / Dual-Use Items) จากสหรัฐอเมริกา เอกสารสำคัญใดที่ฝ่ายจัดซื้อต่างประเทศต้องเป็นผู้ดำเนินการกรอกและส่งมอบให้ซัพพลายเออร์เพื่อยื่นขอใบอนุญาตต่อรัฐบาลต้นทาง?",
+                qEn: "10. Procuring US-origin dual-use high-tech components subject to ITAR/EAR export controls, which mandatory document must procurement execute for license filings?",
+                options: [
+                    "ก. ใบเสร็จรับเงินค่าน้ำค่าไฟของบริษัทผู้ซื้อ",
+                    "ข. ใบรับรองผู้ใช้สุดท้าย (End-User Certificate: EUC) เพื่อยืนยันว่าสินค้าดังกล่าวจะถูกนำไปใช้ในวัตถุประสงค์ทางพลเรือนที่ถูกต้องและไม่มีการนำไปดัดแปลงเป็นอาวุธหรือส่งต่อไปยังประเทศที่โดนคว่ำบาตร",
+                    "ค. ใบตรวจสุขภาพประจำปีของพนักงานแผนกจัดซื้อทุกคน",
+                    "ง. จดหมายแนะนำตัวจากสมาคมพ่อค้าของเก่าแห่งประเทศไทย"
+                ],
+                optionsEn: [
+                    "A. Utility bill payment receipts from the purchasing entity's headquarters.",
+                    "B. End-User Certificate (EUC) legally certifying intended legitimate civilian end-use without re-export to sanctioned regimes or military diversion.",
+                    "C. Annual physical medical certificates of procurement team staff.",
+                    "D. Endorsement letters from antique dealer trade associations."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 3: การบริหารโลจิสติกส์โลกและการจัดการวิกฤต (Global Logistics & Supply Chain Crisis Management)
+            {
+                category: "หมวดที่ 3: การบริหารโลจิสติกส์โลกและการจัดการวิกฤต",
+                categoryEn: "Category 3: Global Logistics & Supply Chain Crisis",
+                q: "11. เกิดวิกฤตการณ์ความขัดแย้งทางภูมิรัฐศาสตร์ (Geopolitical Crisis) ในเส้นทางเดินเรือหลัก (เช่น วิกฤตทะเลแดง) ส่งผลให้สายการเดินเรือประกาศปรับเปลี่ยนเส้นทางอ้อมทวีป ค่าระวางเรือพุ่งสูงขึ้น 4 เท่า และระยะเวลาขนส่งนานขึ้น 20 วัน แผนฉุกเฉิน (Contingency Plan) ระดับผู้จัดการคือข้อใด?",
+                qEn: "11. Geopolitical conflict shuts major maritime corridors (e.g. Red Sea), rerouting vessels, quadrupling ocean freight, and adding 20 days lead time. What is the managerial contingency plan?",
+                options: [
+                    "ก. สั่งระงับการนำเข้าสินค้าทุกประเภททันทีจนกว่าสงครามจะสงบลงอย่างสิ้นเชิง",
+                    "ข. ทำการประเมินความวิกฤตของสินค้า (Criticality Analysis) เปลี่ยนรูปแบบการขนส่งเป็นระบบทางรถไฟสายเอเชีย-ยุโรป หรือการขนส่งต่อเนื่อง Sea-Air สำหรับสินค้าเร่งด่วน และปรับระดับสต็อกความปลอดภัย (Safety Stock Buffer) ขึ้นชั่วคราว",
+                    "ค. โทรศัพท์ไปกดดันและด่าทอเจ้าหน้าที่สายการเดินเรือทุกวันเพื่อให้เขาเดินเรือเส้นทางเดิม",
+                    "ง. บังคับให้ฝ่ายผลิตเปลี่ยนสูตรโครงสร้างสินค้าไปใช้วัตถุดิบอะไรก็ได้ที่หาได้ตามท้องตลาดโดยไม่ผ่านการทดสอบ"
+                ],
+                optionsEn: [
+                    "A. Halt all cross-border procurement until complete geopolitical pacification.",
+                    "B. Perform SKU criticality ABC analysis, activate multimodal corridors (Trans-Eurasian rail or Sea-Air for urgent lines), and dynamically lift safety stock buffers to shield plant schedules.",
+                    "C. Harass carrier customer reps daily demanding they steer through hostile combat zones.",
+                    "D. Mandate engineering immediately substitute unvetted domestic scrap into production."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การบริหารโลจิสติกส์โลกและการจัดการวิกฤต",
+                categoryEn: "Category 3: Global Logistics & Supply Chain Crisis",
+                q: "12. สินค้านำเข้าล็อตพิเศษที่มีมูลค่าสูงและเปราะบาง เกิดความเสียหายอย่างรุนแรงเนื่องจากตู้คอนเทนเนอร์มีความชื้นสูง (Container Sweat) ในระหว่างการขนส่งทางทะเล เมื่อตู้มาถึงโรงงานในไทย ขั้นตอนแรกทางเอกสารเพื่อการเคลมประกันภัยขนส่ง (Marine Cargo Insurance) คือข้อใด?",
+                qEn: "12. A fragile high-value containerized import arrives with catastrophic moisture/sweat corrosion. What is the mandatory immediate protocol to preserve marine insurance claim validity?",
+                options: [
+                    "ก. แกะกล่องสินค้าและนำส่วนที่เสียหายไปโยนทิ้งขยะทันทีเพื่อรักษาความสะอาดของคลัง",
+                    "ข. ออกหนังสือหนังสือแจ้งข้อเรียกร้องความเสียหาย (Notice of Claim) ไปยังสายการเดินเรือทันที ถ่ายภาพหลักฐาน สั่งระงับการใช้งานสินค้า และประสานงานบริษัทผู้สำรวจภัย (Surveyor) เข้ามาร่วมตรวจสอบหน้างานเพื่อออกรายงานความเสียหาย",
+                    "ค. ทำการโอนเงินค่าสินค้าเต็มจำนวนให้ซัพพลายเออร์ทันทีโดยไม่มีการแจ้งเรื่องความเสียหายให้รับทราบ",
+                    "ง. เขียนจดหมายลาออกเพื่อหนีความรับผิดชอบต่อความเสียหายที่เกิดขึ้น"
+                ],
+                optionsEn: [
+                    "A. Dispose of damaged units in municipal trash to maintain clean receiving docks.",
+                    "B. Issue an immediate formal Notice of Claim against the carrier, document photographic evidence, quarantine stock, and commission an independent marine cargo surveyor to produce an official survey report.",
+                    "C. Wire full final supplier payments silently without disclosing damage logs.",
+                    "D. Submit immediate resignation letters to evade operational accountability."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การบริหารโลจิสติกส์โลกและการจัดการวิกฤต",
+                categoryEn: "Category 3: Global Logistics & Supply Chain Crisis",
+                q: "13. ซัพพลายเออร์ในต่างประเทศส่งมอบสินค้าไม่ตรงตามสเปก (Specification Deviation) ที่ระบุในเอกสารสัญญาซื้อขาย ซึ่งหากนำเข้าสู่กระบวนการผลิตจะทำให้สินค้าสำเร็จรูปตกมาตรฐานสากล กลยุทธ์การเจรจาระงับข้อพิพาท (Supplier Dispute Resolution) ข้อใดเหมาะสมที่สุด?",
+                qEn: "13. An overseas supplier delivers components with specification deviations violating contract terms, endangering finished product certifications. What is the most appropriate dispute resolution strategy?",
+                options: [
+                    "ก. ยอมรับสินค้าไว้แล้วปล่อยให้ฝ่ายผลิตไปแก้ปัญหาหน้างานเอาเองตามยถากรรม",
+                    "ข. ออกใบร้องเรียนความไม่สอดคล้องของผลิตภัณฑ์ (NCR) ระงับการจ่ายเงินงวดที่เหลือ เจรจาให้ซัพพลายเออร์ส่งสินค้าล็อตใหม่ทดแทนทางอากาศ (Air Freight) โดยซัพพลายเออร์ต้องรับผิดชอบค่าใช้จ่ายทั้งหมด หรือขอลดราคากรณีที่ยังพอแก้ไขได้",
+                    "ค. สั่งพนักงานจัดซื้อเขียนรีวิวด่าทอซัพพลายเออร์รายนั้นบนเพจเฟซบุ๊กส่วนตัว",
+                    "ง. การเดินทางไปทุบทำลายออฟฟิศสาขาของซัพพลายเออร์ที่ตั้งอยู่ในประเทศไทย"
+                ],
+                optionsEn: [
+                    "A. Accept defective inventory and let plant floor engineers improvise fixes.",
+                    "B. Issue a Non-Conformance Report (NCR), place a payment hold, and negotiate expedited air freight replacement entirely at the supplier's expense or negotiate debit notes for reworkable units.",
+                    "C. Instruct buyers to post defamatory rants on personal social media channels.",
+                    "D. Physically vandalize the vendor's local sales liaison office in Bangkok."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การบริหารโลจิสติกส์โลกและการจัดการวิกฤต",
+                categoryEn: "Category 3: Global Logistics & Supply Chain Crisis",
+                q: "14. ในระหว่างที่ตู้คอนเทนเนอร์สินค้ากำลังจะถูกขนถ่ายลงเรือ เกิดเหตุการณ์ท่าเรือต้นทางในต่างประเทศนัดประยุดงานประท้วงกะทันหัน (Port Strike) ทำให้ตู้สินค้าติดค้างอยู่ภายในท่าเรือและไม่มีกำหนดเปิด ในฐานะผู้นำจัดซื้อต่างประเทศ คุณจะแก้สถานการณ์นี้อย่างไร?",
+                qEn: "14. A sudden wildcat strike shuts the foreign origin port, trapping containerized shipments indefinitely prior to vessel loading. As international procurement head, how do you mitigate this disruption?",
+                options: [
+                    "ก. นั่งรออย่างสงบและสวดมนต์ขอให้กลุ่มผู้ประท้วงตกลงผลประโยชน์กันได้ไวๆ",
+                    "ข. ตรวจสอบสถานะตู้สินค้า ประสานงานชิปปิ้งและสายเรือเพื่อหาแนวทางย้ายตู้ไปยังท่าเรือใกล้เคียง (Alternative Port) หรือเจรจาขอรับสินค้าออกเพื่อเปลี่ยนมาขนส่งทางบก (Cross-Border Trucking) หากระยะทางเอื้ออำนวย",
+                    "ค. ส่งอีเมลไปยกเลิกสัญญากับซัพพลายเออร์ระบุว่าเป็นความผิดฐานส่งมอบล่าช้า",
+                    "ง. ปิดโทรศัพท์มือถือและลาพักร้อนยาวเพื่อหลีกเลี่ยงการตอบคำถามจากฝ่ายผลิต"
+                ],
+                optionsEn: [
+                    "A. Wait passively and hope port labor negotiations resolve rapidly.",
+                    "B. Audit container gate-in status, coordinate with forwarders/carriers to gate-out or reroute cargo to operational secondary ports, or pivot to bonded cross-border trucking where geography allows.",
+                    "C. Send cancellation notices breaching contracts citing late delivery.",
+                    "D. Switch off phones and take long personal leave to dodge plant inquiries."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: การบริหารโลจิสติกส์โลกและการจัดการวิกฤต",
+                categoryEn: "Category 3: Global Logistics & Supply Chain Crisis",
+                q: "15. มีการสุ่มตรวจพบว่า ใบรับรองถิ่นกำเนิดสินค้า (Certificate of Origin: Form D/E/FTA) ที่ซัพพลายเออร์ออกให้ มีการกรอกข้อมูลเครื่องหมายการค้าและพิกัดศุลกากรผิดพลาดเล็กน้อย แต่อยู่ในช่วงที่สินค้ากำลังจะเข้าพิธีการตรวจปล่อย จัดซื้อควรแอ็กชันอย่างไร?",
+                qEn: "15. An FTA Certificate of Origin (Form D/E) contains typographical discrepancies in HS code/trademark details while cargo is pending customs release. What action should procurement take?",
+                options: [
+                    "ก. ใช้ปากกาลบคำผิดลิควิดเปเปอร์แก้ไขข้อมูลบนเอกสารตัวจริงด้วยตัวเองแล้วส่งให้เจ้าหน้าที่",
+                    "ข. แจ้งชิปปิ้งให้ทำเรื่องขอ \"วางเงินประกันภาษีชั่วคราว (Duty Deposit)\" เพื่อนำสินค้าออกมาใช้งานก่อนป้องกันไลน์ผลิตสะดุด ควบคู่กับการประสานงานด่วนให้ซัพพลายเออร์ออกเอกสารฉบับแก้ไข (Corrected Form) มาเปลี่ยนภายในกำหนด",
+                    "ค. สั่งยกเลอร์ตู้สินค้าตัวนั้นและส่งกลับประเทศต้นทางทันทีเพื่อความปลอดภัยทางกฎหมาย",
+                    "ง. โกหกเจ้าหน้าที่ศุลกากรว่าเป็นความบกพร่องของระบบคอมพิวเตอร์ของหน่วยงานรัฐ"
+                ],
+                optionsEn: [
+                    "A. Apply correction fluid to manually alter the original government-sealed certificate.",
+                    "B. Instruct customs brokers to lodge a provisional Duty Deposit to clear goods without line stoppages, while expediting retroactive issuance of an amended certified CO within statutory windows.",
+                    "C. Order container rejection and return to origin immediately.",
+                    "D. Falsely tell customs officials the error was caused by government server bugs."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 4: การเจรจาต่อรองระดับสากลและการสร้างระบบธรรมาภิบาล (International Negotiation & Governance)
+            {
+                category: "หมวดที่ 4: การเจรจาต่อรองระดับสากลและการสร้างระบบธรรมาภิบาล",
+                categoryEn: "Category 4: Negotiation & Governance",
+                q: "16. คุณกำลังเจรจาสัญญาระยะยาวกับซัพพลายเออร์รายใหญ่จากประเทศญี่ปุ่น ซึ่งมีวัฒนธรรมองค์กรที่เน้นความสัมพันธ์ระยะยาว (Long-term Relationship) และความเชื่อใจสูง กลยุทธ์การเจรจาต่อรอง (Negotiation Strategy) ข้อใดจะช่วยให้ได้เงื่อนไขที่ดีที่สุด?",
+                qEn: "16. Negotiating a strategic multi-year contract with a major Japanese corporate vendor with high consensus culture, which negotiation strategy yields optimal terms?",
+                options: [
+                    "ก. การใช้กลวิธีบีบคั้น กดดัน ข่มขู่ว่าจะเปลี่ยนไปใช้คู่แข่งทันทีหากไม่ยอมลดราคาภายใน 5 นาที",
+                    "ข. การเตรียมข้อมูลการตลาดเชิงลึก (Data-driven Prep) แสดงวิสัยทัศน์การเติบโตร่วมกัน เน้นย้ำข้อตกลงแบบต่างตอบแทนและได้ประโยชน์ทั้งสองฝ่าย (Win-Win Negotiation) และเคารพกระบวนการตัดสินใจที่เป็นระบบของทีมญี่ปุ่น",
+                    "ค. การพาผู้บริหารฝั่งญี่ปุ่นไปเที่ยวสถานบันเทิงยามค่ำคืนและมอมเหล้าเพื่อหวังให้เซ็นสัญญาขณะมึนเมา",
+                    "ง. การส่งสัญญากระดาษเปล่าไปให้ฝั่งญี่ปุ่นกรอกราคาตามใจชอบเพื่อแสดงความจริงใจ"
+                ],
+                optionsEn: [
+                    "A. Use aggressive intimidation tactics, demanding a 5-minute price cut ultimatum.",
+                    "B. Leverage thorough data-backed market analytics, present shared growth roadmaps, anchor win-win reciprocity, and respect the structured internal Nemawashi consensus protocols.",
+                    "C. Take foreign executives to bars to induce inebriated contract signings.",
+                    "D. Hand blank contract sheets to the counterpart to show naive trust."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การเจรจาต่อรองระดับสากลและการสร้างระบบธรรมาภิบาล",
+                categoryEn: "Category 4: Negotiation & Governance",
+                q: "17. พนักงานจัดซื้อต่างประเทศในทีมของคุณ มีพฤติกรรมการรับของขวัญ คูปองเงินสด และทริปท่องเที่ยวต่างประเทศจากซัพพลายเออร์รายหนึ่งอย่างต่อเนื่อง โดยอ้างว่าเป็น \"วัฒนธรรมการสร้างความสัมพันธ์\" ของประเทศคู่ค้า ในฐานะหัวหน้าแผนก คุณจะจัดการเรื่องนี้อย่างไรตามหลักการกำกับดูแลกิจการที่ดี (Corporate Governance)?",
+                qEn: "17. An international buyer repeatedly accepts overseas travel trips, cash vouchers, and lavish gifts from a key supplier citing foreign relationship culture. How do you govern this under corporate ethics?",
+                options: [
+                    "ก. อนุญาตให้ทำได้ตราบใดที่พนักงานคนนั้นยังคงต่อรองราคาซัพพลายเออร์รายนี้ได้ถูกอยู่",
+                    "ข. บังคับใช้นโยบาย \"No Gift Policy\" อย่างเด็ดขาด เรียกพนักงานมาตักเตือนทางวินัย วางแนวปฏิบัติสากลที่ชัดเจนว่าการรับประโยชน์ส่วนตนอาจนำไปสู่ผลประโยชน์ทับซ้อน (Conflict of Interest) และจัดทำช่องทางการรายงานที่โปร่งใส",
+                    "ค. ขอส่วนแบ่งของขวัญเหล่านั้นครึ่งหนึ่งเพื่อแลกกับการไม่รายงานให้ฝ่ายบริหารทราบ",
+                    "ง. สั่งให้พนักงานคนดังกล่าวแนะนำซัพพลายเออร์รายนี้ให้รู้จักกับแผนกอื่นๆ เพื่อจะได้ของขวัญเพิ่มขึ้น"
+                ],
+                optionsEn: [
+                    "A. Permit the perks as long as the buyer delivers nominally low purchase prices.",
+                    "B. Strictly enforce corporate No-Gift Policies, initiate disciplinary proceedings for conflict of interest violations, mandate vendor code of conduct declarations, and institute transparent audit trails.",
+                    "C. Demand a 50% cut of the gift vouchers in exchange for staying silent.",
+                    "D. Tell the buyer to introduce the vendor to other departments to harvest more perks."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การเจรจาต่อรองระดับสากลและการสร้างระบบธรรมาภิบาล",
+                categoryEn: "Category 4: Negotiation & Governance",
+                q: "18. บริษัทมีวิสัยทัศน์ในการทลายกำแพงการทำงานซ้ำซ้อน และต้องการนำระบบจัดซื้ออิเล็กทรอนิกส์ระดับโลก (e-Procurement / SAP Ariba) มาใช้งานร่วมกับซัพพลายเออร์ทั่วโลก ตัวชี้วัดความสำเร็จ (Digital Transformation KPIs) ในการบริหารโครงการนี้ของคุณคือข้อใด?",
+                qEn: "18. Implementing an enterprise global e-procurement suite (e.g. SAP Ariba), which KPI cluster demonstrates true digital transformation project success?",
+                options: [
+                    "ก. จำนวนอีเมลที่พนักงานส่งไปทักทายซัพพลายเออร์ในแต่ละวัน",
+                    "ข. อัตราการลดเวลาในวงจรการสั่งซื้อ (Procurement Cycle Time Reduction), ความแม่นยำของข้อมูลใบสั่งซื้อ (PO Accuracy), และสัดส่วนของซัพพลายเออร์ที่เข้ามาทำธุรกรรมผ่านระบบออนไลน์ (Supplier Onboarding Rate)",
+                    "ค. ความสวยงามของหน้าจอ Interface ของตัวโปรแกรมจัดซื้อ",
+                    "ง. จำนวนหน่วยความจำคอมพิวเตอร์ (RAM) ที่ระบบเปิดใช้งานในแต่ละวัน"
+                ],
+                optionsEn: [
+                    "A. Daily volume of conversational greetings emailed to suppliers.",
+                    "B. Procurement cycle time compression, touchless PO accuracy, spend under management compliance, and international supplier portal onboarding adoption rate.",
+                    "C. Aesthetic color saturation of software GUI buttons.",
+                    "D. Daily server RAM memory consumption."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การเจรจาต่อรองระดับสากลและการสร้างระบบธรรมาภิบาล",
+                categoryEn: "Category 4: Negotiation & Governance",
+                q: "19. เกิดกรณีที่แผนกวิศวกรรม (Engineering) ล็อกสเปกวัตถุดิบชิ้นส่วนจากต่างประเทศ (Brand-Specific Lock) ทำให้จัดซื้อต่างประเทศไม่สามารถเปิดประมูลแข่งขันราคาได้ และซัพพลายเออร์รายนั้นเสนอราคาเพิ่มขึ้น 20% ทุกปี คุณจะแก้ปัญหานี้เชิงระบบ (Cross-Functional Synergy) อย่างไร?",
+                qEn: "19. Engineering enforces single-brand specification locks for foreign components, preventing competitive bidding while the monopoly vendor hikes prices 20% yearly. How do you resolve this cross-functionally?",
+                options: [
+                    "ก. ประกาศสงครามขัดแย้งกับแผนกวิศวกรรมและปฏิเสธการออกใบสั่งซื้อ (PO) ทุกใบที่ส่งมาจากแผนกนั้น",
+                    "ข. จัดประชุมทำ Value Engineering (VE) ร่วมกับทีมวิศวกรรม นำเสนอข้อมูลชิ้นส่วนทดแทนที่มีมาตรฐานสากลเท่ากัน (Equivalent Specs) จากซัพพลายเออร์รายอื่น เพื่อร่วมกันทดสอบระบบการทำงาน (Qualification Test) และทลายการผูกขาด",
+                    "ค. ปล่อยให้บริษัทจ่ายราคาแพงต่อไปเพราะถือว่าเป็นความรับผิดชอบของแผนกวิศวกรรมไม่ใช่จัดซื้อ",
+                    "ง. บังคับให้ซัพพลายเออร์รายเดิมลดราคาลงโดยการขู่ว่าจะยกเลิกสัญญาทั้งหมดของบริษัท"
+                ],
+                optionsEn: [
+                    "A. Declare inter-departmental war and reject all PO requests originating from engineering.",
+                    "B. Convene a Value Engineering (VE) taskforce with Engineering, introduce vetted equivalent global alternatives, establish joint qualification testing protocols, and eliminate sole-source lock-in.",
+                    "C. Passively absorb premium price hikes attributing blame entirely to engineering.",
+                    "D. Coerce the sole vendor to drop prices by making empty threats of total contract termination."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การเจรจาต่อรองระดับสากลและการสร้างระบบธรรมาภิบาล",
+                categoryEn: "Category 4: Negotiation & Governance",
+                q: "20. เมื่อบริษัทของคุณประกาศแผนงานชัดเจนในการ \"เตรียมความพร้อมเข้าสู่ตลาดหลักทรัพย์ (IPO) ในอีก 3 ปีข้างหน้า\" บทบาทสูงสุดของหัวหน้าฝ่ายจัดซื้อต่างประเทศในการปรับปรุงโครงสร้างแผนกเพื่อรองรับกระบวนการ Audit คือข้อใด?",
+                qEn: "20. In preparation for a corporate IPO listing within 3 years, what is the procurement manager's primary structural responsibility to satisfy rigorous financial and operational audits?",
+                options: [
+                    "ก. การรีบทำลายเอกสารจัดซื้อย้อนหลังทั้งหมดทิ้งเพื่อไม่ให้ผู้ตรวจสอบบัญชีหาข้อผิดพลาดพบ",
+                    "ข. การจัดทำระบบควบคุมภายใน (Internal Control) ที่รัดกุม มีกระบวนการเปรียบเทียบราคาที่โปร่งใสตรวจสอบได้ (3 Quotations Policy), ระบบการคัดเลือกและประเมินซัพพลายเออร์ (Vendor Evaluation) ที่เป็นระบบ, และการบันทึกสัญญาซื้อขายระหว่างประเทศอย่างถูกต้องตามมาตรฐานบัญชีและกฎหมายศุลกากร 100%",
+                    "ค. การเปลี่ยนไปใช้ซัพพลายเออร์ที่เป็นญาติพี่น้องของผู้บริหารทั้งหมดเพื่อความง่ายในการคุยธุรกิจ",
+                    "ง. การสั่งให้พนักงานทุกคนหยุดทำใบสั่งซื้อชั่วคราวเป็นเวลา 3 ปีเพื่อรอให้เข้าตลาดหลักทรัพย์เสร็จสิ้นก่อน"
+                ],
+                optionsEn: [
+                    "A. Shred all historical procurement transaction dossiers to prevent auditors from detecting oversights.",
+                    "B. Institutionalize internal controls: transparent auditable multi-quote parity policies, systematic periodic vendor appraisals, and 100% legally and customs-compliant cross-border contract archival.",
+                    "C. Restrict vendor panels exclusively to executive relatives for conversational ease.",
+                    "D. Suspend PO issuance across the company for 3 years until IPO processes finalize."
+                ],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'International_Procurement_Manager';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            const _lBtn = document.getElementById('langToggle');
+            if (_lBtn) {
+                _lBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>${t.langBtn}</span>
+                `;
+            }
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, "หัวหน้าฝ่ายจัดซื้อต่างประเทศ");
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, "หัวหน้าฝ่ายจัดซื้อต่างประเทศ");
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const catText = (currentLang === 'en' && item.categoryEn) ? item.categoryEn : item.category;
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span class="category-badge">${catText}</span>
+                    <span class="progress-text" style="margin-bottom:0;">${t.progress(currentStep + 1, questions.length)}</span>
+                </div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: "International_Procurement_Manager",
+                uuid: uuid,
+                name: userName,
+                position: "หัวหน้าฝ่ายจัดซื้อต่างประเทศ",
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_category`] = questions[i].category;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "ผ่านเกณฑ์โดดเด่น (เรียกสัมภาษณ์)" : (score >= 12 ? "ผ่านเกณฑ์มาตรฐาน (พิจารณาเพิ่มเติม)" : "ไม่ผ่านเกณฑ์");
+            payload.decisionNote = score >= 16 ? "เรียกสัมภาษณ์ มีทักษะกลยุทธ์การจัดซื้อต่างประเทศ Incoterms กฎหมายศุลกากร และการเจรจาระดับสากลยอดเยี่ยม" : (score >= 12 ? "พิจารณาประวัติการทำงานและการสัมภาษณ์เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>

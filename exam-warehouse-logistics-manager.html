@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assessment: Warehouse & Logistics Manager - TERA</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+        .exam-container {
+            max-width: 860px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.18);
+            border: 1px solid rgba(241, 196, 15, 0.45);
+            color: #f1c40f;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 2.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: fadeIn 0.4s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #f1c40f;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .opt-btn {
+            display: block;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.15rem 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            text-align: left;
+            font-size: 1.02rem;
+            line-height: 1.55;
+            width: 100%;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: #f1c40f;
+            transform: translateX(4px);
+        }
+
+        .progress-text {
+            color: #fff;
+            opacity: 0.7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        #langToggle,
+        #backBtn {
+            position: fixed;
+            top: 16px;
+            z-index: 9000;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #langToggle {
+            right: 16px;
+        }
+
+        #backBtn {
+            left: 16px;
+        }
+
+        #langToggle:hover,
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+    </style>
+</head>
+
+<body class="page-bg">
+    <div class="bg-overlay"></div>
+
+    <button id="backBtn" onclick="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back</span>
+    </button>
+    <button id="langToggle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="langBtnText">EN</span>
+    </button>
+
+    <div class="exam-container">
+        <header style="text-align: center; margin-bottom: 35px; color: white;">
+            <img src="./Logo%20Veichi.png" alt="TERA" style="height: 60px;">
+            <h1 id="pageTitle" style="margin-top: 15px; font-size: 1.75rem; letter-spacing: -0.3px;">แบบทดสอบตำแหน่ง หัวหน้าคลังสินค้าและขนส่ง (Warehouse & Logistics Manager)</h1>
+            <p id="userInfo" style="opacity: 0.85; font-size: 1.05rem;"></p>
+        </header>
+
+        <div id="questionsContainer"></div>
+    </div>
+
+    <script>
+        let currentLang = "th";
+
+        const ui = {
+            th: {
+                langBtn: "EN",
+                pageTitle: "แบบทดสอบตำแหน่ง หัวหน้าคลังสินค้าและขนส่ง (Warehouse & Logistics Manager)",
+                userInfo: (name, pos) => `ผู้เข้าสอบ: คุณ ${name} | ตำแหน่ง: ${pos}`,
+                progress: (cur, total) => `ข้อที่ ${cur} / ${total}`,
+                saving: "กำลังบันทึกข้อมูล...",
+                savingDesc: "กรุณาอย่าปิดหน้าต่างนี้ ระบบกำลังนำส่งคำถามและคำตอบของคุณ",
+                modalTitle: "ขอบคุณสำหรับคำตอบ!",
+                modalDesc: "ขอให้คุณโชคดีในการสัมภาษณ์",
+                modalBtn: "ตกลง",
+            },
+            en: {
+                langBtn: "TH",
+                pageTitle: "Assessment: Warehouse & Logistics Manager",
+                userInfo: (name, pos) => `Applicant: ${name} | Position: ${pos}`,
+                progress: (cur, total) => `Question ${cur} of ${total}`,
+                saving: "Submitting your responses...",
+                savingDesc: "Please wait while we securely send your answers to our selection system.",
+                modalTitle: "Thank you for your responses!",
+                modalDesc: "We wish you the best of luck in your interview.",
+                modalBtn: "Done",
+            }
+        };
+
+        const questions = [
+            // หมวดที่ 1: การวางแผนกลยุทธ์และการบริหารต้นทุน (Strategic Planning & Cost Optimization)
+            {
+                category: "หมวดที่ 1: การวางแผนกลยุทธ์และการบริหารต้นทุน",
+                categoryEn: "Category 1: Strategic Planning & Cost Optimization",
+                q: "1. ในช่วงไตรมาสสุดท้าย บริษัทประสบปัญหาต้นทุนการค่าขนส่ง (Freight Cost) พุ่งสูงขึ้น 30% จากราคาน้ำมันและอัตราค่าระวางที่ผันผวน ขณะที่ฝ่ายบริหารต้องการให้รักษาเพดานต้นทุนเท่าเดิมโดยห้ามลดคุณภาพการบริการ (SLA) ในฐานะหัวหน้าแผนก คุณจะเลือกแก้ปัญหานี้อย่างไร?",
+                qEn: "1. In Q4, freight costs spiked 30% from fuel and tariff volatility while executive leadership mandates capping costs without degrading delivery SLA. How do you resolve this?",
+                options: [
+                    "ก. ประกาศยกเลิกการส่งสินค้าให้ลูกค้าที่อยู่ต่างจังหวัดไกลๆ ทันทีเพื่อประหยัดน้ำมัน",
+                    "ข. ทำการวิเคราะห์เส้นทางและจัดกลุ่มคำสั่งซื้อ (Route Optimization & Order Consolidation) เปลี่ยนมาใช้การขนส่งแบบต่อเนื่องหลายรูปแบบ (Multimodal Transport) และเจรจาสัญญาระยะยาวกับผู้ให้บริการภายนอก (3PL) เพื่อล็อกราคา",
+                    "ค. บังคับให้พนักงานขับรถขับด้วยความเร็วสูงกว่ากฎหมายกำหนดเพื่อจะได้ส่งงานเสร็จไวขึ้น",
+                    "ง. ลดจำนวนเที่ยววิ่งลงครึ่งหนึ่ง และปล่อยให้สินค้าตกค้างในคลังจนกว่าลูกค้าจะโทรมาตาม"
+                ],
+                optionsEn: [
+                    "A. Immediately cancel deliveries to distant provincial clients to save fuel.",
+                    "B. Execute route optimization and order consolidation, pivot to multimodal transport where feasible, and negotiate long-term fixed rate contracts with 3PL carriers.",
+                    "C. Force drivers to exceed speed limits to complete more deliveries per shift.",
+                    "D. Halve delivery frequencies and leave shipments backlogged until customers escalate."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การวางแผนกลยุทธ์และการบริหารต้นทุน",
+                categoryEn: "Category 1: Strategic Planning & Cost Optimization",
+                q: "2. คลังสินค้าของคุณกำลังเผชิญภาวะ \"พื้นที่จัดเก็บเต็มความจุ (Overcapacity)\" เนื่องจากฝ่ายผลิตเร่งปั๊มสินค้าออกมารองรับฤดูกาลขาย แต่ฝ่ายขายยังไม่สามารถกระจายออกไปได้ ทักษะการจัดการพื้นที่ (Space Management) ข้อใดที่ควรนำมาใช้เร่งด่วนที่สุด?",
+                qEn: "2. The warehouse faces severe overcapacity as production front-loaded seasonal output before sales distribution ramped up. Which space management protocol should be enacted urgently?",
+                options: [
+                    "ก. ขนสินค้าบางส่วนไปวางกองไว้ริมถนนหน้าคลังสินค้าโดยไม่ต้องมีคนเฝ้า",
+                    "ข. นำระบบการจัดเก็บแนวตั้ง (VNA/Drive-in Racking) มาใช้ชั่วคราว ปรับปรุงกลยุทธ์การจัดวางตามอัตราการหมุนเวียนสินค้า (ABC Analysis) และพิจารณาเช่าคลังสินค้าภายนอกระยะสั้น (Public Warehouse) เพื่อรองรับส่วนเกิน",
+                    "ค. แจ้งฝ่ายผลิตให้หยุดเดินเครื่องจักรทั้งหมดทันที โดยไม่จำเป็นต้องปรึกษาผู้บริหารระดับสูง",
+                    "ง. นำสินค้าที่ขายไม่ออกไปเผาทำลายทิ้งเพื่อคืนพื้นที่ว่างให้คลังสินค้า"
+                ],
+                optionsEn: [
+                    "A. Stack excess inventory along the road outside the facility unattended.",
+                    "B. Deploy high-density vertical racking (VNA/Drive-in), re-slot locations based on velocity ABC analysis, and lease short-term overflow public warehouse space.",
+                    "C. Unilaterally shut down all factory production machinery without executive consultation.",
+                    "D. Incinerate unsold inventory to immediately reclaim cubic storage space."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การวางแผนกลยุทธ์และการบริหารต้นทุน",
+                categoryEn: "Category 1: Strategic Planning & Cost Optimization",
+                q: "3. ดัชนีชี้วัดผลงานหลักด้านการจัดส่งสินค้า (Logistics KPIs) ในระดับบริหาร ข้อใดต่อไปนี้ที่สะท้อนถึง \"ความพึงพอใจของลูกค้าและประสิทธิภาพต้นทุน\" ควบคู่กันได้อย่างแม่นยำที่สุด?",
+                qEn: "3. Which executive-level logistics KPI pairing most accurately benchmarks customer satisfaction alongside operational cost efficiency?",
+                options: [
+                    "ก. จำนวนกิโลเมตรที่รถวิ่งทั้งหมดในแต่ละเดือน",
+                    "ข. อัตราการจัดส่งสินค้าถูกต้องและตรงเวลา (On-Time In-Full: OTIF) ควบคู่กับต้นทุนโลจิสติกส์ต่อหน่วยสินค้า (Logistics Cost per Unit)",
+                    "ค. จำนวนครั้งที่พนักงานขับรถแวะพักผ่อนที่จุดบริการทางหลวง",
+                    "ง. ความสะอาดของป้ายทะเบียนรถขนส่งทุกคันในบริษัท"
+                ],
+                optionsEn: [
+                    "A. Total gross kilometers driven monthly by fleet vehicles.",
+                    "B. On-Time In-Full delivery rate (OTIF) evaluated alongside Logistics Cost per Unit.",
+                    "C. Number of highway rest stop breaks taken by drivers.",
+                    "D. Cleanliness of transport vehicle license plates."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การวางแผนกลยุทธ์และการบริหารต้นทุน",
+                categoryEn: "Category 1: Strategic Planning & Cost Optimization",
+                q: "4. บริษัทมีแผนจะเปลี่ยนระบบจัดการคลังสินค้าจากระบบทำมือ (Manual/Paper-based) ไปสู่ระบบอัตโนมัติ (WMS & Automation) ในฐานะหัวหน้าแผนก คุณควรวางกลยุทธ์การเปลี่ยนผ่าน (Change Management) อย่างไรเพื่อไม่ให้กระทบต่อการจ่ายสินค้าประจำวัน?",
+                qEn: "4. The company is migrating from manual paper-based processes to an automated WMS. How should you orchestrate change management to safeguard ongoing dispatch operations?",
+                options: [
+                    "ก. สั่งปิดคลังสินค้าเป็นเวลา 2 สัปดาห์ เพื่อให้ทุกคนลงโปรแกรมและติดตั้งระบบให้เสร็จ",
+                    "ข. วางแผนทำระบบคู่ขนาน (Parallel Running) ในคลังสินค้าต้นแบบขนาดเล็ก ทำการทดสอบระบบและล้างข้อมูล (Data Cleansing) ควบคู่กับการจัดอบรมพนักงานทีละแผนก ก่อนจะเปลี่ยนผ่านแบบเต็มรูปแบบในจังหวะที่ยอดสั่งซื้อต่ำสุดของปี",
+                    "ค. สั่งซื้อระบบมาติดตั้งหน้างานทันทีและให้พนักงานหน้างานไปงมวิธีใช้งานเอาเองในวันรุ่งขึ้น",
+                    "ง. ปฏิเสธการใช้เทคโนโลยีใหม่และยืนยันจะใช้ระบบจดกระดาษแบบเดิมเพื่อความชัวร์"
+                ],
+                optionsEn: [
+                    "A. Shut down the distribution center for 2 weeks for sudden installation.",
+                    "B. Execute a phased parallel-run pilot in a modular zone, conduct rigorous data cleansing, train personnel departmentally, and cut over during the lowest annual shipping volume window.",
+                    "C. Deploy hardware overnight and force floor pickers to improvise operations next morning.",
+                    "D. Reject digitalization and insist on manual paper logs for familiarity."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 1: การวางแผนกลยุทธ์และการบริหารต้นทุน",
+                categoryEn: "Category 1: Strategic Planning & Cost Optimization",
+                q: "5. เมื่อเกิดความขัดแย้งระหว่าง \"ฝ่ายจัดซื้อ\" ที่ต้องการสั่งซื้อวัตถุดิบล็อตใหญ่เพื่อให้ได้ส่วนลด (Volume Discount) กับ \"คุณ\" ที่มองว่าคลังสินค้าไม่มีพื้นที่รองรับและจะทำให้ต้นทุนการถือครองสินค้า (Holding Cost) พุ่งสูง คุณจะใช้หลักการใดในการตัดสินใจ?",
+                qEn: "5. Procurement demands ordering massive bulk quantities for volume discounts, but your warehouse has no space and inventory holding costs will skyrocket. How do you resolve this?",
+                options: [
+                    "ก. ยอมตามฝ่ายจัดซื้อทุกกรณีเพื่อไม่ให้เกิดความขัดแย้งระหว่างแผนก",
+                    "ข. นำโมเดลคำนวณจุดสั่งซื้อที่ประหยัดที่สุด (Total Cost Ownership & EOQ Model) มาคำนวณเปรียบเทียบระหว่าง \"ส่วนลดที่ได้\" กับ \"ต้นทุนค่าพื้นที่ ค่ายุบตัว และค่าประกันภัยที่เพิ่มขึ้น\" เพื่อหาจุดสมดุลที่ดีที่สุดต่อกระแสเงินสดของบริษัท",
+                    "ค. ทะเลาะกับหัวหน้าฝ่ายจัดซื้อกลางที่ประชุมเพื่อให้ผู้บริหารเห็นว่าเราไม่ยอมความ",
+                    "ง. แอบล็อกประตูคลังสินค้าเพื่อไม่ให้รถส่งของของฝ่ายจัดซื้อเข้ามาส่งสินค้าได้"
+                ],
+                optionsEn: [
+                    "A. Capitulate unconditionally to purchasing to avoid inter-departmental friction.",
+                    "B. Leverage Total Cost of Ownership and Economic Order Quantity (EOQ) modeling, balancing volume discount gains against carrying, insurance, shrinkage, and capital costs to optimize enterprise cash flow.",
+                    "C. Stage an aggressive shouting match in the boardroom to display intransigence.",
+                    "D. Secretly padlock the warehouse gates to physically reject purchasing deliveries."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 2: การควบคุมสินค้าคงคลังและระบบเทคโนโลยี (Inventory Control & MarTech/LogTech Integration)
+            {
+                category: "หมวดที่ 2: การควบคุมสินค้าคงคลังและระบบเทคโนโลยี",
+                categoryEn: "Category 2: Inventory Control & LogTech Integration",
+                q: "6. ในวันตรวจสอบนับสินค้าประจำปี (Annual Stock Take) พบว่าสินค้ากลุ่มมูลค่าสูง (High-value Items) มีจำนวนสูญหายและไม่ตรงกับระบบบัญชี (Inventory Shrinkage) เกินเกณฑ์มาตรฐานที่บริษัทกำหนด ขั้นตอนการตรวจสอบเชิงสืบสวน (Root Cause Analysis) ข้อใดที่ถูกต้องที่สุด?",
+                qEn: "6. An annual stock count exposes severe high-value inventory shrinkage exceeding company tolerance. Which root cause investigation protocol is correct?",
+                options: [
+                    "ก. หักเงินเดือนพนักงานคลังสินค้าทุกคนเท่าๆ กันทันทีเพื่อให้เรื่องจบไวที่สุด",
+                    "ข. ทำการตรวจสอบความถูกต้องของธุรกรรม (Transaction Audit) ย้อนหลัง เปรียบเทียบรายงานรับ-จ่ายสินค้า ตรวจสอบประวัติการเข้า-ออกพื้นที่ผ่านระบบ Access Control และกล้อง CCTV พร้อมปรับปรุงระบบจัดเก็บสินค้ามูลค่าสูงเป็นพื้นที่ปิด (Cage Storage)",
+                    "ค. พิมพ์ใบบันทึกรายงานว่าสินค้าชำรุดเสียหายไปเองตามธรรมชาติเพื่อปิดเคส",
+                    "ง. ประกาศยกเลิกการนับสต็อกในอนาคตเพื่อไม่ให้เกิดตัวเลขที่ขัดแย้งกันอีก"
+                ],
+                optionsEn: [
+                    "A. Deduct equal sums from every warehouse employee's paycheck to close the matter quickly.",
+                    "B. Perform retroactive transaction ledger audits reconciling inbound/outbound postings, review biometric access control and CCTV logs, and secure high-value stock within locked cage storage.",
+                    "C. File a fraudulent write-off claiming inventory naturally disintegrated.",
+                    "D. Cancel future stocktaking cycles to avoid recording discrepancy figures."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การควบคุมสินค้าคงคลังและระบบเทคโนโลยี",
+                categoryEn: "Category 2: Inventory Control & LogTech Integration",
+                q: "7. การนำเทคโนโลยี RFID (Radio Frequency Identification) มาใช้แทนระบบ Barcode แบบเดิมในคลังสินค้าขนาดใหญ่ จะช่วยยกระดับการบริหารจัดการในมิติใดสูงที่สุดเมื่อเปรียบเทียบกับต้นทุนที่จ่ายไป?",
+                qEn: "7. Relative to implementation costs, which operational dimension gains the greatest leap when upgrading from standard barcodes to RFID in a large-scale warehouse?",
+                options: [
+                    "ก. ทำให้พนักงานคลังสินค้ามีความสนุกสนานในการยิงเลเซอร์มากขึ้น",
+                    "ข. เพิ่มความเร็วและแม่นยำในการตรวจนับสต็อกพร้อมกันทีละจำนวนมาก (Bulk Scanning) โดยไม่ต้องเปิดกล่องสินค้า ช่วยลดเวลาในกระบวนการรับเข้า (Inbound) และจัดส่ง (Outbound) อย่างมีนัยสำคัญ",
+                    "ค. ช่วยให้รถโฟล์กลิฟต์วิ่งได้เร็วขึ้นเป็น 2 เท่าโดยอัตโนมัติ",
+                    "ง. ป้องกันไม่ให้ฝุ่นจับบนตัวสินค้าคงคลังได้ 100%"
+                ],
+                optionsEn: [
+                    "A. Warehouse workers experience higher amusement playing with laser scanners.",
+                    "B. Radical acceleration of bulk non-line-of-sight scanning without carton unsealing, drastically compressing dock turnaround in inbound intake and outbound staging.",
+                    "C. Forklifts automatically double their operational travel speeds.",
+                    "D. Total elimination of ambient warehouse dust settling onto palletized goods."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การควบคุมสินค้าคงคลังและระบบเทคโนโลยี",
+                categoryEn: "Category 2: Inventory Control & LogTech Integration",
+                q: "8. ในระบบการกระจายสินค้าแบบ Cross-Docking หัวใจสำคัญที่หัวหน้าคลังสินค้าต้องควบคุมและประสานงานอย่างรัดกุมที่สุดคือข้อใดเพื่อให้เกิดประโยชน์สูงสุดตามนิยามของระบบนี้?",
+                qEn: "8. In a high-velocity Cross-Docking distribution network, what is the critical coordination bottleneck the manager must strictly control?",
+                options: [
+                    "ก. การจัดเตรียมอาหารกลางวันให้พนักงานขับรถขนส่ง",
+                    "ข. การจัดตารางเวลาเข้าจอดของรถขนส่ง (Dock Scheduling) และความแม่นยำของข้อมูลสินค้าล่วงหน้า (Advanced Shipping Notice: ASN) เพื่อให้สินค้าหมุนเวียนออกจากคลังได้ทันทีโดยไม่มีการจัดเก็บเข้าชั้นวาง",
+                    "ค. การเลือกซื้อสีทาพื้นคลังสินค้าให้ทนทานต่อรอยล้อรถ",
+                    "ง. การปล่อยให้สินค้าจอดแช่ไว้ที่ชานชาลาเป็นเวลาอย่างน้อย 3 วันเพื่อตรวจสอบคุณภาพ"
+                ],
+                optionsEn: [
+                    "A. Preparing hot catered lunches for arriving transport drivers.",
+                    "B. Tight inbound/outbound dock scheduling synchronized with high-fidelity Advanced Shipping Notices (ASN) to facilitate zero-storage pass-through transfers.",
+                    "C. Selecting polyurethane floor epoxy paint resistant to tire skid marks.",
+                    "D. Staging goods stationary on dock floors for at least 3 days for quality quarantine."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การควบคุมสินค้าคงคลังและระบบเทคโนโลยี",
+                categoryEn: "Category 2: Inventory Control & LogTech Integration",
+                q: "9. หากระบบ WMS (Warehouse Management System) ล่มกะทันหันในระหว่างที่มียอดคำสั่งซื้อหลั่งไหลเข้ามาเป็นจำนวนมาก หน้าที่ของผู้นำคลังสินค้าในการจัดการภาวะฉุกเฉิน (Business Continuity Plan) คือข้อใด?",
+                qEn: "9. When the WMS crashes abruptly during peak order influx, which business continuity action must the warehouse leader trigger?",
+                options: [
+                    "ก. สั่งให้พนักงานทุกคนหยุดทำงานและกลับบ้านทันทีเพื่อรอจนกว่าระบบจะซ่อมเสร็จ",
+                    "ข. เปิดใช้งานระบบ Manual Backup Control ที่เตรียมไว้ทันที จัดทีมงานกระจายตามโซนเพื่อหยิบสินค้าตามความสำคัญของออร์เดอร์ (Prioritized Orders) บันทึกข้อมูลลงเอกสารชั่วคราว และจำกัดการเข้าถึงพื้นที่คลังเพื่อความปลอดภัย",
+                    "ค. โทรศัพท์ไปต่อว่าฝ่ายไอทีทุกๆ 5 นาทีด้วยอารมณ์ฉุนเฉียว",
+                    "ง. ใช้ระบบเดาสุ่มหยิบสินค้าอะไรก็ได้ใส่กล่องส่งให้ลูกค้าไปก่อนเพื่อรักษาเวลา"
+                ],
+                optionsEn: [
+                    "A. Order the entire shift to clock out and return home until servers reboot.",
+                    "B. Immediately enact documented manual fallback SOPs: zone-based wave picking for tier-1 priority dispatches, physical paper manifests, and strict physical security controls.",
+                    "C. Bombard the IT helpdesk with abusive phone calls every 5 minutes.",
+                    "D. Pack random products into delivery cartons blindly to maintain dispatch cadence."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 2: การควบคุมสินค้าคงคลังและระบบเทคโนโลยี",
+                categoryEn: "Category 2: Inventory Control & LogTech Integration",
+                q: "10. การจัดการสินค้าหมดอายุหรือล้าสมัย (Obsolete & Expired Stock) สำหรับคลังสินค้าประเภทอาหารหรือเวชภัณฑ์ วินัยการบริหารคลังข้อใดที่ต้องบังคับใช้อย่างไม่มีข้อยกเว้น?",
+                qEn: "10. In food or pharmaceutical warehouses managing perishables, which inventory control discipline must be strictly and unconditionally enforced?",
+                options: [
+                    "ก. ระบบตามใจชอบ (Whichever is Closest: WIC) หยิบชิ้นที่อยู่ใกล้ตัวที่สุดออกไปก่อน",
+                    "ข. ระบบ FEFO (First-Expired, First-Out) ควบคู่กับการตั้งระบบแจ้งเตือนสินค้าใกล้หมดอายุ (Batch & Expiry Alert) ล่วงหน้าอย่างน้อย 30-60 วัน เพื่อส่งสัญญาณให้ฝ่ายขายทำโปรโมชันระบายสินค้า",
+                    "ค. การนำสินค้าที่หมดอายุแล้วไปผสมกับสินค้าล็อตใหม่เพื่อลดต้นทุนความสูญเสีย",
+                    "ง. การโยนสินค้าหมดอายุไปซ่อนไว้ด้านหลังสุดของชั้นวางเพื่อไม่ให้ผู้ตรวจประเมินมองเห็น"
+                ],
+                optionsEn: [
+                    "A. Whichever is Closest (WIC) picking philosophy.",
+                    "B. Strict FEFO (First-Expired, First-Out) picking enforcement coupled with automated 30-60 day pre-expiry batch alerts triggering commercial sales liquidation.",
+                    "C. Blending expired batches into new production runs to conceal write-offs.",
+                    "D. Shoving expired cartons to the dark rear of pallet bays during audits."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 3: ความปลอดภัย กฎหมาย และการจัดการวิกฤต (Safety, Regulation & Crisis Management)
+            {
+                category: "หมวดที่ 3: ความปลอดภัย กฎหมาย และการจัดการวิกฤต",
+                categoryEn: "Category 3: Safety, Regulation & Crisis Management",
+                q: "11. เกิดอุบัติเหตุรถโฟล์กลิฟต์ชนชั้นวางสินค้า (Racking) ระดับสูง ส่งผลให้โครงสร้างชั้นวางเอียงและมีแนวโน้มจะพังถล่มลงมา ท่ามกลางความตื่นตระหนกของพนักงานในคลัง สิ่งแรกที่คุณต้องทำในฐานะหัวหน้าคือข้อใด?",
+                qEn: "11. A forklift impact buckles high-bay racking uprights, threatening structural collapse. What is the manager's paramount first response?",
+                options: [
+                    "ก. รีบวิ่งเข้าไปช่วยพยุงชั้นวางสินค้าด้วยตัวเองเพื่อไม่ให้มันล้มลงมา",
+                    "ข. สั่งอพยพพนักงานทุกคนออกจากโซนอันตรายทันที (Evacuation) กั้นพื้นที่รัศมีเสี่ยงภัย ห้ามไม่ให้มีการใช้งานเครื่องจักรในบริเวณนั้น และประสานงานวิศวกรโครงสร้างเข้าตรวจสอบความปลอดภัยก่อนทำการรื้อถอน",
+                    "ค. โทรศัพท์หาฝ่ายจัดซื้อเพื่อสั่งซื้อชั้นวางสินค้าใหม่ทดแทนทันทีโดยไม่ดูหน้างาน",
+                    "ง. สั่งให้พนักงานรีบขับรถโฟล์กลิฟต์คันเดิมเข้าไปขนสินค้าออกจากชั้นวางที่กำลังจะล้ม"
+                ],
+                optionsEn: [
+                    "A. Run over to physically hold up the collapsing steel rack columns.",
+                    "B. Immediately evacuate all personnel, establish an exclusion safety perimeter, prohibit all equipment ingress, and dispatch structural engineers to assess stabilization before decanting.",
+                    "C. Call procurement to order replacement racking without surveying the scene.",
+                    "D. Command the same forklift driver to rush into the failing bay to retrieve pallets."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: ความปลอดภัย กฎหมาย และการจัดการวิกฤต",
+                categoryEn: "Category 3: Safety, Regulation & Crisis Management",
+                q: "12. กรมการขนส่งทางบกประกาศใช้กฎหมายใหม่เกี่ยวกับข้อจำกัดชั่วโมงการทำงานของพนักงานขับรถขนส่ง (Driver Working Hours) เพื่อความปลอดภัยบนท้องถนน ซึ่งส่งผลให้รอบการวิ่งรถส่งของของบริษัทลดลงในระยะสั้น คุณจะปรับตัวเชิงกลยุทธ์อย่างไร?",
+                qEn: "12. The Department of Land Transport mandates stricter daily driving hour caps for highway safety, constraining short-term fleet rotations. How do you strategically adapt?",
+                options: [
+                    "ก. สั่งให้พนักงานขับรถปลอมแปลงเอกสารสมุดบันทึกเวลาการวิ่งรถเพื่อหลีกเลี่ยงกฎหมาย",
+                    "ข. ปรับเปลี่ยนแผนการจัดส่งเป็นระบบผลัดเปลี่ยนพนักงานขับรถ (Relay Driving) หรือสร้างจุดเปลี่ยนถ่ายสินค้า (Distribution Hub) กึ่งกลางเส้นทาง และนำระบบ GPS Tracking มาใช้วิเคราะห์พฤติกรรมและความเหนื่อยล้าของคนขับ",
+                    "ค. ยื่นจดหมายลาออกเนื่องจากกฎหมายทำให้ทำงานยากเกินไป",
+                    "ง. จ้างพนักงานขับรถที่ไม่มีใบอนุญาตขับขี่ประเภทประเภทขนส่งเข้ามาวิ่งเสริมในช่วงกลางคืน"
+                ],
+                optionsEn: [
+                    "A. Instruct drivers to falsify logbooks and bypass compliance checks.",
+                    "B. Implement relay driving protocols, establish mid-route cross-dock transfer hubs, and integrate GPS telematics to monitor driver fatigue and driving hour compliance.",
+                    "C. Resign claiming regulatory enforcement makes fleet management impossible.",
+                    "D. Hire unlicensed moonlight drivers for night runs off the books."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: ความปลอดภัย กฎหมาย และการจัดการวิกฤต",
+                categoryEn: "Category 3: Safety, Regulation & Crisis Management",
+                q: "13. รถขนส่งสินค้าล็อตสำคัญของบริษัทประสบอุบัติเหตุพลิกคว่ำบนทางหลวงต่างจังหวัด สินค้าเสียหายทั้งหมดและมีสารเคมีบางส่วนรั่วไหลลงสู่พื้นผิวจราจร ข่าวเริ่มแพร่กระจายในท้องถิ่น คุณจะบริหารจัดการวิกฤตนี้อย่างไร?",
+                qEn: "13. A company transport truck carrying chemicals overturns on a major provincial highway, spilling contents across traffic lanes. What is your crisis management protocol?",
+                options: [
+                    "ก. โพสต์ข้อความปฏิเสธความรับผิดชอบผ่านสื่อโซเชียลระบุว่าเป็นความผิดของคนขับรถเพียงผู้เดียว",
+                    "ข. เปิดศูนย์บัญชาการเหตุการณ์ด่วน (Crisis Response Center) ประสานหน่วยกู้ภัยและเจ้าหน้าที่สิ่งแวดล้อมเข้าควบคุมการรั่วไหล ส่งทีมงานไปดูแลผู้บาดเจ็บทันที พร้อมจัดเตรียมแผนขนส่งสำรอง (Backup Fleet) เพื่อจัดส่งสินค้าใหม่ให้ลูกค้าทดแทนโดยไม่ให้ซัพพลายเชนสะดุด",
+                    "ค. สั่งให้พนักงานขับรถหนีออกจากที่เกิดเหตุเพื่อไม่ให้บริษัทโดนฟ้องร้อง",
+                    "ง. นิ่งเฉยและรอให้เรื่องเงียบหายไปเองตามกาลเวลา"
+                ],
+                optionsEn: [
+                    "A. Blame the driver entirely on corporate social media and deny responsibility.",
+                    "B. Spin up the crisis command protocol: deploy certified HAZMAT containment, render emergency assistance to injured parties, coordinate local authorities, and mobilize backup stock to protect client supply chains.",
+                    "C. Order the driver to flee the crash site to dodge litigation.",
+                    "D. Maintain silence hoping local press coverage fades away."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: ความปลอดภัย กฎหมาย และการจัดการวิกฤต",
+                categoryEn: "Category 3: Safety, Regulation & Crisis Management",
+                q: "14. ในระหว่างการตรวจสอบความปลอดภัยประจำไตรมาส (Safety Audit) พบว่าพนักงานในคลังสินค้าจำนวนมากละเลยไม่สวมใส่อุปกรณ์คุ้มครองความปลอดภัยส่วนบุคคล (PPE) เช่น รองเท้าเซฟตี้ หรือหมวกนิรภัย เนื่องจากบ่นว่าร้อนและอึดอัด คุณจะแก้ปัญหานี้เชิงโครงสร้างอย่างไร?",
+                qEn: "14. Safety audits reveal widespread PPE non-compliance (boots, helmets) with floor workers complaining of thermal discomfort. How do you resolve this structurally?",
+                options: [
+                    "ก. ออกกฎปรับเงินพนักงานทุกคนทันทีโดยไม่มีการตักเตือนล่วงหน้า",
+                    "ข. ทบทวนความเหมาะสมของอุปกรณ์ PPE จัดหาอุปกรณ์ที่ได้มาตรฐานและเหมาะกับสภาพอากาศ ปรับปรุงระบบระบายอากาศในคลัง ตั้งคณะกรรมการความปลอดภัย (Safety Committee) และใช้มาตรการลงโทษทางวินัยแบบมีลำดับขั้นจากเบาไปหาหนัก",
+                    "ค. อนุญาตให้พนักงานสวมใส่รองเท้าแตะเข้ามาทำงานได้เพื่อเพิ่มความสะดวกสบาย",
+                    "ง. สั่งปิดระบบพัดลมระบายอากาศในคลังทั้งหมดเป็นการลงโทษที่พนักงานไม่เชื่อฟัง"
+                ],
+                optionsEn: [
+                    "A. Levy cash fines on all workers immediately without prior consultation.",
+                    "B. Upgrade PPE specifications to breathable, certified lightweight ergonomic models, enhance warehouse air circulation, empower employee safety committees, and apply progressive disciplinary escalation.",
+                    "C. Authorize rubber flip-flops on the active warehouse floor for worker comfort.",
+                    "D. Shut off all ventilation fans as collective punishment."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 3: ความปลอดภัย กฎหมาย และการจัดการวิกฤต",
+                categoryEn: "Category 3: Safety, Regulation & Crisis Management",
+                q: "15. คลังสินค้าของคุณตั้งอยู่ในพื้นที่ที่มีความเสี่ยงภัยพิบัติน้ำท่วมเฉียบพลัน การวางแผนเตรียมความพร้อมก่อนเกิดเหตุ (Proactive Disaster Recovery Plan) ในฐานะผู้จัดการคลังสินค้า ข้อใดมีความสำคัญสูงสุด?",
+                qEn: "15. Your facility sits in a flash-flood risk basin. What is the most critical element of a proactive disaster recovery plan for a warehouse manager?",
+                options: [
+                    "ก. การสวดมนต์อ้อนวอนเพื่อไม่ให้พายุพัดผ่านบริเวณคลังสินค้า",
+                    "ข. การจัดทำแผนความเสี่ยง กำหนดระดับความสูงในการจัดเก็บสินค้ากลุ่มวิกฤตไว้บนแร็คชั้นบน (Elevated Storage) จัดทำข้อตกลงพื้นที่สำรองกับคลังสินค้าพันธมิตร และทำประกันภัยความเสี่ยงภัยทรัพย์สินและธุรกิจหยุดชะงัก (Property & Business Interruption Insurance)",
+                    "ค. การเตรียมถังน้ำมันสำรองไว้เติมให้รถโฟล์กลิฟต์วิ่งลุยน้ำ",
+                    "ง. การปล่อยให้สินค้าวางอยู่ที่พื้นตามปกติและเตรียมพนักงานไปช่วยกันยกตอนน้ำมาถึงหน้าประตู"
+                ],
+                optionsEn: [
+                    "A. Praying that severe tropical storms bypass the geographical province.",
+                    "B. Engineering elevated pallet rack storage protocols for mission-critical SKUs, contracting standby reciprocal backup space with regional logistics partners, and verifying property & business interruption insurance policies.",
+                    "C. Stockpiling diesel drums to run forklifts through rising flood waters.",
+                    "D. Leaving all pallets on the slab and telling workers to lift boxes when flood waters hit the gates."
+                ],
+                ans: 1
+            },
+
+            // หมวดที่ 4: การบริหารทีมงาน พนักงานขับรถ และพันธมิตร (Team Leadership & Vendor Management)
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน พนักงานขับรถ และพันธมิตร",
+                categoryEn: "Category 4: Team Leadership & Vendor Management",
+                q: "16. พนักงานขับรถขนส่ง (Drivers) ของบริษัท ซึ่งเป็นกำลังหลักในการกระจายสินค้าสู่ภูมิภาค รวมตัวกันประท้วงหยุดงานเนื่องจากไม่พอใจโครงสร้างค่าเที่ยว (Trip Allowance) แบบใหม่ ในฐานะหัวหน้าสายงาน คุณจะแก้ปัญหาความขัดแย้งนี้อย่างไร?",
+                qEn: "16. Fleet delivery drivers stage a wildcat work stoppage protesting revised trip allowances. As functional director, how do you resolve this labor impasse?",
+                options: [
+                    "ก. ใช้กำลังทหารหรือตำรวจเข้ามากดดันและบังคับให้พนักงานกลับไปขับรถตามปกติ",
+                    "ข. เปิดโต๊ะเจรจาร่วมกับตัวแทนพนักงานขับรถ รับฟังข้อกังวลเชิงลึก นำตัวเลขต้นทุนและสถิติการวิ่งงานจริงมาเปิดเผยอย่างโปร่งใส ปรับปรุงโครงสร้างแรงจูงใจ (Incentive Scheme) ให้สะท้อนตามความยากง่ายของเส้นทางและความปลอดภัย",
+                    "ค. ไล่ออกพนักงานขับรถทุกคนที่เข้าร่วมการประท้วงทันทีและปิดบริษัทหนี",
+                    "ง. ยอมรับข้อเรียกร้องทุกข้อของพนักงานโดยไม่คำนึงถึงงบภาพรวมของบริษัท"
+                ],
+                optionsEn: [
+                    "A. Deploy armed security forces to coerce drivers back into cockpits.",
+                    "B. Open transparent dialogue with driver representatives, review granular route mileage and operational hardship data, and co-design a balanced incentive scheme rewarding road safety and challenging routes.",
+                    "C. Fire all protesting drivers en masse and shutter logistics operations.",
+                    "D. Capitulate unconditionally to all driver demands without regard to financial feasibility."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน พนักงานขับรถ และพันธมิตร",
+                categoryEn: "Category 4: Team Leadership & Vendor Management",
+                q: "17. อัตราการลาออก (Turnover Rate) ของพนักงานหยิบสินค้า (Pickers/Packers) ในคลังสินค้าพุ่งสูงถึง 40% ต่อปี ส่งผลให้บริษัทต้องเสียเวลาและต้นทุนในการฝึกอบรมพนักงานใหม่ซ้ำๆ คุณจะลดอัตราการลาออกนี้เชิงระบบอย่างไร?",
+                qEn: "17. Picker/packer turnover climbs to 40% annually, inflating repetitive onboarding and training costs. How do you resolve this systemic attrition?",
+                options: [
+                    "ก. เพิ่มชั่วโมงการทำงานและยกเลิกวันหยุดเสาร์-อาทิตย์ เพื่อไม่ให้พนักงานมีเวลาไปหางานใหม่",
+                    "ข. ปรับปรุงสภาพแวดล้อมการทำงาน (Ergonomics) ลดความเหนื่อยล้าทางกายภาพ ออกแบบเส้นทางการเติบโตของสายอาชีพ (Career Path) จากพนักงานรายวันสู่หัวหน้าชุดงาน และนำระบบโบนัสตามประสิทธิภาพการหยิบสินค้า (Picking Productivity Bonus) มาใช้",
+                    "ค. ซื้อหุ่นยนต์มาทำงานแทนพนักงานทั้งหมดในวันรุ่งขึ้นโดยไม่คำนึงถึงงบประมาณ",
+                    "ง. การเรียกพนักงานมาติติงเรียงคนว่าไม่มีความอดทนในการทำงานหนัก"
+                ],
+                optionsEn: [
+                    "A. Increase mandatory shift lengths and abolish weekends so workers lack time to job hunt.",
+                    "B. Redesign picking ergonomics to reduce physical strain, build clear upward career ladders from floor picker to team lead, and introduce accurate performance-based picking productivity bonuses.",
+                    "C. Procure automated robots immediately regardless of capital constraints.",
+                    "D. Berate workers individually for lacking physical stamina and endurance."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน พนักงานขับรถ และพันธมิตร",
+                categoryEn: "Category 4: Team Leadership & Vendor Management",
+                q: "18. ในการประเมินผลงานประจำปีของผู้ให้บริการขนส่งภายนอก (3PL/Outsourced Freight) ตัวชี้วัดเชิงคุณภาพ (Soft Performance) ข้อใดที่คุณควรนำมาพิจารณาประกอบร่วมกับคะแนนตัวเลขราคาเพื่อพิจารณาต่อสัญญา?",
+                qEn: "18. When conducting annual vendor reviews for outsourced freight carriers (3PL), which qualitative indicator should be weighted alongside pricing for contract renewal?",
+                options: [
+                    "ก. ความสนิทสนมของพนักงานขับรถภายนอกกับหัวหน้าคลังสินค้า",
+                    "ข. อัตราการเกิดอุบัติเหตุบนท้องถนน ความยืดหยุ่นในการรองรับปริมาณงานที่เพิ่มขึ้นกะทันหัน (Scalability) และความรวดเร็วในการแก้ไขปัญหาเมื่อเกิดข้อยกเว้น (Exception Handling)",
+                    "ค. ยี่ห้อและสีของรถขนส่งที่ผู้รับเหมานำมาวิ่งงาน",
+                    "ง. จำนวนครั้งที่ผู้บริหารของบริษัท 3PL ส่งของขวัญมาให้ในเทศกาลปีใหม่"
+                ],
+                optionsEn: [
+                    "A. Personal socializing and friendliness between 3PL staff and warehouse leads.",
+                    "B. Road accident frequency, surge volume elasticity (scalability), and responsiveness during delivery exceptions and crisis handling.",
+                    "C. Fleet vehicle exterior paint brand and cosmetic color palette.",
+                    "D. Frequency of luxury holiday gift baskets dispatched by 3PL executives."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน พนักงานขับรถ และพันธมิตร",
+                categoryEn: "Category 4: Team Leadership & Vendor Management",
+                q: "19. ทีมงานฝ่ายรับสินค้า (Inbound) และทีมงานฝ่ายจัดส่งสินค้า (Outbound) มีการโยนความผิดให้กันเมื่อเกิดปัญหาสินค้าค้างชะงักที่พื้นที่ตรงกลาง (Staging Area) คุณจะทลายกำแพงการทำงาน (Silo Breaking) นี้อย่างไร?",
+                qEn: "19. Inbound receiving and outbound dispatch teams blame each other whenever pallets bottleneck in the central staging buffer. How do you eliminate this silo mentality?",
+                options: [
+                    "ก. สร้างกำแพงคอนกรีตขึ้นมากั้นกลางระหว่างสองแผนกเพื่อไม่ให้เห็นหน้ากัน",
+                    "ข. จัดทำกระบวนการทำงานมาตรฐานร่วมกัน (Standard Operating Procedure: SOP) กำหนดจุดรับส่งมอบงานและเวลามาตรฐาน (SLA) ที่ชัดเจนในพื้นที่ Staging Area และจัดกิจกรรมหมุนเวียนหน้าที่การทำงาน (Job Rotation) ระหว่างสองทีม",
+                    "ค. สั่งลงโทษลดขั้นหัวหน้าแผนกทั้งสองฝ่ายพร้อมกันโดยไม่ฟังเหตุผล",
+                    "ง. ปล่อยให้ทั้งสองทีมแก้ปัญหากันเองเนื่องจากเป็นเรื่องระดับปฏิบัติการ"
+                ],
+                optionsEn: [
+                    "A. Construct a physical cinder-block divider wall between teams to avoid contact.",
+                    "B. Co-create standardized joint handoff SOPs with crisp staging area dwell SLAs, and establish cross-functional job rotation between receiving and dispatch crews.",
+                    "C. Demote both departmental supervisors simultaneously without an evidentiary hearing.",
+                    "D. Leave floor crews to feud indefinitely citing operational autonomy."
+                ],
+                ans: 1
+            },
+            {
+                category: "หมวดที่ 4: การบริหารทีมงาน พนักงานขับรถ และพันธมิตร",
+                categoryEn: "Category 4: Team Leadership & Vendor Management",
+                q: "20. เมื่อบริษัทมีวิสัยทัศน์ระยะยาวที่จะนำองค์กรเข้าสู่ตลาดหลักทรัพย์ (IPO) ในอีก 3 ปีข้างหน้า การเตรียมความพร้อมของแผนกคลังสินค้าและขนส่ง ในส่วนที่คุณรับผิดชอบต้องยกระดับโครงสร้างเรื่องใดสำคัญที่สุด?",
+                qEn: "20. Preparing for a corporate IPO within 3 years, which structural capability must the warehouse & logistics division prioritize most for regulatory and investor scrutiny?",
+                options: [
+                    "ก. การตกแต่งอาคารคลังสินค้าภายนอกให้ดูสวยงามทันสมัยเพื่อถ่ายภาพลงหนังสือชี้ชวน",
+                    "ข. การจัดทำระบบการควบคุมภายใน (Internal Control) ที่เข้มงวด การันตีความถูกต้องของมูลค่าสินค้าคงคลัง (Inventory Accuracy) ผ่านการ Audit ที่โปร่งใส มีเอกสารสิทธิ์และใบอนุญาตสถานประกอบการคลังสินค้าและสิ่งแวดล้อมที่ถูกต้อง 100% ตามกฎหมาย",
+                    "ค. การเร่งระบายสินค้าในคลังออกไปให้หมดเพื่อไม่ให้เหลือสินค้าคงคลังสะสม",
+                    "ง. การสั่งให้พนักงานทุกคนในคลังหยุดทำงานรูทีนและหันไปติวสอบสถาบันการเงิน"
+                ],
+                optionsEn: [
+                    "A. Painting warehouse exteriors with vibrant corporate murals for prospectus photos.",
+                    "B. Enforcing institutional internal controls, guaranteeing audit-verified inventory valuation accuracy, and ensuring 100% regulatory compliance for facility, logistics, and environmental permits.",
+                    "C. Dumping all physical inventory off premises to show an empty facility.",
+                    "D. Halting daily warehouse dispatches to prepare staff for financial exams."
+                ],
+                ans: 1
+            }
+        ];
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyEfYLPui1hVutBVgvKXUV2pUSI5th8A8IAO75QRc_ZK1ia1lgoqNkbDZFwNhyncBj/exec";
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'ผู้สมัคร';
+        const userPos = urlParams.get('position') || 'Warehouse_Logistics_Manager';
+        const uuid = urlParams.get('uuid') || 'no-uuid';
+
+        let currentStep = 0;
+        const userAnswers = [];
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = ui[lang];
+            const _lBtn = document.getElementById('langToggle');
+            if (_lBtn) {
+                _lBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>${t.langBtn}</span>
+                `;
+            }
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('userInfo').textContent = t.userInfo(userName, "หัวหน้าคลังสินค้าและขนส่ง");
+            renderQuestion();
+        }
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            applyLang(currentLang === 'th' ? 'en' : 'th');
+        });
+
+        window.onload = () => {
+            document.getElementById('userInfo').textContent = ui[currentLang].userInfo(userName, "หัวหน้าคลังสินค้าและขนส่ง");
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = "";
+            const item = questions[currentStep];
+            const t = ui[currentLang];
+
+            const catText = (currentLang === 'en' && item.categoryEn) ? item.categoryEn : item.category;
+            const questionText = (currentLang === 'en' && item.qEn) ? item.qEn : item.q;
+            const opts = (currentLang === 'en' && item.optionsEn) ? item.optionsEn : item.options;
+
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span class="category-badge">${catText}</span>
+                    <span class="progress-text" style="margin-bottom:0;">${t.progress(currentStep + 1, questions.length)}</span>
+                </div>
+                <p class="q-text">${questionText}</p>
+                <div class="options-grid">
+                    ${opts.map((opt, i) => `
+                        <button type="button" class="opt-btn" onclick="selectOption(${i})">${opt}</button>
+                    `).join('')}
+                </div>`;
+            container.appendChild(card);
+        }
+
+        async function selectOption(choiceIndex) {
+            const item = questions[currentStep];
+            userAnswers.push({
+                text: item.options[choiceIndex],
+                isCorrect: choiceIndex === item.ans
+            });
+
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion();
+            } else {
+                await finishExam();
+            }
+        }
+
+        async function finishExam() {
+            const t = ui[currentLang];
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = `
+                <div class="q-card" style="text-align:center; padding: 4rem 2rem;">
+                    <div style="border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #f1c40f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 25px;"></div>
+                    <h2 style="color:#f1c40f;">${t.saving}</h2>
+                    <p style="opacity:0.8;">${t.savingDesc}</p>
+                </div>
+                <style>@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }</style>`;
+
+            let score = 0;
+            const payload = {
+                targetTab: "Warehouse_Logistics_Manager",
+                uuid: uuid,
+                name: userName,
+                position: "หัวหน้าคลังสินค้าและขนส่ง",
+                answersCount: questions.length,
+                userAgent: navigator.userAgent
+            };
+
+            userAnswers.forEach((ans, i) => {
+                if (ans.isCorrect) score++;
+                payload[`q${i + 1}_title`] = questions[i].q;
+                payload[`q${i + 1}_category`] = questions[i].category;
+                payload[`q${i + 1}_text`] = ans.text;
+                payload[`q${i + 1}_score`] = ans.isCorrect ? "1" : "0";
+            });
+
+            payload.totalScore = String(score);
+            payload.hrStatus = score >= 16 ? "ผ่านเกณฑ์โดดเด่น (เรียกสัมภาษณ์)" : (score >= 12 ? "ผ่านเกณฑ์มาตรฐาน (พิจารณาเพิ่มเติม)" : "ไม่ผ่านเกณฑ์");
+            payload.decisionNote = score >= 16 ? "เรียกสัมภาษณ์ มีทักษะการบริหารคลังสินค้า ควบคุมต้นทุนโลจิสติกส์ ความปลอดภัย และการเตรียมพร้อมระดับสากลดีเยี่ยม" : (score >= 12 ? "พิจารณาประสบการณ์บริหารคลังสินค้าและการสัมภาษณ์เพิ่มเติม" : "ไม่แนะนำ");
+
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('modalDesc').textContent = t.modalDesc;
+            document.getElementById('modalBtn').textContent = t.modalBtn;
+
+            try {
+                const body = new URLSearchParams();
+                for (const key in payload) { body.append(key, payload[key]); }
+                await fetch(SCRIPT_URL, { method: "POST", body: body, mode: "no-cors" });
+                document.getElementById('customModal').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customModal').style.display = 'block';
+            }
+        }
+
+        function goBack() {
+            const preScore = urlParams.get('preScore') || '0';
+            const iqScore = urlParams.get('iqScore') || '0';
+            const eqScore = urlParams.get('eqScore') || '0';
+            window.location.href = `index.html?name=${encodeURIComponent(userName)}&uuid=${encodeURIComponent(uuid)}&preScore=${preScore}&iqScore=${iqScore}&eqScore=${eqScore}`;
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="customModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+           background: transparent; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+                color: white; margin: 12% auto; padding: 3rem 2rem; border-radius: 20px; width: 85%; max-width: 450px;
+                text-align: center; border: 1px solid rgba(255,255,255,0.2);
+                box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 0.5s ease-in-out;">
+            <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(39, 174, 96, 0.2); border: 2px solid rgba(39, 174, 96, 0.5); color: #2ecc71;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 id="modalTitle" style="color: #f1c40f; margin-top: 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                ขอบคุณสำหรับคำตอบ!</h2>
+            <p id="modalDesc" style="font-size: 1.2rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                ขอให้คุณโชคดีในการสัมภาษณ์</p>
+            <button id="modalBtn" onclick="goHome()" style="background: #27ae60; color: white; border: none;
+                   padding: 15px 40px; border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+                   font-weight: bold; transition: 0.3s; width: 100%;
+                   box-shadow: 0 5px 15px rgba(39,174,96,0.4);">ตกลง</button>
+        </div>
+    </div>
+</body>
+
+</html>
